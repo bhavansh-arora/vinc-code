@@ -9,3 +9,5 @@ data/*.db-*
 public/game/index.html
 public/vinc3d.js
 *.tsbuildinfo
+__pycache__
+*.pyc
