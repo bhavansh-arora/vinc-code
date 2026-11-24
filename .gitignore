@@ -1,0 +1,13 @@
+node_modules/
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+data/*.db
+data/*.db-*
+npm-debug.log*
+.DS_Store
+public/game/index.html

@@ -1,0 +1,1643 @@
+<title>Meet Vinc</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400..800&family=Lora:ital,wght@0,500..700;1,500..700&display=swap">
+<style>
+/* Layout: VINC workshop sheet. Interactive mascot hero, a playable workshop, the garage, then the concept notes. */
+:root {
+  --paper: #F7F0E3; --paper-2: #EFE2CC; --card: #FFF9EF;
+  --ink: #2B1A10; --ink-2: #5E4634; --muted: #6E5442; --line: #DCCBAE;
+  --amber: #D98A1C; --amber-ink: #9A5B0A; --teal: #1F6F66; --rust: #C2502A; --plum: #8C3557; --olive: #4C7424;
+  --slate: #34465A; --gold: #E8B030;
+  --screen: #1E2F2B; --eye: #FFF7EA; --dot: rgba(43, 26, 16, 0.09); --shadow: rgba(43, 26, 16, 0.12);
+  --scrim: rgba(27, 19, 13, 0.55);
+  --paint: var(--amber); --torso: var(--teal);
+  --display: "Lora", Georgia, "Times New Roman", serif;
+  --body: "DM Sans", "Segoe UI", Arial, sans-serif;
+  --mono: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #1B130D; --paper-2: #231910; --card: #2B1F16;
+    --ink: #F4EADB; --ink-2: #DCCAB1; --muted: #BBA58B; --line: #47352A;
+    --amber: #E09A35; --amber-ink: #F0B44C; --teal: #2A8378; --rust: #CC5C35; --plum: #A4466E; --olive: #5D8A30;
+    --slate: #557089; --gold: #F0B44C;
+    --screen: #12201D; --eye: #FFF7EA; --dot: rgba(244, 234, 219, 0.06); --shadow: rgba(0, 0, 0, 0.35);
+    --scrim: rgba(0, 0, 0, 0.6);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #1B130D; --paper-2: #231910; --card: #2B1F16;
+  --ink: #F4EADB; --ink-2: #DCCAB1; --muted: #BBA58B; --line: #47352A;
+  --amber: #E09A35; --amber-ink: #F0B44C; --teal: #2A8378; --rust: #CC5C35; --plum: #A4466E; --olive: #5D8A30;
+  --slate: #557089; --gold: #F0B44C;
+  --screen: #12201D; --eye: #FFF7EA; --dot: rgba(244, 234, 219, 0.06); --shadow: rgba(0, 0, 0, 0.35);
+  --scrim: rgba(0, 0, 0, 0.6);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.55;
+  background-image: radial-gradient(var(--dot) 1.2px, transparent 1.2px); background-size: 22px 22px;
+}
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+section { padding-block: 56px; border-top: 1px solid var(--line); }
+h1, h2, h3 { font-family: var(--display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.6rem, 3.2vw, 2.2rem); margin-bottom: 10px; }
+h3 { font-size: 1.2rem; }
+p { margin: 0; }
+.eyebrow { font-family: var(--mono); font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; color: var(--amber-ink); }
+.lede { color: var(--ink-2); max-width: 62ch; }
+.muted { color: var(--muted); }
+.small { font-size: .86rem; }
+button { font: inherit; cursor: pointer; color: inherit; }
+button:focus-visible, input:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+symbol { overflow: visible; }
+
+/* SVG paint classes */
+.f-amber { fill: var(--amber); } .f-teal { fill: var(--teal); } .f-rust { fill: var(--rust); } .f-plum { fill: var(--plum); }
+.f-olive { fill: var(--olive); } .f-ink { fill: var(--ink); } .f-ink2 { fill: var(--ink-2); } .f-card { fill: var(--card); }
+.f-screen { fill: var(--screen); } .f-eye { fill: var(--eye); } .f-paper2 { fill: var(--paper-2); } .f-line { fill: var(--line); }
+.f-shadow { fill: var(--shadow); } .f-gold { fill: var(--gold); } .f-paint { fill: var(--paint); } .f-torso { fill: var(--torso); }
+.s-ink { stroke: var(--ink); } .s-eye { stroke: var(--eye); } .s-amberink { stroke: var(--amber-ink); } .s-gold { stroke: var(--gold); }
+.s-rust { stroke: var(--rust); } .s-olive { stroke: var(--olive); } .s-teal { stroke: var(--teal); } .s-plum { stroke: var(--plum); }
+/* Hats are switched with inherited custom properties so they also reach <use> copies of Vinc. */
+.hat-cap { display: var(--show-cap, none); } .hat-phones { display: var(--show-phones, none); }
+.hat-grad { display: var(--show-grad, none); } .hat-crown { display: var(--show-crown, none); }
+.eyes { transform-origin: 110px 92px; animation: blink 5s infinite; }
+.wave { transform-origin: 162px 168px; animation: wave 2.6s ease-in-out infinite; }
+.bulb { animation: glow 2.2s ease-in-out infinite; }
+#pupils { transition: transform .12s linear; }
+@keyframes blink { 0%, 94%, 100% { transform: scaleY(1); } 96% { transform: scaleY(.1); } }
+@keyframes wave { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-14deg); } }
+@keyframes glow { 0%, 100% { opacity: 1; } 50% { opacity: .55; } }
+@keyframes hop { 0%, 100% { transform: translateY(0); } 35% { transform: translateY(-18px) rotate(-3deg); } 65% { transform: translateY(0) rotate(2deg); } }
+@keyframes shake { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+
+/* Hero */
+.hero { padding-block: 40px 56px; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 32px; align-items: center; }
+.hero h1 { font-size: clamp(2.6rem, 7vw, 4.6rem); letter-spacing: -.01em; margin: 10px 0 14px; }
+.hero h1 em { color: var(--amber-ink); font-style: italic; }
+.hero .lede { font-size: 1.12rem; }
+.facts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+.chip { font-family: var(--mono); font-size: .8rem; padding: 5px 11px; border: 1.5px solid var(--line); border-radius: 999px; background: var(--card); color: var(--ink-2); }
+.chip.wallet { border-color: var(--amber); color: var(--amber-ink); font-weight: 500; }
+.tray { margin-top: 22px; display: grid; gap: 8px; }
+.tray-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-family: var(--mono); font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.slots { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+.slot { background: var(--card); border: 1.5px solid var(--line); border-radius: 12px; padding: 8px 4px 6px; display: grid; justify-items: center; gap: 2px; font-size: .72rem; color: var(--ink-2); text-align: center; line-height: 1.2; }
+.slot svg { width: 36px; height: 36px; }
+.slot.locked svg { opacity: .22; filter: grayscale(1); }
+.slot.locked { border-style: dashed; color: var(--muted); }
+.slot.got { border-color: var(--amber); box-shadow: 0 0 0 2px var(--amber) inset; }
+.stage { position: relative; display: grid; place-items: center; }
+.stage::before { content: ""; position: absolute; width: 78%; aspect-ratio: 1; border-radius: 50%; background: var(--paper-2); border: 2px dashed var(--line); }
+.vinci-btn { position: relative; background: none; border: 0; padding: 0; width: min(100%, 400px); border-radius: 24px; }
+.c3d { display: none; }
+body.has3d .c3d { display: block; }
+body.has3d .fallback2d { display: none !important; }
+.hero3d { width: 100%; height: auto; aspect-ratio: 1 / 1.05; }
+.board3d { position: relative; aspect-ratio: 10 / 9; max-width: 100%; border-radius: 12px; overflow: hidden; background: radial-gradient(120% 95% at 50% 28%, var(--card), var(--paper-2)); }
+.board3d canvas { width: 100%; height: 100%; display: block; touch-action: pan-y; cursor: grab; }
+.board3d canvas:active, .garage3d:active { cursor: grabbing; }
+.orbit-hint { position: absolute; right: 10px; bottom: 8px; font-family: var(--mono); font-size: .72rem; color: var(--muted); pointer-events: none; }
+.garage3d { width: min(100%, 300px); height: auto; aspect-ratio: 1 / 1.05; touch-action: pan-y; cursor: grab; }
+.part3d { width: 160px; height: 160px; display: block; }
+.mascot { display: block; width: 100%; height: auto; }
+.vinci-btn.hop .mascot { animation: hop .55s ease; }
+.speech { position: absolute; top: 2%; right: 0; background: var(--card); border: 2px solid var(--ink); border-radius: 16px 16px 16px 4px; padding: 8px 12px; font-weight: 600; font-size: .92rem; max-width: 190px; box-shadow: 3px 3px 0 var(--ink); }
+.tap-hint { position: absolute; bottom: 2%; left: 50%; transform: translateX(-50%); font-family: var(--mono); font-size: .74rem; color: var(--muted); white-space: nowrap; }
+
+/* Play */
+.levels { display: grid; gap: 12px; margin-top: 22px; }
+.world { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.world-name { font-family: var(--mono); font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); min-width: 190px; }
+.lvl { width: 56px; height: 56px; border-radius: 14px; border: 2px solid var(--ink); background: var(--card); display: grid; place-items: center; align-content: center; gap: 0; font-weight: 700; box-shadow: 2px 2px 0 var(--ink); line-height: 1.1; }
+.lvl small { font-size: .64rem; letter-spacing: 1px; color: var(--amber); font-weight: 400; }
+.lvl small .off { color: var(--line); }
+.lvl.cur { background: var(--amber); color: #2B1A10; }
+.lvl.cur small, .lvl.cur small .off { color: #2B1A10; }
+.lvl.debug { border-style: dashed; }
+.lvl:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
+.lvl svg { width: 18px; height: 18px; }
+
+.demo { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; margin-top: 24px; align-items: start; }
+.board-wrap { background: var(--card); border: 2px solid var(--ink); border-radius: 18px; padding: 14px; box-shadow: 5px 5px 0 var(--ink); display: grid; gap: 10px; min-width: 0; }
+.lvl-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
+.lvl-head h3 { font-size: 1.35rem; }
+.tag { font-family: var(--mono); font-size: .74rem; padding: 3px 9px; border-radius: 999px; background: var(--rust); color: #FFF7EA; }
+.tag.loop { background: var(--olive); }
+.hud { display: flex; justify-content: space-between; align-items: center; font-family: var(--mono); font-size: .84rem; color: var(--ink-2); gap: 8px; flex-wrap: wrap; font-variant-numeric: tabular-nums; }
+.stars { letter-spacing: 2px; color: var(--amber); }
+.stars .off { color: var(--line); }
+.board { position: relative; display: grid; grid-template-columns: repeat(var(--cols), 1fr); aspect-ratio: var(--cols) / var(--rows); max-width: 100%; border-radius: 10px; overflow: hidden; background: var(--paper-2); }
+.cell { border: 1px solid var(--line); display: grid; place-items: center; }
+.cell svg { width: 70%; height: 70%; transition: transform .35s ease, opacity .35s ease; }
+.cell.got svg { transform: scale(1.7) rotate(40deg); opacity: 0; }
+.bot { position: absolute; left: 0; top: 0; width: calc(100% / var(--cols)); height: calc(100% / var(--rows)); transition: transform .32s ease; display: grid; place-items: center; z-index: 2; }
+.bot svg { width: 84%; height: 84%; overflow: visible; }
+.bot .dir { transform-origin: 50px 50px; transition: transform .25s ease; }
+.bot.bump svg { animation: shake .3s; }
+.msg { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border-radius: 12px; background: var(--paper-2); font-size: .94rem; min-height: 56px; }
+.msg svg { flex: none; width: 34px; height: 34px; overflow: visible; }
+
+.editor { background: var(--card); border: 1.5px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 12px; min-width: 0; }
+.ed-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.palette { display: flex; flex-wrap: wrap; gap: 8px; }
+.blk { font-family: var(--mono); font-size: .92rem; padding: 8px 12px; border-radius: 10px; border: 2px solid var(--ink); color: #FFF7EA; box-shadow: 2px 2px 0 var(--ink); touch-action: none; user-select: none; -webkit-user-select: none; cursor: grab; }
+.blk:active { transform: translate(2px, 2px); box-shadow: none; }
+.blk.step, .pill.step { background: var(--teal); } .blk.turnLeft, .pill.turnLeft { background: var(--plum); } .blk.turnRight, .pill.turnRight { background: var(--rust); }
+.blk.repeat, .pill.repeat { background: var(--olive); }
+.blk.jump, .pill.jump { background: #3F5872; }
+/* Curriculum explorer */
+.tally { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+.tab { padding: 8px 14px; border-radius: 999px; border: 2px solid var(--ink); background: var(--card); font-weight: 600; }
+.tab[aria-selected="true"] { background: var(--ink); color: var(--paper); }
+.tab small { font-family: var(--mono); font-weight: 400; opacity: .8; margin-left: 4px; }
+.cls-head { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 16px; align-items: center; margin-top: 18px; padding: 16px; background: var(--card); border: 1.5px solid var(--line); border-radius: 14px; }
+.cls-head svg { width: 72px; height: 72px; }
+.cls-head h3 { font-size: 1.4rem; }
+.cls-head p { color: var(--ink-2); font-size: .95rem; margin-top: 4px; }
+.status { display: inline-block; font-family: var(--mono); font-size: .72rem; padding: 2px 9px; border-radius: 999px; margin-left: 8px; vertical-align: middle; font-weight: 500; }
+.status.live { background: var(--teal); color: #FFF7EA; }
+.status.plan { border: 1.5px dashed var(--line); color: var(--ink-2); }
+.acts { list-style: none; padding: 0; margin: 14px 0 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; counter-reset: act; }
+.act { display: grid; grid-template-columns: 1.8em minmax(0, 1fr); column-gap: 8px; row-gap: 4px; padding: 12px 14px; background: var(--card); border: 1.5px solid var(--line); border-radius: 12px; align-content: start; }
+.act::before { counter-increment: act; content: counter(act); font-family: var(--mono); color: var(--muted); grid-row: span 2; font-size: .85rem; padding-top: 1px; }
+.act.extra::before { content: "+"; }
+.act.extra { border-style: dashed; }
+.act-meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.act-meta b { font-size: .98rem; }
+.act p { color: var(--ink-2); font-size: .9rem; }
+.type { font-family: var(--mono); font-size: .7rem; padding: 0 8px; border-radius: 999px; color: var(--c); border: 1.5px solid var(--c); white-space: nowrap; }
+.act .play { margin-left: auto; font-size: .78rem; padding: 2px 10px; border-radius: 8px; border: 1.5px solid var(--ink); background: var(--amber); color: #2B1A10; font-weight: 600; }
+.act .play:disabled { background: transparent; color: var(--muted); border-color: var(--line); cursor: not-allowed; }
+.mini-stars { font-size: .74rem; color: var(--amber); letter-spacing: 1px; }
+.mini-stars .off { color: var(--line); }
+.blk:disabled { background: var(--paper-2); color: var(--muted); border-style: dashed; box-shadow: none; cursor: not-allowed; }
+.code-wrap { position: relative; }
+.code { font-family: var(--mono); font-size: .9rem; background: var(--screen); color: #F4EADB; border-radius: 10px; padding: 8px 0; min-height: 230px; margin: 0; list-style: none; }
+.code-wrap.dropping .code { box-shadow: 0 0 0 3px var(--amber); }
+.row { display: flex; align-items: center; gap: 6px; padding: 3px 8px; touch-action: none; user-select: none; -webkit-user-select: none; cursor: grab; }
+.row.is-end { cursor: default; }
+.row .ln { width: 1.7em; flex: none; text-align: right; color: #8C7A66; font-size: .78rem; }
+.row .ind { flex: none; align-self: stretch; border-right: 2px solid rgba(93, 138, 48, .55); }
+.row .ind[style="width:0px"] { border: 0; }
+.pill { display: inline-flex; align-items: center; gap: 6px; color: #FFF7EA; padding: 3px 10px; border-radius: 8px; white-space: nowrap; }
+.pill.end { background: transparent; color: #A9C98A; border: 1.5px dashed rgba(169, 201, 138, .6); padding: 1px 10px; font-size: .8rem; }
+.num { background: #FFF7EA; color: #2B1A10; border: 0; border-radius: 6px; padding: 0 8px; font-weight: 700; font-family: var(--mono); }
+.iter { font-size: .74rem; background: #F0B44C; color: #2B1A10; border-radius: 999px; padding: 0 7px; }
+.row .x { margin-left: auto; background: none; border: 0; color: #BBA58B; font-size: .85rem; padding: 2px 6px; border-radius: 6px; }
+.row .x:hover { background: rgba(255, 247, 234, .1); }
+.row.now { background: rgba(240, 180, 76, .22); }
+.row.err { background: rgba(204, 92, 53, .45); }
+.row.dragging { opacity: .3; }
+.code .empty { color: #BBA58B; padding: 10px 14px; }
+.drop { position: absolute; height: 4px; right: 10px; background: #F0B44C; border-radius: 4px; pointer-events: none; box-shadow: 0 0 0 2px rgba(240, 180, 76, .3); }
+.ghost { position: fixed; left: 0; top: 0; z-index: 70; pointer-events: none; opacity: .94; box-shadow: 4px 6px 0 rgba(0, 0, 0, .25); }
+.ghost.del { opacity: .55; filter: grayscale(1); }
+.ghost.del::after { content: "drop to delete"; position: absolute; left: 0; top: 100%; margin-top: 4px; font-family: var(--mono); font-size: .72rem; background: var(--ink); color: var(--paper); padding: 1px 6px; border-radius: 4px; white-space: nowrap; }
+.controls { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn { padding: 9px 14px; border-radius: 10px; border: 2px solid var(--ink); background: var(--card); color: var(--ink); font-weight: 600; }
+.btn.primary { background: var(--amber); color: #2B1A10; min-width: 96px; }
+.btn:disabled { opacity: .5; cursor: default; }
+.btn.ghosty { border-color: var(--line); font-weight: 500; }
+.toggle { display: flex; gap: 8px; align-items: center; font-size: .9rem; color: var(--ink-2); cursor: pointer; }
+.toggle input { width: 18px; height: 18px; accent-color: var(--amber); }
+.py { font-family: var(--mono); font-size: .86rem; background: var(--paper-2); border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 12px; margin: 0; overflow-x: auto; color: var(--ink); }
+.tools { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; align-items: center; }
+.tools .spacer { flex: 1; }
+
+/* Garage */
+.garage { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 24px; margin-top: 24px; align-items: start; }
+.preview { background: var(--card); border: 2px solid var(--ink); border-radius: 18px; padding: 18px; box-shadow: 5px 5px 0 var(--ink); display: grid; justify-items: center; gap: 10px; }
+.preview svg { width: min(100%, 240px); height: auto; }
+.shop { display: grid; gap: 18px; min-width: 0; }
+.shop h3 { font-size: 1.05rem; margin-bottom: 8px; }
+.items { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.item { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 10px; align-items: center; text-align: left; padding: 10px 12px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--card); }
+.item .sw { grid-row: span 2; width: 26px; height: 26px; border-radius: 8px; border: 2px solid var(--ink); }
+.item .nm { font-weight: 600; font-size: .92rem; }
+.item .pr { font-family: var(--mono); font-size: .76rem; color: var(--muted); }
+.item.on { border-color: var(--amber); box-shadow: 0 0 0 2px var(--amber) inset; }
+.item.on .pr { color: var(--amber-ink); }
+.item.no { animation: shake .3s; }
+.shop-msg { font-size: .92rem; color: var(--ink-2); min-height: 1.5em; }
+
+/* Concept notes */
+.why { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; margin-top: 26px; }
+.why > div { padding: 18px; background: var(--card); border: 1.5px solid var(--line); border-radius: 14px; display: grid; gap: 6px; align-content: start; }
+.why b { font-family: var(--display); font-size: 1.08rem; }
+.persona { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; margin-top: 26px; }
+.traits { display: grid; gap: 12px; }
+.trait { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 12px; align-items: baseline; padding-bottom: 12px; border-bottom: 1px dashed var(--line); }
+.trait span:first-child { font-family: var(--mono); font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.lines { display: grid; gap: 10px; align-content: start; }
+.line { background: var(--card); border: 1.5px solid var(--line); border-radius: 14px 14px 14px 4px; padding: 10px 14px; }
+.line small { display: block; font-family: var(--mono); font-size: .72rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 2px; }
+.path { list-style: none; padding: 0; margin: 28px 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+.part { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 14px; padding: 16px; background: var(--card); border: 1.5px solid var(--line); border-radius: 14px; }
+.part svg { width: 64px; height: 64px; }
+.part .meta { font-family: var(--mono); font-size: .74rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.part h3 { margin: 2px 0 4px; }
+.part .concept { display: inline-block; font-family: var(--mono); font-size: .78rem; padding: 2px 8px; border-radius: 6px; background: var(--paper-2); color: var(--amber-ink); margin-bottom: 6px; }
+.part p { color: var(--ink-2); font-size: .95rem; }
+.track { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; font-size: .92rem; color: var(--ink-2); }
+.track b { color: var(--ink); }
+.loop { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 26px; }
+.loop > div { padding: 18px; border-top: 4px solid var(--c, var(--amber)); background: var(--card); border-radius: 0 0 14px 14px; display: grid; gap: 6px; align-content: start; }
+.loop b { font-family: var(--display); font-size: 1.08rem; }
+.loop p { color: var(--ink-2); font-size: .95rem; }
+.alts { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 22px; }
+.alts > div { padding: 18px; border: 1.5px dashed var(--line); border-radius: 14px; display: grid; gap: 6px; align-content: start; }
+.alts p { color: var(--ink-2); font-size: .95rem; }
+.next ol { margin: 18px 0 0; padding-left: 1.3em; display: grid; gap: 10px; max-width: 70ch; color: var(--ink-2); }
+.next li b { color: var(--ink); }
+footer { padding-block: 28px 40px; border-top: 1px solid var(--line); font-family: var(--mono); font-size: .8rem; color: var(--muted); }
+
+/* Modal + fx */
+.modal { position: fixed; inset: 0; background: var(--scrim); display: grid; place-items: center; z-index: 80; padding: 16px; }
+.modal-card { background: var(--card); border: 2px solid var(--ink); border-radius: 20px; padding: 26px 22px 22px; width: 100%; max-width: 400px; text-align: center; box-shadow: 6px 6px 0 var(--ink); display: grid; gap: 12px; justify-items: center; }
+.modal-card h3 { font-size: 1.6rem; }
+.modal-card p { color: var(--ink-2); }
+.big-stars { font-size: 2.6rem; letter-spacing: 6px; line-height: 1; }
+.big-stars span { display: inline-block; color: var(--line); }
+.big-stars span.on { color: var(--amber); animation: pop .4s ease backwards; }
+.big-stars span:nth-child(2) { animation-delay: .15s; } .big-stars span:nth-child(3) { animation-delay: .3s; }
+@keyframes pop { 0% { transform: scale(0); } 70% { transform: scale(1.3); } 100% { transform: scale(1); } }
+.modal-card .part-icon { width: 96px; height: 96px; animation: pop .5s ease; }
+.earn { font-family: var(--mono); font-weight: 500; color: var(--amber-ink); }
+.modal-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+#fx { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 90; }
+
+@media (prefers-reduced-motion: reduce) {
+  .eyes, .wave, .bulb, .vinci-btn.hop .mascot, .bot.bump svg, .item.no, .big-stars span.on, .modal-card .part-icon { animation: none; }
+  .bot, .bot .dir, .cell svg, #pupils { transition: none; }
+}
+@media (max-width: 860px) {
+  .hero, .persona, .demo, .garage { grid-template-columns: minmax(0, 1fr); }
+  .hero .stage { order: -1; }
+  .world-name { min-width: 0; width: 100%; }
+}
+@media (max-width: 460px) {
+  .slots { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .trait { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .path { grid-template-columns: minmax(0, 1fr); }
+  .lvl { width: 50px; height: 50px; }
+  .speech { max-width: 160px; font-size: .85rem; }
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="mini" viewBox="0 0 100 100">
+      <rect x="46" y="4" width="8" height="14" rx="3" class="f-ink"/>
+      <circle cx="50" cy="6" r="6" class="f-amber s-ink" stroke-width="3"/>
+      <rect x="10" y="16" width="80" height="64" rx="20" class="f-paint s-ink" stroke-width="4"/>
+      <rect x="21" y="27" width="58" height="40" rx="12" class="f-screen"/>
+      <ellipse cx="39" cy="45" rx="6" ry="7" class="f-eye"/>
+      <ellipse cx="61" cy="45" rx="6" ry="7" class="f-eye"/>
+      <path d="M42 56 Q50 62 58 56" class="s-eye" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <circle cx="30" cy="90" r="8" class="f-ink"/><circle cx="70" cy="90" r="8" class="f-ink"/>
+      <g class="hat hat-cap"><path d="M20 22 Q50 -8 80 22 Z" class="f-rust s-ink" stroke-width="3"/><path d="M72 17 Q90 15 98 22 L74 24 Z" class="f-rust s-ink" stroke-width="3" stroke-linejoin="round"/></g>
+      <g class="hat hat-phones"><path d="M10 52 Q8 4 50 4 Q92 4 90 52" class="s-ink" stroke-width="5" fill="none"/><rect x="2" y="38" width="14" height="24" rx="5" class="f-plum s-ink" stroke-width="3"/><rect x="84" y="38" width="14" height="24" rx="5" class="f-plum s-ink" stroke-width="3"/></g>
+      <g class="hat hat-grad"><rect x="34" y="8" width="32" height="12" rx="2" class="f-ink"/><path d="M8 8 L50 -6 L92 8 L50 22 Z" class="f-ink"/><path d="M50 7 L84 12 L84 28" class="s-gold" stroke-width="2.5" fill="none"/><circle cx="84" cy="30" r="3.5" class="f-gold"/></g>
+      <g class="hat hat-crown"><path d="M22 22 L20 0 L35 11 L50 -6 L65 11 L80 0 L78 22 Z" class="f-gold s-ink" stroke-width="3" stroke-linejoin="round"/></g>
+    </symbol>
+    <symbol id="crate" viewBox="0 0 60 60">
+      <rect x="6" y="8" width="48" height="46" rx="5" class="f-ink2 s-ink" stroke-width="3"/>
+      <path d="M10 12 L50 50 M50 12 L10 50" class="s-ink" stroke-width="3" opacity=".55"/>
+      <rect x="6" y="8" width="48" height="10" rx="4" class="f-line s-ink" stroke-width="3"/>
+    </symbol>
+    <symbol id="spark" viewBox="0 0 60 60">
+      <path d="M30 4 L36 24 L56 30 L36 36 L30 56 L24 36 L4 30 L24 24 Z" class="f-amber s-ink" stroke-width="3" stroke-linejoin="round"/>
+      <circle cx="30" cy="30" r="5" class="f-card"/>
+    </symbol>
+    <symbol id="bug" viewBox="0 0 40 40">
+      <path d="M14 8 L10 3 M26 8 L30 3" class="s-ink" stroke-width="2.5" stroke-linecap="round"/>
+      <ellipse cx="20" cy="23" rx="13" ry="14" class="f-rust s-ink" stroke-width="2.5"/>
+      <path d="M20 10 V37" class="s-ink" stroke-width="2"/>
+      <circle cx="14" cy="22" r="2.6" class="f-ink"/><circle cx="26" cy="28" r="2.6" class="f-ink"/>
+      <circle cx="15" cy="13" r="3" class="f-eye"/><circle cx="25" cy="13" r="3" class="f-eye"/>
+      <circle cx="15" cy="13" r="1.4" class="f-ink"/><circle cx="25" cy="13" r="1.4" class="f-ink"/>
+    </symbol>
+    <symbol id="lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="3" class="f-ink2"/><path d="M8 10 V7 a4 4 0 0 1 8 0 V10" class="s-ink" stroke-width="2.4" fill="none"/></symbol>
+    <symbol id="p-wheels" viewBox="0 0 64 64"><circle cx="20" cy="40" r="14" class="f-ink"/><circle cx="20" cy="40" r="5" class="f-amber"/><circle cx="46" cy="40" r="14" class="f-ink"/><circle cx="46" cy="40" r="5" class="f-amber"/><rect x="14" y="14" width="38" height="14" rx="5" class="f-teal s-ink" stroke-width="3"/></symbol>
+    <symbol id="p-spring" viewBox="0 0 64 64"><path d="M18 8 L46 16 L18 24 L46 32 L18 40 L46 48" class="s-olive" fill="none" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><rect x="12" y="50" width="40" height="8" rx="3" class="f-ink"/></symbol>
+    <symbol id="p-antenna" viewBox="0 0 64 64"><line x1="32" y1="58" x2="32" y2="26" class="s-ink" stroke-width="4" stroke-linecap="round"/><circle cx="32" cy="18" r="12" class="f-plum s-ink" stroke-width="3"/><circle cx="32" cy="18" r="4" class="f-eye"/><path d="M12 10 Q6 18 12 26 M52 10 Q58 18 52 26" class="s-plum" fill="none" stroke-width="3" stroke-linecap="round"/></symbol>
+    <symbol id="p-chip" viewBox="0 0 64 64"><rect x="14" y="14" width="36" height="36" rx="6" class="f-ink"/><rect x="22" y="22" width="20" height="20" rx="3" class="f-amber"/><path d="M22 6 V14 M32 6 V14 M42 6 V14 M22 50 V58 M32 50 V58 M42 50 V58 M6 22 H14 M6 32 H14 M6 42 H14 M50 22 H58 M50 32 H58 M50 42 H58" class="s-ink" stroke-width="3" stroke-linecap="round"/></symbol>
+    <symbol id="p-gear" viewBox="0 0 64 64"><path d="M32 6 V14 M32 50 V58 M6 32 H14 M50 32 H58 M13 13 L19 19 M45 45 L51 51 M51 13 L45 19 M13 51 L19 45" class="s-rust" stroke-width="7" stroke-linecap="round"/><circle cx="32" cy="32" r="16" class="f-rust s-ink" stroke-width="3"/><circle cx="32" cy="32" r="6" class="f-card"/></symbol>
+    <symbol id="p-rocket" viewBox="0 0 64 64"><path d="M26 46 Q32 62 38 46 Z" class="f-amber"/><path d="M22 34 L11 47 L22 46 Z M42 34 L53 47 L42 46 Z" class="f-rust s-ink" stroke-width="2.5" stroke-linejoin="round"/><path d="M32 4 C44 14 46 30 42 46 L22 46 C18 30 20 14 32 4 Z" class="f-card s-ink" stroke-width="3"/><circle cx="32" cy="24" r="6" class="f-teal s-ink" stroke-width="2.5"/></symbol>
+    <symbol id="p-brain" viewBox="0 0 64 64"><path d="M32 8 C18 8 10 18 10 28 C10 36 16 40 16 46 L48 46 C48 40 54 36 54 28 C54 18 46 8 32 8 Z" class="f-teal s-ink" stroke-width="3"/><path d="M22 24 L30 30 L22 36 M34 36 H42" class="s-eye" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><rect x="20" y="48" width="24" height="8" rx="3" class="f-ink"/></symbol>
+  </defs>
+</svg>
+
+<div class="wrap">
+  <header class="hero">
+    <div>
+      <div class="eyebrow">Mascot concept · VINC Code · Grade 3 and up</div>
+      <h1>Meet <em>Vinc</em>, the robot built from spare parts.</h1>
+      <p class="lede">Vinc was put together on the VINC Lab workbench from leftover bits, and a few parts are still missing. Kids write code to guide Vinc through puzzles, and every class they finish gives Vinc a new part. Each part unlocks the next coding idea.</p>
+      <div class="facts">
+        <span class="chip">Name: VINC, the sum of parts</span>
+        <span class="chip">Height: 3 coffee mugs</span>
+        <span class="chip wallet" id="heroWallet">⚡ 0 sparks</span>
+      </div>
+      <div class="tray">
+        <div class="tray-head"><span>Vinc's parts</span><span id="partCount">0 / 6 found</span></div>
+        <div class="slots" id="slots"></div>
+      </div>
+    </div>
+    <div class="stage">
+      <button class="vinci-btn" id="vinciBtn" aria-label="Tap Vinc to say hi">
+        <canvas class="c3d hero3d" id="heroCanvas" role="img" aria-label="Vinc in 3D: a small robot with a screen face, glowing eyes, an antenna bulb, mismatched arms and two wheels"></canvas>
+        <svg class="mascot fallback2d" id="heroSvg" viewBox="0 0 220 260" role="img" aria-label="Vinc: a small robot with a screen face, glowing eyes, an antenna bulb, mismatched arms and two wheels">
+          <g id="vinciFull">
+            <ellipse class="f-shadow" cx="110" cy="248" rx="66" ry="8"/>
+            <line x1="110" y1="46" x2="110" y2="22" class="s-ink" stroke-width="5" stroke-linecap="round"/>
+            <circle cx="110" cy="16" r="11" class="f-amber s-ink bulb" stroke-width="4"/>
+            <g class="wave">
+              <path d="M160 170 Q188 160 192 128" class="s-olive" fill="none" stroke-width="12" stroke-linecap="round"/>
+              <circle cx="193" cy="121" r="11" class="f-olive s-ink" stroke-width="4"/>
+            </g>
+            <path d="M60 172 Q34 184 32 208" class="s-rust" fill="none" stroke-width="12" stroke-linecap="round"/>
+            <circle cx="31" cy="213" r="11" class="f-rust s-ink" stroke-width="4"/>
+            <circle cx="82" cy="228" r="18" class="f-ink"/><circle cx="82" cy="228" r="7" class="f-amber"/>
+            <circle cx="138" cy="228" r="18" class="f-ink"/><circle cx="138" cy="228" r="7" class="f-amber"/>
+            <rect x="58" y="150" width="104" height="72" rx="18" class="f-torso s-ink" stroke-width="5"/>
+            <circle cx="110" cy="186" r="16" class="f-card s-ink" stroke-width="4"/>
+            <path d="M102 180 L110 194 L118 180" class="s-amberink" fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="72" cy="164" r="3.5" class="f-ink"/><circle cx="148" cy="164" r="3.5" class="f-ink"/>
+            <rect x="98" y="136" width="24" height="16" rx="4" class="f-ink2"/>
+            <rect x="40" y="44" width="140" height="98" rx="30" class="f-paint s-ink" stroke-width="5"/>
+            <circle cx="38" cy="93" r="9" class="f-rust s-ink" stroke-width="4"/>
+            <circle cx="182" cy="93" r="9" class="f-plum s-ink" stroke-width="4"/>
+            <rect x="58" y="60" width="104" height="66" rx="20" class="f-screen"/>
+            <g class="eyes">
+              <ellipse cx="90" cy="92" rx="10" ry="12" class="f-eye"/>
+              <ellipse cx="130" cy="92" rx="10" ry="12" class="f-eye"/>
+              <g id="pupils"><circle cx="90" cy="93" r="5" class="f-screen"/><circle cx="130" cy="93" r="5" class="f-screen"/><circle cx="92" cy="90" r="1.6" class="f-eye"/><circle cx="132" cy="90" r="1.6" class="f-eye"/></g>
+            </g>
+            <path d="M98 110 Q110 119 122 110" class="s-eye" fill="none" stroke-width="4" stroke-linecap="round"/>
+            <rect x="140" y="47" width="30" height="10" rx="2" transform="rotate(22 155 52)" class="f-paper2 s-ink" stroke-width="1.5" opacity=".95"/>
+            <g class="hat hat-cap"><path d="M58 52 Q110 0 162 52 Z" class="f-rust s-ink" stroke-width="4"/><path d="M150 45 Q184 42 198 54 L152 56 Z" class="f-rust s-ink" stroke-width="4" stroke-linejoin="round"/><circle cx="110" cy="27" r="5" class="f-ink"/></g>
+            <g class="hat hat-phones"><path d="M34 96 Q30 22 110 22 Q190 22 186 96" fill="none" class="s-ink" stroke-width="9" stroke-linecap="round"/><rect x="22" y="74" width="24" height="40" rx="10" class="f-plum s-ink" stroke-width="4"/><rect x="174" y="74" width="24" height="40" rx="10" class="f-plum s-ink" stroke-width="4"/></g>
+            <g class="hat hat-grad"><rect x="78" y="34" width="64" height="18" rx="4" class="f-ink"/><path d="M40 34 L110 10 L180 34 L110 56 Z" class="f-ink"/><path d="M110 33 L168 40 L168 66" fill="none" class="s-gold" stroke-width="3"/><circle cx="168" cy="68" r="5" class="f-gold"/></g>
+            <g class="hat hat-crown"><path d="M66 52 L62 18 L86 36 L110 8 L134 36 L158 18 L154 52 Z" class="f-gold s-ink" stroke-width="4" stroke-linejoin="round"/><circle cx="110" cy="40" r="5" class="f-rust"/><circle cx="86" cy="44" r="3.5" class="f-teal"/><circle cx="134" cy="44" r="3.5" class="f-plum"/></g>
+          </g>
+        </svg>
+        <span class="tap-hint">tap Vinc</span>
+      </button>
+      <div class="speech" id="speech" aria-live="polite">Hi! Can you help me find my missing parts?</div>
+    </div>
+  </header>
+
+  <section id="play">
+    <div class="eyebrow">Play the prototype</div>
+    <h2>Vinc's Workshop</h2>
+    <p class="lede">30 levels: 15 for Class 3 and 15 for Class 4. Drag blocks into the code (or tap them), press Run, and collect every spark. Use fewer blocks to earn more stars. Finish a class to win Vinc's next part.</p>
+    <div class="levels" id="levels"></div>
+    <div class="demo">
+      <div class="board-wrap">
+        <div class="lvl-head">
+          <div><div class="eyebrow" id="lvlWorld">World 1 · Level 1</div><h3 id="lvlName">First steps</h3></div>
+          <span class="tag" id="lvlTag" hidden>Catch Glitch</span>
+        </div>
+        <div class="hud"><span id="hudSparks">✦ 0 / 1 sparks</span><span id="hudBlocks">Blocks: 0 · ★★★ at 3 or fewer</span><span class="stars" id="bestStars" aria-label="Best stars"></span></div>
+        <div class="board3d c3d"><canvas id="boardCanvas" aria-label="3D level board. Drag sideways to turn it."></canvas><span class="orbit-hint">drag to turn the board</span></div>
+        <div class="board fallback2d" id="board" aria-label="Level grid">
+          <div class="bot" id="bot"><svg viewBox="0 0 100 100" aria-label="Vinc"><use href="#mini"/><g class="dir" id="dir"><path d="M50 -16 L61 -3 L39 -3 Z" class="f-rust s-ink" stroke-width="2.5" stroke-linejoin="round"/></g></svg></div>
+        </div>
+        <div class="msg" id="msg" role="status"></div>
+      </div>
+      <div class="editor">
+        <div class="ed-top"><span class="eyebrow">Blocks</span><span class="small muted">Drag into the code, or tap to add</span></div>
+        <div class="palette" id="palette"></div>
+        <div class="code-wrap" id="codeWrap"><ol class="code" id="code" aria-label="Your program"></ol><div class="drop" id="drop" hidden></div></div>
+        <p class="small muted">Drag a block out of the code to delete it. Tap the number on a repeat block to change it.</p>
+        <div class="controls">
+          <button class="btn primary" id="run">▶ Run</button>
+          <button class="btn" id="step">Step</button>
+          <button class="btn" id="reset">Reset</button>
+          <button class="btn" id="speed">Speed 1×</button>
+          <button class="btn ghosty" id="hint">Hint</button>
+        </div>
+        <label class="toggle"><input type="checkbox" id="showPy"> Show my code as Python (grade 5+)</label>
+        <pre class="py" id="py" hidden></pre>
+      </div>
+    </div>
+    <div class="tools">
+      <button class="btn ghosty" id="sound">Sound: on</button>
+      <button class="btn ghosty" id="unlockAll">Preview: unlock all levels</button>
+      <span class="spacer"></span>
+      <button class="btn ghosty" id="resetAll">Reset my progress</button>
+    </div>
+  </section>
+
+  <section id="garage">
+    <div class="eyebrow">Spend your sparks</div>
+    <h2>Vinc's Garage</h2>
+    <p class="lede">Every star earns 5 sparks. Spend them on paint jobs and hats, and Vinc wears them everywhere, including in the levels. Kids get to make Vinc their own without spending any real money.</p>
+    <div class="garage">
+      <div class="preview">
+        <canvas class="c3d garage3d" id="garageCanvas" aria-label="Vinc on a turntable. Drag to spin."></canvas>
+        <svg class="fallback2d" viewBox="0 0 220 260" aria-label="Vinc preview"><use href="#vinciFull"/></svg>
+        <span class="chip wallet" id="garageWallet">⚡ 0 sparks</span>
+      </div>
+      <div class="shop">
+        <div><h3>Paint jobs</h3><div class="items" id="paints"></div></div>
+        <div><h3>Hats</h3><div class="items" id="hats"></div></div>
+        <p class="shop-msg" id="shopMsg" role="status">Earn stars in the workshop, then come back to shop.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">Why this character</div>
+    <h2>Vinc fits the VINC brand and the way kids learn</h2>
+    <div class="why">
+      <div><b>The brand, brought to life</b><p class="muted">Your logo says "VINC, the sum of parts." Vinc is a robot made of parts, so the mascot is the brand. Every time a child says its name, they say yours.</p></div>
+      <div><b>A robot that needs instructions</b><p class="muted">Robots only do exactly what they're told, so giving Vinc instructions is the most natural reason to write code. Kids understand that straight away.</p></div>
+      <div><b>It links to your real robotics lab</b><p class="muted">A physical Vinc (micro:bit or ESP32 on wheels) at the Bengaluru centre runs the same code kids write online. Few kids' coding platforms have a real robot to go with them.</p></div>
+      <div><b>Original and safe to grow</b><p class="muted">CodeMonkey owns the monkey. A robot of your own can become toys, stickers, T-shirts and certificates without any trademark conflict.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">Personality</div>
+    <h2>Curious and eager, and it gets things wrong sometimes</h2>
+    <p class="lede">Vinc is never the teacher. The child is the engineer and Vinc is the creation. When code fails, Vinc doesn't call it the child's mistake. It blames Glitch, a tiny bug hiding in the code, and the two of them go looking for it together.</p>
+    <div class="persona">
+      <div class="traits">
+        <div class="trait"><span>Voice</span><span>Short, excited sentences. Uses "we" a lot. Never sarcastic.</span></div>
+        <div class="trait"><span>Quirk</span><span>Says "Beep-ah!" when surprised. Its antenna bulb blinks when it's thinking.</span></div>
+        <div class="trait"><span>Flaw</span><span>Too literal. If you tell it to step 3 times, it steps 3 times, even into a wall.</span></div>
+        <div class="trait"><span>Sidekick</span><span><b>Glitch</b>, a cheeky little beetle that hides in broken code. Kids learn that debugging means catching Glitch.</span></div>
+        <div class="trait"><span>Dream</span><span>To build a rocket from the parts it collects, which leads into the final AI world.</span></div>
+      </div>
+      <div class="lines">
+        <div class="line"><small>Level start</small>"There's a spark up there! Can we reach it in 10 blocks or fewer?"</div>
+        <div class="line"><small>Code fails</small>"Beep-ah! I bumped into a crate on line 3. I think Glitch got into our code!"</div>
+        <div class="line"><small>Three stars</small>"Whoa, that's the shortest code ever! You're a real engineer."</div>
+        <div class="line"><small>New part</small>"Spring legs?! Now I can jump. Let's try repeating that!"</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="curriculum">
+    <div class="eyebrow">Curriculum · Classes 3 to 8</div>
+    <h2>At least 15 activities in every class</h2>
+    <p class="lede">Each class is one world with one coding idea and one part to win. Classes 3 and 4 are playable in the workshop above. Classes 5 to 8 are designed and ready to build on the platform.</p>
+    <div class="tally" id="tally"></div>
+    <div class="tabs" role="tablist" aria-label="Choose a class" id="clsTabs"></div>
+    <div id="clsPanel" role="tabpanel"></div>
+    <div class="track"><b>Code style by class:</b> <span>Classes 3–4: drag-and-drop blocks</span><span class="muted">→</span><span>Class 5: blocks with a "show as Python" toggle</span><span class="muted">→</span><span>Classes 6–8: Python, with the same Vinc and the same worlds</span></div>
+  </section>
+
+  <section>
+    <div class="eyebrow">The game loop</div>
+    <h2>What keeps kids coming back</h2>
+    <div class="loop">
+      <div style="--c: var(--amber)"><b>Stars for short code</b><p>1–3 stars per level, based on how few blocks the program uses. Kids replay levels to beat their own score, which quietly teaches them to write efficient code.</p></div>
+      <div style="--c: var(--teal)"><b>Sparks to spend</b><p>Stars turn into sparks, which buy paint jobs and hats in the Garage. Kids express themselves without paying with real money.</p></div>
+      <div style="--c: var(--rust)"><b>Catch Glitch</b><p>Debug levels start with broken code. Kids find the line where Glitch is hiding and fix it. Debugging becomes a hunt rather than a failure.</p></div>
+      <div style="--c: var(--plum)"><b>Class leagues</b><p>Teachers see a class dashboard. Students earn badges and join weekly "Spark Cup" challenges. Rankings stay friendly: first names only, and only within the class.</p></div>
+      <div style="--c: var(--olive)"><b>Build-a-level</b><p>After Class 4, kids design their own puzzles and share them with classmates. Making levels for others is the best test of understanding.</p></div>
+      <div style="--c: var(--amber-ink)"><b>Real Vinc day</b><p>At the end of each class, run your code on the physical Vinc robot at the centre. Online learning leads into the hands-on lab.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">If you want options</div>
+    <h2>Other names and characters considered</h2>
+    <div class="alts">
+      <div><h3>Jodu</h3><p>From <i>jod</i> (जोड़), Hindi for "joining" and "a sum". A clever echo of the tagline, but a second name to build and protect alongside VINC.</p></div>
+      <div><h3>Yantu</h3><p>From <i>yantra</i> (यन्त्र), "machine". Short and warm, with a clear Indian root, but no link to the VINC brand.</p></div>
+      <div><h3>Partu</h3><p>"Parts" with a friendly Indian nickname ending, like Bittu or Chintu. Kids get it instantly, but it's a little silly for Classes 7 and 8.</p></div>
+      <div><h3>Kitbo</h3><p>"Kit" + "robot". Rejected: it is too close to KIBO and KUBO, two coding robots that already sell to schools.</p></div>
+      <div><h3>Tara the Firefly</h3><p>A different character: lights up paths in night levels. It's harder to link to robotics, and "giving instructions" makes less sense for an insect.</p></div>
+    </div>
+    <p class="lede" style="margin-top:16px">The robot is named Vinc, after the company. VINC DEEPTECH has applied for the VINC trademark in class 9 (software). The mascot will also appear on the online platform, a physical robot and merchandise, which fall in other classes.</p>
+  </section>
+
+  <section class="next">
+    <div class="eyebrow">Next steps</div>
+    <h2>From prototype to the real platform</h2>
+    <ol>
+      <li><b>Lock the look.</b> Give this sketch to an illustrator for a turnaround (front, side, back) plus 6 expressions: happy, thinking, surprised, sad, proud and sleepy.</li>
+      <li><b>Test this prototype with 10 kids in grades 3–4</b> at the centre's opening weekend. Watch where they get stuck and what makes them laugh.</li>
+      <li><b>Complete the trademark family.</b> VINC is filed in class 9. Planned: VINC LAB, VINC GLOBAL and VINC BOT in classes 16, 28, 41 and 42. Also consider VINC itself in 41 and 42, VINC BOT in class 9, and copyright or a logo mark for the robot's finished design.</li>
+      <li><b>Build the platform in the vinc-code repo:</b> accounts, a teacher dashboard and progress saved on a server, starting with the 30 levels for Classes 3 and 4.</li>
+      <li><b>Build Classes 5 to 8</b> from the activity plans above, adding if/else, variables and functions to the block editor, then Python.</li>
+      <li><b>Build the physical Vinc</b> so each class's Lab activity can run on a real robot at the centre.</li>
+    </ol>
+  </section>
+</div>
+<footer><div class="wrap">Vinc prototype v0.5 · 3D · colours and type from vinc-lab.com · VINC Learning Centre, Bengaluru</div></footer>
+
+<div class="modal" id="modal" hidden><div class="modal-card" id="modalCard" role="dialog" aria-modal="true" aria-labelledby="modalTitle"></div></div>
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ---------- Vinc 3D engine (Three.js). Exposes window.V3D; the game falls back to 2D if WebGL is missing. ---------- */
+(function () {
+  'use strict';
+  var V = window.V3D = { ok: false };
+  if (!window.THREE) return;
+  try { var tc = document.createElement('canvas'); if (!(tc.getContext('webgl2') || tc.getContext('webgl'))) return; } catch (e) { return; }
+  V.ok = true;
+  var T = THREE, PI = Math.PI;
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var BR = { ink: '#2B1A10', rust: '#C2502A', plum: '#8C3557', olive: '#4C7424', amber: '#D98A1C', amberInk: '#9A5B0A', card: '#FFF9EF', screen: '#1E2F2B', eye: '#FFF7EA', gold: '#E8B030', tape: '#EFE2CC', teal: '#1F6F66' };
+  var look = { paint: BR.amber, torso: BR.teal, hat: 'none' };
+  var VINCIS = [];
+
+  function L(hex) { return new T.Color(hex).convertSRGBToLinear(); }
+  function C(name) { var c = new T.Color(); try { c.setStyle(getComputedStyle(document.body).getPropertyValue(name).trim() || '#888888'); } catch (e) {} return c.convertSRGBToLinear(); }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function ease(p) { return p < .5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2; }
+  function backOut(p) { var c1 = 1.9, c3 = c1 + 1; return 1 + c3 * Math.pow(p - 1, 3) + c1 * Math.pow(p - 1, 2); }
+  function plastic(o) { return new T.MeshPhysicalMaterial(Object.assign({ roughness: .34, metalness: 0, clearcoat: .6, clearcoatRoughness: .25 }, o || {})); }
+  function std(o) { return new T.MeshStandardMaterial(Object.assign({ roughness: .55, metalness: 0 }, o || {})); }
+  function mesh(geo, mat, cast) { var m = new T.Mesh(geo, mat); m.castShadow = cast !== false; m.receiveShadow = true; return m; }
+  function clear(g) { while (g.children.length) g.remove(g.children[0]); }
+  function rrect(W, H, rr) {
+    var s = new T.Shape(), x = -W / 2, y = -H / 2;
+    s.moveTo(x + rr, y); s.lineTo(x + W - rr, y); s.quadraticCurveTo(x + W, y, x + W, y + rr);
+    s.lineTo(x + W, y + H - rr); s.quadraticCurveTo(x + W, y + H, x + W - rr, y + H);
+    s.lineTo(x + rr, y + H); s.quadraticCurveTo(x, y + H, x, y + H - rr);
+    s.lineTo(x, y + rr); s.quadraticCurveTo(x, y, x + rr, y); return s;
+  }
+  function rbox(w, h, d, r) {
+    var b = Math.min(r * .5, d * .2, .1);
+    var g = new T.ExtrudeGeometry(rrect(w - 2 * b, h - 2 * b, Math.max(r - b, .02)), { depth: d - 2 * b, bevelEnabled: true, bevelSize: b, bevelThickness: b, bevelSegments: 5, curveSegments: 10 });
+    g.center(); return g;
+  }
+
+  /* ----- renderer, environment, lights ----- */
+  function envFor(renderer) {
+    var s = new T.Scene();
+    s.add(new T.Mesh(new T.BoxGeometry(10, 10, 10), new T.MeshBasicMaterial({ color: 0x5a4a3c, side: T.BackSide })));
+    function panel(w, h, x, y, z, c, i) { var m = new T.Mesh(new T.PlaneGeometry(w, h), new T.MeshBasicMaterial({ color: new T.Color(c).multiplyScalar(i), side: T.DoubleSide })); m.position.set(x, y, z); m.lookAt(0, 0, 0); s.add(m); }
+    panel(6, 3, 0, 4.9, 0, 0xfff3e0, 3); panel(3, 4, -4.9, 1, 1, 0xffe2b8, 1.8); panel(3, 3, 4.9, 1.5, -1, 0xcfe8e4, 1.3); panel(5, 2, 0, .5, 4.9, 0xffffff, 1.5);
+    var pm = new T.PMREMGenerator(renderer), tex = pm.fromScene(s, .04).texture; pm.dispose(); return tex;
+  }
+  var views = [];
+  function makeView(canvas, fov, alwaysVisible) {
+    var r = new T.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
+    r.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    r.outputEncoding = T.sRGBEncoding; r.toneMapping = T.ACESFilmicToneMapping; r.toneMappingExposure = 1.05;
+    r.shadowMap.enabled = true; r.shadowMap.type = T.PCFSoftShadowMap; r.setClearColor(0x000000, 0);
+    var v = { canvas: canvas, renderer: r, scene: new T.Scene(), camera: new T.PerspectiveCamera(fov, 1, .1, 80), visible: true, w: 0, h: 0, update: function () {} };
+    v.scene.environment = envFor(r);
+    v.fit = function () {
+      var w = canvas.clientWidth, h = canvas.clientHeight; if (!w || !h) return false;
+      if (w !== v.w || h !== v.h) { v.w = w; v.h = h; r.setSize(w, h, false); v.camera.aspect = w / h; v.camera.updateProjectionMatrix(); }
+      return true;
+    };
+    if (!alwaysVisible && 'IntersectionObserver' in window) new IntersectionObserver(function (es) { v.visible = es[es.length - 1].isIntersecting; }).observe(canvas);
+    views.push(v); return v;
+  }
+  function lights(scene, size) {
+    scene.add(new T.HemisphereLight(0xfff4e6, 0x3a2a1c, .55));
+    var key = new T.DirectionalLight(0xfff0dc, 1.55); key.position.set(3, 7, 4.5); key.castShadow = true;
+    key.shadow.mapSize.set(1024, 1024); key.shadow.bias = -.0006; key.shadow.normalBias = .02;
+    var c = key.shadow.camera; c.left = -size; c.right = size; c.top = size; c.bottom = -size; c.near = .5; c.far = 30;
+    scene.add(key);
+    var rim = new T.DirectionalLight(0x9fd8cf, .65); rim.position.set(-4, 3, -4); scene.add(rim);
+    return key;
+  }
+  function ground(scene, size) { var g = new T.Mesh(new T.PlaneGeometry(size, size), new T.ShadowMaterial({ opacity: .2 })); g.rotation.x = -PI / 2; g.receiveShadow = true; scene.add(g); return g; }
+  var last = 0;
+  function frame(now) {
+    requestAnimationFrame(frame);
+    var t = now / 1000, dt = Math.min(.05, t - last || .016); last = t;
+    if (document.hidden) return;
+    for (var i = 0; i < views.length; i++) {
+      var v = views[i]; if (!v.visible || !v.canvas.isConnected || !v.fit()) continue;
+      v.update(t, dt); v.renderer.render(v.scene, v.camera);
+    }
+  }
+  requestAnimationFrame(frame);
+
+  /* ----- Vinc model ----- */
+  function makeWheel(M) {
+    var w = new T.Group();
+    var tire = mesh(new T.CylinderGeometry(.22, .22, .16, 32), M.rubber); tire.rotation.z = PI / 2;
+    var tread = mesh(new T.TorusGeometry(.215, .025, 8, 32), M.rubber); tread.rotation.y = PI / 2;
+    var hub = mesh(new T.CylinderGeometry(.1, .1, .17, 24), M.hub); hub.rotation.z = PI / 2;
+    var spoke = mesh(new T.BoxGeometry(.18, .34, .06), M.hub);
+    w.add(tire, tread, hub, spoke); return w;
+  }
+  function makeVinc() {
+    var M = {
+      paint: plastic(), torso: plastic(), ink: std({ color: L(BR.ink), roughness: .45 }), rust: plastic({ color: L(BR.rust) }), plum: plastic({ color: L(BR.plum) }),
+      olive: plastic({ color: L(BR.olive) }), teal: plastic({ color: L(BR.teal) }), amberInk: plastic({ color: L(BR.amberInk) }), card: plastic({ color: L(BR.card) }),
+      hub: plastic({ color: L(BR.amber), metalness: .15 }), tape: std({ color: L(BR.tape), roughness: .95 }),
+      screen: new T.MeshPhysicalMaterial({ color: L(BR.screen), roughness: .08, metalness: .1, clearcoat: 1, clearcoatRoughness: .04 }),
+      eye: std({ color: L(BR.eye), emissive: L(BR.eye), emissiveIntensity: 1.3 }), bulb: std({ color: L(BR.amber), emissive: L('#F0B44C'), emissiveIntensity: 1.6 }),
+      rubber: std({ color: L('#221A14'), roughness: .9 }), gold: std({ color: L(BR.gold), metalness: .9, roughness: .26, side: T.DoubleSide })
+    };
+    var g = new T.Group(), root = new T.Group(); g.add(root);
+    var wheels = [-.33, .33].map(function (x) { var w = makeWheel(M); w.position.set(x, .22, 0); root.add(w); return w; });
+    var axle = mesh(new T.CylinderGeometry(.05, .05, .6, 12), M.ink); axle.rotation.z = PI / 2; axle.position.y = .22; root.add(axle);
+    var torso = mesh(rbox(1, .72, .7, .16), M.torso); torso.position.y = .8; root.add(torso);
+    var dial = mesh(new T.CylinderGeometry(.18, .18, .06, 32), M.card); dial.rotation.x = PI / 2; dial.position.set(0, .8, .36); root.add(dial);
+    [-1, 1].forEach(function (s) {
+      var v = mesh(new T.BoxGeometry(.045, .2, .04), M.amberInk); v.position.set(s * .045, .81, .4); v.rotation.z = -s * .42; root.add(v);
+      var bolt = mesh(new T.SphereGeometry(.035, 12, 8), M.ink); bolt.position.set(s * .38, 1.03, .36); root.add(bolt);
+    });
+    var neck = mesh(new T.CylinderGeometry(.13, .15, .18, 20), M.ink); neck.position.y = 1.22; root.add(neck);
+    var head = new T.Group(); head.position.y = 1.26; root.add(head);
+    var skull = mesh(rbox(1.4, 1, .92, .3), M.paint); skull.position.y = .55; head.add(skull);
+    var scr = mesh(rbox(1.08, .7, .1, .2), M.screen, false); scr.position.set(0, .56, .43); head.add(scr);
+    var eyes = new T.Group(); eyes.position.set(0, .6, .48); head.add(eyes);
+    var pupils = new T.Group(); eyes.add(pupils);
+    [-1, 1].forEach(function (s) {
+      var e = mesh(new T.SphereGeometry(.12, 24, 16), M.eye, false); e.scale.set(1, 1.2, .42); e.position.x = s * .21; eyes.add(e);
+      var p = mesh(new T.SphereGeometry(.055, 16, 12), M.screen, false); p.scale.z = .5; p.position.set(s * .21, -.01, .045); pupils.add(p);
+    });
+    var mouth = mesh(new T.TorusGeometry(.12, .024, 10, 28, PI), M.eye, false); mouth.rotation.z = PI; mouth.position.set(0, .38, .485); head.add(mouth);
+    [[-1, M.rust], [1, M.plum]].forEach(function (a) { var e = mesh(new T.CylinderGeometry(.1, .1, .12, 20), a[1]); e.rotation.z = PI / 2; e.position.set(a[0] * .74, .55, 0); head.add(e); });
+    var tape = mesh(new T.BoxGeometry(.32, .09, .02), M.tape, false); tape.position.set(.4, .86, .47); tape.rotation.z = -.45; head.add(tape);
+    var ant = new T.Group(); ant.position.y = 1.03; head.add(ant);
+    var stalk = mesh(new T.CylinderGeometry(.03, .03, .3, 10), M.ink); stalk.position.y = .15; ant.add(stalk);
+    var bulb = mesh(new T.SphereGeometry(.11, 24, 16), M.bulb); bulb.position.y = .36; ant.add(bulb);
+    function arm(side, mat, pts) {
+      var a = new T.Group(); a.position.set(side * .5, 1, 0);
+      var curve = new T.CatmullRomCurve3(pts.map(function (p) { return new T.Vector3(p[0] * side, p[1], p[2]); }));
+      a.add(mesh(new T.TubeGeometry(curve, 24, .07, 12), mat));
+      var end = pts[pts.length - 1], hand = mesh(new T.SphereGeometry(.12, 20, 14), mat); hand.position.set(end[0] * side, end[1], end[2]); a.add(hand);
+      root.add(a); return a;
+    }
+    var armL = arm(-1, M.rust, [[0, 0, 0], [.22, -.12, .05], [.32, -.42, .1]]);
+    var armR = arm(1, M.olive, [[0, 0, 0], [.25, .02, .05], [.34, .38, .1]]);
+    /* hats */
+    var hats = {};
+    var cap = new T.Group();
+    var dome = mesh(new T.SphereGeometry(.62, 32, 16, 0, PI * 2, 0, PI / 2), M.rust); dome.scale.set(1.1, .6, .9); dome.position.y = .98; cap.add(dome);
+    var brim = mesh(new T.CylinderGeometry(.42, .42, .04, 32, 1, false, -PI / 2, PI), M.rust); brim.position.set(0, 1, .46); brim.scale.z = 1.1; cap.add(brim);
+    var cbtn = mesh(new T.SphereGeometry(.06, 12, 8), M.rust); cbtn.position.y = 1.35; cap.add(cbtn);
+    hats.cap = cap;
+    var ph = new T.Group();
+    var band = mesh(new T.TorusGeometry(.8, .05, 12, 48, PI), M.ink); band.position.y = .55; ph.add(band);
+    [-1, 1].forEach(function (s) { var cup = mesh(new T.CylinderGeometry(.22, .22, .16, 28), M.plum); cup.rotation.z = PI / 2; cup.position.set(s * .8, .55, 0); ph.add(cup); });
+    hats.phones = ph;
+    var gr = new T.Group();
+    var gbase = mesh(new T.BoxGeometry(.8, .22, .7), M.ink); gbase.position.y = 1.12; gr.add(gbase);
+    var gboard = mesh(new T.BoxGeometry(1.3, .05, 1.3), M.ink); gboard.position.y = 1.25; gboard.rotation.y = PI / 4; gr.add(gboard);
+    var gbtn = mesh(new T.SphereGeometry(.05, 12, 8), M.gold); gbtn.position.y = 1.29; gr.add(gbtn);
+    var cord = mesh(new T.CylinderGeometry(.015, .015, .9, 6), M.gold); cord.rotation.z = PI / 2; cord.position.set(.45, 1.29, 0); gr.add(cord);
+    var hang = mesh(new T.CylinderGeometry(.015, .015, .3, 6), M.gold); hang.position.set(.9, 1.14, 0); gr.add(hang);
+    var tassel = mesh(new T.ConeGeometry(.06, .16, 12), M.gold); tassel.position.set(.9, .96, 0); gr.add(tassel);
+    hats.grad = gr;
+    var cr = new T.Group();
+    var crb = mesh(new T.CylinderGeometry(.44, .44, .24, 36, 1, true), M.gold); crb.position.y = 1.15; cr.add(crb);
+    for (var i = 0; i < 8; i++) { var a = i / 8 * PI * 2, sp = mesh(new T.ConeGeometry(.07, .22, 12), M.gold); sp.position.set(Math.sin(a) * .44, 1.37, Math.cos(a) * .44); cr.add(sp); }
+    [[0, M.rust], [-.3, M.teal], [.3, M.plum]].forEach(function (gm) { var s = mesh(new T.SphereGeometry(.05, 12, 8), gm[1]); s.position.set(gm[0], 1.15, Math.sqrt(.46 * .46 - gm[0] * gm[0])); cr.add(s); });
+    hats.crown = cr;
+    for (var h in hats) { hats[h].visible = false; head.add(hats[h]); }
+    var b = { group: g, root: root, head: head, eyes: eyes, pupils: pupils, armL: armL, armR: armR, ant: ant, wheels: wheels, hats: hats, M: M, blinkAt: 1 + Math.random() * 2, blinkT: -1 };
+    VINCIS.push(b); applyLookTo(b); return b;
+  }
+  function applyLookTo(b) {
+    b.M.paint.color.copy(L(look.paint)); b.M.torso.color.copy(L(look.torso));
+    for (var h in b.hats) b.hats[h].visible = h === look.hat;
+  }
+  V.setLook = function (paint, torso, hat) { look = { paint: paint, torso: torso, hat: hat }; VINCIS.forEach(applyLookTo); };
+  function idle(b, t, dt, amt) {
+    if (reduce) amt = 0;
+    b.root.position.y = Math.sin(t * 2.2) * .03 * amt;
+    b.armR.rotation.z = (Math.sin(t * 3.2) * .35 + .1) * amt;
+    b.armL.rotation.z = Math.sin(t * 2.2 + 1) * .06 * amt;
+    b.ant.rotation.z = Math.sin(t * 2.7) * .1 * amt;
+    b.M.bulb.emissiveIntensity = 1.4 + Math.sin(t * 3) * .5 * (amt ? 1 : 0);
+    if (t > b.blinkAt) { b.blinkAt = t + 2.5 + Math.random() * 3; b.blinkT = 0; }
+    if (b.blinkT >= 0) { b.blinkT += dt / .16; b.eyes.scale.y = b.blinkT < 1 ? Math.max(.1, Math.abs(Math.cos(b.blinkT * PI))) : 1; if (b.blinkT >= 1) b.blinkT = -1; }
+  }
+
+  /* ----- Hero ----- */
+  V.initHero = function (canvas) {
+    var v = makeView(canvas, 30); lights(v.scene, 3); ground(v.scene, 8);
+    v.camera.position.set(0, 1.75, 6.7); v.camera.lookAt(0, 1.22, 0);
+    var bot = makeVinc(); v.scene.add(bot.group);
+    var aim = { x: 0, y: 0 }, cur = { x: 0, y: 0 }, jump = -1;
+    window.addEventListener('pointermove', function (e) {
+      var r = canvas.getBoundingClientRect(); if (!r.width) return;
+      aim.x = clamp((e.clientX - (r.left + r.width / 2)) / (r.width * .8), -1, 1);
+      aim.y = clamp((e.clientY - (r.top + r.height * .35)) / (r.height * .8), -1, 1);
+    });
+    V.heroTap = function () { jump = 0; };
+    v.update = function (t, dt) {
+      var k = Math.min(1, dt * 6); cur.x += (aim.x - cur.x) * k; cur.y += (aim.y - cur.y) * k;
+      bot.head.rotation.set(cur.y * .28, cur.x * .55, 0); bot.group.rotation.y = cur.x * .22;
+      bot.pupils.position.set(cur.x * .045, -cur.y * .03, 0);
+      bot.root.rotation.set(0, 0, 0); bot.root.scale.set(1, 1, 1);
+      idle(bot, t, dt, 1);
+      if (jump >= 0) {
+        jump += dt / .9; var p = Math.min(1, jump);
+        bot.root.position.y = Math.sin(p * PI) * (reduce ? .2 : .95);
+        if (!reduce) bot.root.rotation.y = ease(p) * PI * 2;
+        var sq = 1 - Math.sin(p * PI * 2) * .07; bot.root.scale.set(1 / Math.sqrt(sq), sq, 1 / Math.sqrt(sq));
+        bot.armL.rotation.z = -Math.sin(p * PI) * 1.1; bot.armR.rotation.z = Math.sin(p * PI) * .9;
+        if (p >= 1) jump = -1;
+      }
+    };
+  };
+
+  /* ----- Garage turntable ----- */
+  V.initGarage = function (canvas) {
+    var v = makeView(canvas, 30); lights(v.scene, 3); ground(v.scene, 8);
+    v.camera.position.set(0, 2.1, 6.6); v.camera.lookAt(0, 1.1, 0);
+    var turn = new T.Group(); v.scene.add(turn);
+    var ped = mesh(new T.CylinderGeometry(1.15, 1.25, .25, 56), plastic({ color: L(BR.tape) })); ped.position.y = -.125; turn.add(ped);
+    var ring = mesh(new T.TorusGeometry(1.17, .035, 10, 72), plastic({ color: L(BR.amber) })); ring.rotation.x = PI / 2; ring.position.y = .005; turn.add(ring);
+    var bot = makeVinc(); turn.add(bot.group); turn.position.y = .25;
+    var spin = .4, vel = reduce ? 0 : .5, dragging = false, lx = 0;
+    canvas.addEventListener('pointerdown', function (e) { dragging = true; lx = e.clientX; try { canvas.setPointerCapture(e.pointerId); } catch (er) {} });
+    canvas.addEventListener('pointermove', function (e) { if (!dragging) return; var d = e.clientX - lx; lx = e.clientX; spin += d * .012; vel = clamp(d * .6, -8, 8); });
+    ['pointerup', 'pointercancel'].forEach(function (n) { canvas.addEventListener(n, function () { dragging = false; }); });
+    v.update = function (t, dt) {
+      if (!dragging) { vel += ((reduce ? 0 : .5) - vel) * Math.min(1, dt * 1.5); spin += vel * dt; }
+      turn.rotation.y = spin; idle(bot, t, dt, 1);
+    };
+  };
+
+  /* ----- Board ----- */
+  function makeGlitch() {
+    var g = new T.Group(), inner = new T.Group(); g.add(inner);
+    var red = plastic({ color: L(BR.rust) }), blk = std({ color: L(BR.ink), roughness: .35 }), wht = std({ color: L(BR.eye), emissive: L(BR.eye), emissiveIntensity: .35 });
+    var body = mesh(new T.SphereGeometry(.2, 28, 18), red); body.scale.set(1, .72, 1.2); body.position.y = .15; inner.add(body);
+    var seam = mesh(new T.TorusGeometry(.2, .008, 6, 40, PI), blk); seam.rotation.y = PI / 2; seam.scale.set(1.2, .72, 1); seam.position.y = .15; inner.add(seam);
+    [[.08, .26, .02], [-.09, .25, -.06], [.06, .23, -.14], [-.07, .26, .09]].forEach(function (p) { var s = mesh(new T.SphereGeometry(.035, 12, 8), blk); s.position.set(p[0], p[1], p[2]); s.scale.y = .5; inner.add(s); });
+    var hd = mesh(new T.SphereGeometry(.1, 18, 12), blk); hd.position.set(0, .15, .25); inner.add(hd);
+    [-1, 1].forEach(function (s) {
+      var e = mesh(new T.SphereGeometry(.042, 14, 10), wht, false); e.position.set(s * .045, .2, .31); inner.add(e);
+      var p = mesh(new T.SphereGeometry(.02, 10, 8), blk, false); p.position.set(s * .045, .2, .348); inner.add(p);
+      var an = mesh(new T.CylinderGeometry(.008, .008, .17, 6), blk); an.position.set(s * .05, .3, .3); an.rotation.set(.6, 0, -s * .45); inner.add(an);
+      var tip = mesh(new T.SphereGeometry(.022, 10, 8), red); tip.position.set(s * .09, .37, .35); inner.add(tip);
+      [-.1, 0, .1].forEach(function (z) { var lg = mesh(new T.CylinderGeometry(.014, .014, .17, 6), blk); lg.position.set(s * .2, .07, z); lg.rotation.z = s * 1.1; inner.add(lg); });
+    });
+    g.visible = false; return { group: g, inner: inner };
+  }
+  function starGeo() {
+    var s = new T.Shape();
+    for (var i = 0; i < 8; i++) { var a = i / 8 * PI * 2 + PI / 2, r = i % 2 ? .11 : .34, x = Math.cos(a) * r, y = Math.sin(a) * r; if (i) s.lineTo(x, y); else s.moveTo(x, y); }
+    s.closePath();
+    var g = new T.ExtrudeGeometry(s, { depth: .05, bevelEnabled: true, bevelSize: .03, bevelThickness: .035, bevelSegments: 2 }); g.center(); return g;
+  }
+  function glowTex() {
+    var c = document.createElement('canvas'); c.width = c.height = 128; var x = c.getContext('2d');
+    var gr = x.createRadialGradient(64, 64, 0, 64, 64, 64);
+    gr.addColorStop(0, 'rgba(255,224,150,1)'); gr.addColorStop(.35, 'rgba(255,184,70,.5)'); gr.addColorStop(1, 'rgba(255,160,40,0)');
+    x.fillStyle = gr; x.fillRect(0, 0, 128, 128); return new T.CanvasTexture(c);
+  }
+  function crateTex() {
+    var c = document.createElement('canvas'); c.width = c.height = 256; var x = c.getContext('2d');
+    for (var i = 0; i < 5; i++) { x.fillStyle = i % 2 ? '#8E5F36' : '#A47246'; x.fillRect(0, i * 51.2, 256, 51.2); x.fillStyle = 'rgba(43,26,16,.4)'; x.fillRect(0, i * 51.2, 256, 3); }
+    x.strokeStyle = 'rgba(43,26,16,.14)'; x.lineWidth = 1.5;
+    for (var k = 0; k < 40; k++) { var y = (k * 53) % 256; x.beginPath(); x.moveTo(0, y); x.bezierCurveTo(80, y + 6, 170, y - 6, 256, y + 2); x.stroke(); }
+    x.strokeStyle = '#6B4325'; x.lineWidth = 26; x.strokeRect(13, 13, 230, 230);
+    x.lineWidth = 22; x.beginPath(); x.moveTo(24, 24); x.lineTo(232, 232); x.stroke();
+    x.fillStyle = '#3A2414'; [[22, 22], [234, 22], [22, 234], [234, 234]].forEach(function (p) { x.beginPath(); x.arc(p[0], p[1], 6, 0, 7); x.fill(); });
+    var t = new T.CanvasTexture(c); t.encoding = T.sRGBEncoding; t.anisotropy = 4; return t;
+  }
+  V.initBoard = function (canvas) {
+    var v = makeView(canvas, 36), key = lights(v.scene, 5);
+    var world = new T.Group(), tilesG = new T.Group(), propsG = new T.Group(), fxG = new T.Group(); v.scene.add(world); world.add(tilesG, propsG, fxG);
+    var FY = .05, SC = .43, YAW = [PI, PI / 2, 0, -PI / 2];
+    var tileA = std({ roughness: .75 }), tileB = std({ roughness: .75 }), baseM = plastic({ color: L('#6B4A33'), clearcoat: .2 });
+    var crateM = std({ map: crateTex(), roughness: .78 });
+    var sparkM = std({ color: L(BR.amber), emissive: L('#F0B44C'), emissiveIntensity: .55, metalness: .35, roughness: .3 });
+    var glowM = new T.SpriteMaterial({ map: glowTex(), blending: T.AdditiveBlending, depthWrite: false, transparent: true });
+    var partM = std({ color: L('#F0B44C'), emissive: L('#F0B44C'), emissiveIntensity: .9 });
+    var confM = [BR.amber, BR.teal, BR.rust, BR.plum, BR.olive, BR.gold].map(function (h) { return std({ color: L(h), side: T.DoubleSide, roughness: .5 }); });
+    var tileGeo = new T.BoxGeometry(.96, .1, .96), crateGeo = new T.BoxGeometry(.76, .76, .76), sGeo = starGeo(), partGeo = new T.OctahedronGeometry(.05), confGeo = new T.PlaneGeometry(.07, .13);
+    var bot = makeVinc(); bot.group.scale.setScalar(SC); world.add(bot.group);
+    var arrowS = new T.Shape(); arrowS.moveTo(0, -.13); arrowS.lineTo(-.11, .06); arrowS.lineTo(.11, .06); arrowS.closePath();
+    var marker = new T.Mesh(new T.ShapeGeometry(arrowS), std({ color: L(BR.amber), emissive: L(BR.amber), emissiveIntensity: .4, transparent: true, opacity: .85 }));
+    marker.rotation.x = -PI / 2; marker.position.set(0, FY + .012, .44);
+    var markerG = new T.Group(); markerG.add(marker); world.add(markerG);
+    var glitch = makeGlitch(); world.add(glitch.group);
+    var rows = 5, cols = 5, sparks = {}, parts = [];
+    var jumpY = 0, cur = { x: 0, z: 0, yaw: 0 }, tw = null, clock = 0, bumpT = -9, glitchT = -9, winT = -9, shakeT = -9;
+    var yawOff = 0, yawAim = 0, dragging = false, lx = 0;
+    function wx(c) { return c - (cols - 1) / 2; }
+    function wz(r) { return r - (rows - 1) / 2; }
+    function setPose() { bot.group.position.set(cur.x, FY, cur.z); bot.group.rotation.y = cur.yaw; markerG.position.set(cur.x, 0, cur.z); markerG.rotation.y = cur.yaw; }
+    function refresh() { tileA.color.copy(C('--paper-2')).multiplyScalar(.78); tileB.color.copy(C('--line')).multiplyScalar(.74); }
+    canvas.addEventListener('pointerdown', function (e) { dragging = true; lx = e.clientX; try { canvas.setPointerCapture(e.pointerId); } catch (er) {} });
+    canvas.addEventListener('pointermove', function (e) { if (!dragging) return; yawAim = clamp(yawAim + (e.clientX - lx) * .007, -.9, .9); lx = e.clientX; });
+    ['pointerup', 'pointercancel'].forEach(function (n) { canvas.addEventListener(n, function () { dragging = false; }); });
+    canvas.addEventListener('dblclick', function () { yawAim = 0; });
+    var B = {};
+    B.refresh = refresh;
+    B.build = function (P) {
+      rows = P.rows; cols = P.cols; clear(tilesG); clear(propsG); sparks = {}; refresh();
+      var base = mesh(new T.BoxGeometry(cols + .45, .4, rows + .45), baseM); base.position.y = -.25; tilesG.add(base);
+      for (var r = 0; r < rows; r++) for (var c = 0; c < cols; c++) {
+        var k = r + ',' + c, tile = mesh(tileGeo, (r + c) % 2 ? tileB : tileA, false); tile.position.set(wx(c), 0, wz(r)); tilesG.add(tile);
+        if (P.crates[k]) { var cr = mesh(crateGeo, crateM); cr.position.set(wx(c), FY + .38, wz(r)); cr.rotation.y = ((r * 7 + c * 3) % 5 - 2) * .04; propsG.add(cr); }
+        if (P.sparks.indexOf(k) >= 0) {
+          var sg = new T.Group(), star = mesh(sGeo, sparkM), glow = new T.Sprite(glowM);
+          glow.scale.setScalar(.85); star.scale.setScalar(1.25); star.rotation.x = -.25; sg.add(glow, star); sg.position.set(wx(c), FY + .58, wz(r)); propsG.add(sg);
+          sparks[k] = { g: sg, star: star, phase: r * 1.3 + c, st: -1 };
+        }
+      }
+      var n = Math.max(rows, cols), sc = key.shadow.camera; sc.left = sc.bottom = -(n / 2 + 1.5); sc.right = sc.top = n / 2 + 1.5; sc.updateProjectionMatrix();
+      v.dist = n * 1.45 + 2.6;
+    };
+    B.place = function (pos, dur, jump) {
+      var ty = YAW[pos.d], d = ((ty - cur.yaw) % (2 * PI) + 3 * PI) % (2 * PI) - PI;
+      var to = { x: wx(pos.c), z: wz(pos.r), yaw: cur.yaw + d };
+      if (!dur) { tw = null; cur = to; setPose(); return; }
+      tw = { from: { x: cur.x, z: cur.z, yaw: cur.yaw }, to: to, t0: clock, dur: dur / 1000, jump: !!jump };
+    };
+    B.reset = function () {
+      tw = null; bumpT = glitchT = winT = shakeT = -9; glitch.group.visible = false; clear(fxG); parts = [];
+      for (var k in sparks) { var s = sparks[k]; s.st = -1; s.g.visible = true; s.g.scale.setScalar(1); }
+    };
+    function burst(pos, n, conf) {
+      for (var i = 0; i < n; i++) {
+        var m = conf ? new T.Mesh(confGeo, confM[i % confM.length]) : new T.Mesh(partGeo, partM);
+        m.position.copy(pos);
+        var a = Math.random() * PI * 2, sp = conf ? 1.2 + Math.random() * 2 : 1 + Math.random() * 1.6;
+        parts.push({ m: m, vx: Math.cos(a) * sp, vz: Math.sin(a) * sp, vy: conf ? 3 + Math.random() * 3 : 1.5 + Math.random() * 2, life: conf ? 2.2 : .8, max: conf ? 2.2 : .8, spin: conf ? (Math.random() - .5) * 14 : 6 });
+        fxG.add(m);
+      }
+    }
+    B.collect = function (k) { var s = sparks[k]; if (!s) return; s.st = clock; burst(s.g.position.clone(), 16, false); };
+    B.bump = function (pos, nr, nc, off) {
+      bumpT = clock; shakeT = clock;
+      var gx, gz, gy;
+      if (off) { gx = (wx(pos.c) + wx(nc)) / 2; gz = (wz(pos.r) + wz(nr)) / 2; gy = FY; }
+      else { gx = wx(nc); gz = wz(nr); gy = FY + .76; }
+      glitch.group.position.set(gx, gy, gz); glitch.group.rotation.y = Math.atan2(cur.x - gx, cur.z - gz);
+      glitch.group.visible = true; glitchT = clock + .22; glitch.group.scale.setScalar(.001);
+    };
+    B.win = function () { winT = clock; if (!reduce) burst(new T.Vector3(cur.x, FY + 1, cur.z), 90, true); };
+    v.update = function (t, dt) {
+      clock = t;
+      bot.root.rotation.set(0, 0, 0); bot.root.scale.set(1, 1, 1);
+      idle(bot, t, dt, .7);
+      if (tw) {
+        var p = Math.min(1, (t - tw.t0) / tw.dur), e = ease(p);
+        var nx = tw.from.x + (tw.to.x - tw.from.x) * e, nz = tw.from.z + (tw.to.z - tw.from.z) * e, ny = tw.from.yaw + (tw.to.yaw - tw.from.yaw) * e;
+        var moved = Math.hypot(nx - cur.x, nz - cur.z), turned = ny - cur.yaw;
+        bot.wheels[0].rotation.x += moved / (.22 * SC) + turned * 3; bot.wheels[1].rotation.x += moved / (.22 * SC) - turned * 3;
+        jumpY = tw.jump ? Math.sin(p * PI) * .85 : 0;
+        if (!tw.jump && (tw.to.x !== tw.from.x || tw.to.z !== tw.from.z)) bot.root.rotation.x = Math.sin(p * PI) * .14;
+        if (tw.jump) { var sq = 1 - Math.sin(p * PI) * .12; bot.root.scale.set(1 / Math.sqrt(sq), 1 / sq, 1 / Math.sqrt(sq)); }
+        cur = { x: nx, z: nz, yaw: ny }; if (p >= 1) { tw = null; jumpY = 0; }
+      }
+      setPose(); bot.group.position.y += jumpY;
+      var bp = (t - bumpT) / .42;
+      if (bp >= 0 && bp < 1) {
+        var f = Math.sin(bp * PI) * .26;
+        bot.group.position.x += Math.sin(cur.yaw) * f; bot.group.position.z += Math.cos(cur.yaw) * f;
+        bot.root.rotation.x = -Math.sin(bp * PI) * .35;
+      }
+      if (glitch.group.visible) {
+        var gp = (t - glitchT) / .35;
+        glitch.group.scale.setScalar(gp <= 0 ? .001 : backOut(Math.min(1, gp)) * .95);
+        if (!reduce) { glitch.inner.rotation.y = Math.sin(t * 9) * .3; glitch.inner.position.y = Math.abs(Math.sin(t * 7)) * .06; }
+      }
+      var wp = (t - winT) / 1.3;
+      if (wp >= 0 && wp < 1) {
+        bot.root.position.y += Math.abs(Math.sin(wp * PI * 2)) * (reduce ? .3 : 1.6);
+        if (!reduce) bot.root.rotation.y = ease(wp) * PI * 2;
+        bot.armL.rotation.z = -Math.sin(wp * PI) * 1.2; bot.armR.rotation.z = Math.sin(wp * PI) * 1;
+      }
+      for (var k in sparks) {
+        var s = sparks[k]; if (!s.g.visible) continue;
+        if (s.st < 0) { s.star.rotation.y = reduce ? 0 : Math.sin(t * 1.4 + s.phase) * .55; s.star.rotation.z += reduce ? 0 : dt * .9; s.g.position.y = FY + .58 + (reduce ? 0 : Math.sin(t * 2 + s.phase) * .06); }
+        else {
+          var sp2 = (t - s.st) / .55; s.star.rotation.z += dt * 14; s.g.position.y = FY + .58 + sp2 * .9;
+          s.g.scale.setScalar(Math.max(.001, sp2 < .3 ? 1 + sp2 / .3 * .5 : 1.5 * (1 - (sp2 - .3) / .7)));
+          if (sp2 >= 1) s.g.visible = false;
+        }
+      }
+      for (var i = parts.length - 1; i >= 0; i--) {
+        var q = parts[i]; q.life -= dt;
+        if (q.life <= 0) { fxG.remove(q.m); parts.splice(i, 1); continue; }
+        q.vy -= 6 * dt; q.m.position.x += q.vx * dt; q.m.position.y = Math.max(FY + .02, q.m.position.y + q.vy * dt); q.m.position.z += q.vz * dt;
+        if (q.m.position.y <= FY + .02) { q.vx *= .9; q.vz *= .9; q.vy = 0; }
+        q.m.rotation.x += q.spin * dt; q.m.rotation.y += q.spin * .7 * dt;
+        q.m.scale.setScalar(Math.max(.001, Math.min(1, q.life / q.max * 2.5)));
+      }
+      yawOff += (yawAim - yawOff) * Math.min(1, dt * 6);
+      var el = .8, R = v.dist || 9, yaw = yawOff;
+      v.camera.position.set(Math.sin(yaw) * R * Math.cos(el), R * Math.sin(el), Math.cos(yaw) * R * Math.cos(el));
+      var sk = (t - shakeT) / .3;
+      if (sk >= 0 && sk < 1 && !reduce) { v.camera.position.x += (Math.random() - .5) * .12 * (1 - sk); v.camera.position.y += (Math.random() - .5) * .08 * (1 - sk); }
+      v.camera.lookAt(0, -.15, .1);
+    };
+    var mo = new MutationObserver(refresh); mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    if (window.matchMedia) { var mq = window.matchMedia('(prefers-color-scheme: dark)'); if (mq.addEventListener) mq.addEventListener('change', refresh); }
+    return B;
+  };
+
+  /* ----- Part reveal (modal) ----- */
+  var partV = null;
+  V.partCanvas = function (id) {
+    if (!partV) {
+      var cv = document.createElement('canvas'); cv.className = 'part3d'; cv.setAttribute('aria-hidden', 'true');
+      partV = makeView(cv, 32, true); lights(partV.scene, 2);
+      partV.camera.position.set(0, .9, 3.2); partV.camera.lookAt(0, .15, 0);
+      partV.holder = new T.Group(); partV.scene.add(partV.holder);
+      partV.update = function (t, dt) { partV.holder.rotation.y += dt * (reduce ? .3 : 1.5); partV.holder.position.y = reduce ? 0 : Math.sin(t * 2) * .05; };
+    }
+    clear(partV.holder);
+    var M = { rubber: std({ color: L('#221A14'), roughness: .9 }), hub: plastic({ color: L(BR.amber) }), ink: std({ color: L(BR.ink) }) };
+    var grp = new T.Group();
+    if (id === 'antenna') {
+      var base = mesh(new T.CylinderGeometry(.34, .4, .12, 32), M.ink); base.position.y = -.2; grp.add(base);
+      var st = mesh(new T.CylinderGeometry(.05, .05, .8, 14), M.ink); st.position.y = .22; grp.add(st);
+      var blb = mesh(new T.SphereGeometry(.2, 28, 18), std({ color: L(BR.plum), emissive: L('#E07AA6'), emissiveIntensity: .9 })); blb.position.y = .7; grp.add(blb);
+      [.34, .5].forEach(function (r) { var ring = mesh(new T.TorusGeometry(r, .025, 8, 40, PI * .6), plastic({ color: L(BR.plum) })); ring.position.y = .7; ring.rotation.z = PI * .2; grp.add(ring); var r2 = ring.clone(); r2.rotation.z = PI * 1.2; grp.add(r2); });
+    } else if (id === 'wheels') {
+      [-.42, .42].forEach(function (x) { var w = makeWheel(M); w.scale.setScalar(2); w.position.set(x, .3, 0); w.rotation.x = .4; grp.add(w); });
+      var ax = mesh(new T.CylinderGeometry(.07, .07, .9, 14), M.ink); ax.rotation.z = PI / 2; ax.position.y = .3; grp.add(ax);
+    } else {
+      var pts = []; for (var i = 0; i <= 200; i++) { var a = i / 200 * PI * 2 * 5; pts.push(new T.Vector3(Math.cos(a) * .3, i / 200 * .9 - .15, Math.sin(a) * .3)); }
+      grp.add(mesh(new T.TubeGeometry(new T.CatmullRomCurve3(pts), 400, .045, 10), plastic({ color: L(BR.olive), metalness: .3 })));
+      var foot = mesh(new T.CylinderGeometry(.42, .46, .1, 32), M.ink); foot.position.y = -.2; grp.add(foot);
+      var top = mesh(new T.CylinderGeometry(.36, .36, .06, 32), M.hub); top.position.y = .78; grp.add(top);
+    }
+    partV.holder.add(grp); return partV.canvas;
+  };
+})();
+</script>
+<script>
+(function () {
+  'use strict';
+  var KEY = 'jodu-proto-v3';
+  var V3D = window.V3D && window.V3D.ok ? window.V3D : { ok: false }, B3 = null;
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var $ = function (id) { return document.getElementById(id); };
+
+  var WORLDS = { 3: 'Class 3 · Workbench', 4: 'Class 4 · Rooftop Garden' };
+  var LEVELS = [
+    {"id": "3-1", "world": 3, "name": "First steps", "par": 3, "map": [".....", ".....", ">..*.", ".....", "....."], "say": "A spark! It's right in front of me. How many steps away is it?", "hint": "Count the squares between Vinc and the spark, then add that many step() blocks."},
+    {"id": "3-2", "world": 3, "name": "Turn the corner", "par": 8, "map": ["...*.", ".....", ".....", ".....", ">...."], "say": "This spark is around a corner. I'll need to turn!", "hint": "Roll right 3 squares, then turnLeft() to face up, then roll up 4 squares."},
+    {"id": "3-3", "world": 3, "name": "Which way?", "par": 5, "map": [".....", ".....", "*...^", ".....", "....."], "say": "I'm facing up, but the spark is to my left. Turn me first!", "hint": "Turning does not move Vinc. turnLeft() once, then step."},
+    {"id": "3-4", "world": 3, "name": "Two sparks", "par": 10, "map": [".....", ".*...", ".....", ".#...", ">..*."], "say": "Two sparks this time. Which one should we grab first?", "hint": "Get the bottom spark first. Going for the top one first leaves a crate in the way."},
+    {"id": "3-5", "world": 3, "name": "Glitch's trap", "par": 9, "map": [".*...", ".#.#.", ".....", ".#...", ">...."], "debug": true, "code": ["step", "step", "turnRight", "step", "step", "step", "step", "turnLeft", "step"], "say": "Hee hee! I swapped one block in Vinc's code. Press Run and find me!", "hint": "Watch which way Vinc turns on line 3. Is that the way to the spark?"},
+    {"id": "3-6", "world": 3, "name": "Around the crate", "par": 9, "map": [".....", ".....", ">.#.*", ".....", "....."], "say": "A crate is blocking my way! Can we go around it?", "hint": "Go up one row to get past the crate, then come back down to the spark."},
+    {"id": "3-7", "world": 3, "name": "Crate maze", "par": 10, "map": ["....*", "...#.", ".#...", "....#", ">..#."], "say": "Crates everywhere! Can we reach the spark in 10 blocks or fewer?", "hint": "Roll up the left edge to the top, then turn right and roll along the top row."},
+    {"id": "3-8", "world": 3, "name": "There and back", "par": 11, "map": ["*....", ".#...", ".#...", ".#...", "^.*.."], "say": "One spark up high, one down low. Plan the whole trip!", "hint": "Try grabbing the spark next to you first, then go up the third column."},
+    {"id": "3-9", "world": 3, "name": "Big board", "par": 10, "map": ["......", ".*..*.", "......", ".#..#.", "......", ">....."], "say": "A bigger board! Two sparks in the same row…", "hint": "Climb to the row with both sparks, then roll straight across it."},
+    {"id": "3-10", "world": 3, "name": "Glitch counts wrong", "par": 9, "map": ["*....", ".....", "..#..", ".##..", "....<"], "debug": true, "code": ["step", "step", "step", "step", "step", "turnRight", "step", "step", "step", "step"], "say": "Hee hee! I added an extra block somewhere. Vinc will roll right off the board!", "hint": "Count the squares in the bottom row. How many steps fit before the edge?"},
+    {"id": "3-11", "world": 3, "name": "The long way round", "par": 11, "map": [".....*", "......", "####..", "......", "......", ">....."], "say": "A wall of crates! There must be a gap somewhere.", "hint": "The gap in the crate wall is on the right side."},
+    {"id": "3-12", "world": 3, "name": "Corner tour", "par": 14, "map": ["*...*", ".....", "..#..", ".....", "^...*"], "say": "Three corners, three sparks. That's a lot of blocks… we'll find a shortcut in Class 4!", "hint": "Up the left side, across the top, then down the right side."},
+    {"id": "3-13", "world": 3, "name": "Market lanes", "par": 14, "map": ["..#..*", "..#.##", "......", "#.#.##", "..#...", ">.#..."], "say": "The market is full of crates. Find the lane to the spark!", "hint": "Take one step, then go up the second column. Zig-zag through the gaps toward the top-right corner."},
+    {"id": "3-14", "world": 3, "name": "Four sparks", "par": 20, "map": [".*....", "......", "...#.*", "*.....", "..#...", ">...*."], "say": "Four sparks! Which order is shortest? Try a few plans.", "hint": "Go round the edge of the board: up, across the top, then down the right side."},
+    {"id": "3-15", "world": 3, "name": "Glitch's big mess", "par": 16, "map": ["......", ".#..*.", ".#....", ".#.##.", "*.....", ".>..#."], "debug": true, "boss": true, "code": ["turnRight", "step", "turnLeft", "step", "turnRight", "step", "step", "step", "step", "turnRight", "step", "step", "step", "turnRight", "step"], "say": "Boss level! I hid TWO bugs in this code. Can you catch me twice?", "hint": "Vinc starts facing right. Which way must it turn to reach the left spark first?"},
+    {"id": "4-1", "world": 4, "name": "Long hallway", "par": 2, "map": ["......", "......", "......", "......", "......", ">....*"], "tag": "New block: repeat", "say": "New block: repeat! It runs the blocks inside it again and again.", "hint": "Drag a repeat block in, put one step() inside it, and set the number to 5."},
+    {"id": "4-2", "world": 4, "name": "Tall tower", "par": 2, "map": ["...*...", ".......", ".......", "...*...", ".......", ".......", "...^..."], "say": "Up, up, up! Can you climb the tower with just two blocks?", "hint": "repeat 6 times: step()."},
+    {"id": "4-3", "world": 4, "name": "Turn and go", "par": 5, "map": [".....*", "......", "......", "......", "......", ">....*"], "say": "Two long roads. Two loops?", "hint": "Loop along the bottom, turn left, then loop up the right side."},
+    {"id": "4-4", "world": 4, "name": "Staircase", "par": 5, "map": [".....*", "....*.", "...*..", "..*...", ".*....", ">....."], "say": "Sparks on every stair! Climbing stairs is the same few moves over and over…", "hint": "One stair is: step, turnLeft, step, turnRight. Repeat that 5 times."},
+    {"id": "4-5", "world": 4, "name": "Glitch's loop", "par": 5, "map": ["....*", "...*.", "..*..", ".*...", ">...."], "debug": true, "code": ["repeat3", "step", "turnLeft", "step", "turnRight", "end"], "say": "I changed one number in this loop. Vinc will stop too early. Hee hee!", "hint": "Count the stairs. How many times should the loop repeat?"},
+    {"id": "4-6", "world": 4, "name": "Corner tour, again", "par": 4, "map": ["*...*", ".....", "..#..", ".....", "^...*"], "say": "Remember Corner tour? It took 14 blocks. Can you do it in 4 with a loop inside a loop?", "hint": "One side is \"repeat 4 { step }\" then turnRight. Repeat that whole thing 3 times."},
+    {"id": "4-7", "world": 4, "name": "First jump", "par": 2, "map": [".....", ".....", ">#.#*", ".....", "....."], "tag": "New block: jump", "say": "My Spring legs can jump over one crate! jump() moves me two squares.", "hint": "jump() hops over the square in front and lands on the one after it."},
+    {"id": "4-8", "world": 4, "name": "Crate hurdles", "par": 2, "map": [".......", ".......", ".......", ".......", ".......", ".......", ">#*#*#*"], "say": "Hurdles! Jump, jump, jump!", "hint": "Put one jump() inside a repeat 3 loop."},
+    {"id": "4-9", "world": 4, "name": "Hurdle stairs", "par": 5, "map": [".......", ".......", ".......", "......*", ".....#*", "...#*..", ">#*...."], "say": "Jump a hurdle, climb a stair, again and again!", "hint": "One pattern: jump, turnLeft, step, turnRight. How many times?"},
+    {"id": "4-10", "world": 4, "name": "Glitch broke my legs", "par": 2, "map": [".......", ".......", ".......", "*#*#*#<", ".......", ".......", "......."], "debug": true, "code": ["repeat3", "step", "end"], "say": "I swapped a block inside the loop. Now Vinc can't get over anything!", "hint": "Which block lets Vinc get over a crate?"},
+    {"id": "4-11", "world": 4, "name": "Big square", "par": 4, "map": ["*.....*", ".......", ".......", "...#...", ".......", ".......", "^.....*"], "say": "A bigger square. Same idea, different numbers!", "hint": "Each side is 6 steps long. Change the numbers from Corner tour, again."},
+    {"id": "4-12", "world": 4, "name": "Down the stairs", "par": 5, "map": [">......", ".*.....", "..*....", "...*...", "....*..", ".....*.", "......*"], "say": "Going down! It's the staircase, but in the other direction.", "hint": "One stair down is: step, turnRight, step, turnLeft."},
+    {"id": "4-13", "world": 4, "name": "Jump around the corner", "par": 4, "map": ["*#*#*#*", "#......", ".......", "#......", ".......", "#......", "^......"], "say": "Jumps going up, then jumps going across. A loop in a loop again?", "hint": "Three jumps, then turnRight. Do that twice."},
+    {"id": "4-14", "world": 4, "name": "Garden path", "par": 5, "map": [".......", ".......", "*#..*..", "....#..", ".......", ".......", ">..#*.."], "say": "Roll, roll, jump, turn… I see a pattern!", "hint": "Two steps, a jump and a turnLeft, repeated 3 times."},
+    {"id": "4-15", "world": 4, "name": "Glitch's garden", "par": 5, "map": ["..*#..<", ".......", ".......", "..#....", "..*..#*", ".......", "......."], "debug": true, "boss": true, "code": ["repeat3", "repeat3", "step", "end", "jump", "turnRight", "end"], "say": "Boss level! Two bugs are hiding in this loop. Good luck catching me!", "hint": "Count the steps before each crate, and check which way Vinc should turn."}
+  ];
+  var PARTS = [
+    { id: 'spring', name: 'Spring legs', world: 3 }, { id: 'antenna', name: 'Sensor antenna', world: 4 },
+    { id: 'chip', name: 'Memory chip', world: 5 }, { id: 'gear', name: 'Gear toolbelt', world: 6 },
+    { id: 'brain', name: 'AI brain', world: 7 }, { id: 'rocket', name: 'Rocket boosters', world: 8 }
+  ];
+  var PAINTS = [
+    { id: 'amber', name: 'Workshop amber', v: 'var(--amber)', hex: '#D98A1C', cost: 0 }, { id: 'teal', name: 'Lab teal', v: 'var(--teal)', hex: '#1F6F66', cost: 10 },
+    { id: 'olive', name: 'Garden olive', v: 'var(--olive)', hex: '#4C7424', cost: 10 }, { id: 'rust', name: 'Rust red', v: 'var(--rust)', hex: '#C2502A', cost: 15 },
+    { id: 'plum', name: 'Night plum', v: 'var(--plum)', hex: '#8C3557', cost: 15 }, { id: 'slate', name: 'Metro slate', v: 'var(--slate)', hex: '#34465A', cost: 25 }
+  ];
+  var HATS = [
+    { id: 'none', name: 'No hat', cost: 0 }, { id: 'cap', name: 'Cricket cap', cost: 15 },
+    { id: 'phones', name: 'Headphones', cost: 20 }, { id: 'grad', name: 'Graduation cap', cost: 30 }, { id: 'crown', name: 'Coder crown', cost: 40 }
+  ];
+  var DR = [-1, 0, 1, 0], DC = [0, 1, 0, -1];
+  var PY = { step: 'step', turnLeft: 'turn_left', turnRight: 'turn_right', jump: 'jump' };
+  var LABEL = { step: 'step()', turnLeft: 'turnLeft()', turnRight: 'turnRight()', jump: 'jump()' };
+  var SPEEDS = [[1, 460], [2, 240], [3, 120]];
+
+  function defaults() { return { best: {}, spent: 0, owned: ['amber', 'none'], paint: 'amber', hat: 'none', parts: [], sound: true, unlockAll: false, cur: 0, speed: 0 }; }
+  function load() {
+    var d = defaults();
+    try { var raw = localStorage.getItem(KEY); if (raw) { var o = JSON.parse(raw); for (var k in d) if (o[k] !== undefined) d[k] = o[k]; } } catch (e) {}
+    return d;
+  }
+  var S = load();
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+  function wallet() { var t = 0; for (var k in S.best) t += S.best[k]; return t * 5 - S.spent; }
+  function starsHtml(n) { return '★'.repeat(n) + '<span class="off">' + '★'.repeat(3 - n) + '</span>'; }
+
+  /* ---------- Sound ---------- */
+  var ac = null;
+  var SFX = {
+    step: [[520, .05, 'square', .03]], turn: [[380, .05, 'triangle', .06]],
+    spark: [[880, .08, 'sine', .12], [1320, .14, 'sine', .12, .07]], bump: [[140, .22, 'sawtooth', .07]],
+    win: [[523, .12, 'triangle', .12], [659, .12, 'triangle', .12, .1], [784, .12, 'triangle', .12, .2], [1047, .35, 'triangle', .12, .3]],
+    buy: [[988, .08, 'square', .05], [1319, .16, 'square', .05, .08]], tap: [[660, .07, 'sine', .08]], jump: [[300, .12, 'sine', .1], [620, .14, 'sine', .1, .06]], add: [[740, .04, 'sine', .06]],
+    part: [[392, .14, 'triangle', .12], [523, .14, 'triangle', .12, .12], [659, .14, 'triangle', .12, .24], [784, .14, 'triangle', .12, .36], [1047, .5, 'triangle', .12, .48]]
+  };
+  function sfx(name) {
+    if (!S.sound) return;
+    try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return; }
+    if (ac.state === 'suspended') ac.resume();
+    SFX[name].forEach(function (n) {
+      var o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime + (n[4] || 0);
+      o.type = n[2]; o.frequency.value = n[0];
+      g.gain.setValueAtTime(n[3], t); g.gain.exponentialRampToValueAtTime(0.0001, t + n[1]);
+      o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t + n[1] + .02);
+    });
+  }
+
+  /* ---------- Confetti ---------- */
+  function confetti(originEl) {
+    if (reduce) return;
+    var cv = $('fx'), ctx = cv.getContext('2d'), dpr = window.devicePixelRatio || 1;
+    cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; ctx.scale(dpr, dpr);
+    var cs = getComputedStyle(document.documentElement);
+    var cols = ['--amber', '--teal', '--rust', '--plum', '--olive', '--gold'].map(function (v) { return cs.getPropertyValue(v).trim(); });
+    var r = originEl.getBoundingClientRect(), ox = r.left + r.width / 2, oy = r.top + r.height / 3;
+    var ps = [];
+    for (var i = 0; i < 140; i++) {
+      var a = Math.random() * Math.PI * 2, sp = 4 + Math.random() * 7;
+      ps.push({ x: ox, y: oy, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 5, s: 5 + Math.random() * 6, r: Math.random() * 6, vr: Math.random() * .3 - .15, c: cols[i % cols.length] });
+    }
+    var f = 0;
+    (function frame() {
+      ctx.clearRect(0, 0, innerWidth, innerHeight);
+      ps.forEach(function (p) {
+        p.vy += .25; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.r += p.vr;
+        ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r); ctx.globalAlpha = Math.max(0, 1 - f / 110);
+        ctx.fillStyle = p.c; ctx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); ctx.restore();
+      });
+      if (++f < 110) requestAnimationFrame(frame); else ctx.clearRect(0, 0, innerWidth, innerHeight);
+    })();
+  }
+
+  /* ---------- Look (paint + hat) ---------- */
+  function applyLook() {
+    var p = PAINTS.find(function (x) { return x.id === S.paint; }) || PAINTS[0];
+    document.body.style.setProperty('--paint', p.v);
+    document.body.style.setProperty('--torso', p.id === 'teal' ? 'var(--amber)' : 'var(--teal)');
+    if (V3D.ok) V3D.setLook(p.hex, p.id === 'teal' ? '#D98A1C' : '#1F6F66', S.hat);
+    ['cap', 'phones', 'grad', 'crown'].forEach(function (h) { document.body.style.setProperty('--show-' + h, S.hat === h ? 'inline' : 'none'); });
+  }
+  function updateWallet() {
+    var w = wallet(), t = '⚡ ' + w + ' spark' + (w === 1 ? '' : 's');
+    $('heroWallet').textContent = t; $('garageWallet').textContent = t;
+  }
+
+  /* ---------- Parts tray ---------- */
+  function worldDone(w) { return LEVELS.filter(function (l) { return l.world === w; }).every(function (l) { return S.best[l.id] > 0; }); }
+  function renderSlots() {
+    var el = $('slots'); el.innerHTML = ''; var n = 0;
+    PARTS.forEach(function (p) {
+      var got = S.parts.indexOf(p.id) >= 0; if (got) n++;
+      var d = document.createElement('div');
+      d.className = 'slot ' + (got ? 'got' : 'locked');
+      d.title = got ? p.name + ': found!' : p.name + ': finish Class ' + p.world + ' to find it';
+      d.innerHTML = '<svg aria-hidden="true"><use href="#p-' + p.id + '"/></svg><span>' + (got ? p.name : 'Class ' + p.world) + '</span>';
+      el.appendChild(d);
+    });
+    $('partCount').textContent = n + ' / 6 found';
+  }
+
+  /* ---------- Hero interactions ---------- */
+  var pupils = $('pupils'), heroSvg = $('heroSvg'), vinciBtn = $('vinciBtn'), speech = $('speech');
+  window.addEventListener('pointermove', function (e) {
+    if (reduce) return;
+    var r = heroSvg.getBoundingClientRect(); if (!r.width) return;
+    var dx = e.clientX - (r.left + r.width * .5), dy = e.clientY - (r.top + r.height * .36);
+    var L = Math.hypot(dx, dy) || 1, m = Math.min(4.5, L / 30);
+    pupils.setAttribute('transform', 'translate(' + (dx / L * m).toFixed(2) + ' ' + (dy / L * m).toFixed(2) + ')');
+  });
+  var tapN = 0;
+  vinciBtn.addEventListener('click', function () {
+    var got = S.parts.length, hat = HATS.find(function (h) { return h.id === S.hat; });
+    var lines = [
+      'Beep-ah! That tickles!',
+      got ? 'I\'ve found ' + got + ' of my 6 parts. Thanks, engineer!' : 'I\'m missing all 6 parts! Scroll down and play to help me.',
+      'My favourite snack? Sparks! Crunchy and glowy.',
+      S.hat !== 'none' ? 'Do you like my ' + hat.name.toLowerCase() + '? I feel so fancy.' : 'I\'d love a hat. The Garage sells some…',
+      'Robots do exactly what you tell them. Even silly things!',
+      'One day I\'ll build a rocket. Then: space!'
+    ];
+    speech.textContent = lines[tapN++ % lines.length];
+    vinciBtn.classList.remove('hop'); void vinciBtn.offsetWidth; vinciBtn.classList.add('hop');
+    if (V3D.ok && V3D.heroTap) V3D.heroTap();
+    sfx('tap');
+  });
+
+  /* ---------- Level helpers ---------- */
+  function parse(L) {
+    var crates = {}, sparks = [], start = null;
+    L.map.forEach(function (row, r) {
+      row.split('').forEach(function (ch, c) {
+        if (ch === '#') crates[r + ',' + c] = 1;
+        else if (ch === '*') sparks.push(r + ',' + c);
+        else if ('^>v<'.indexOf(ch) >= 0) start = { r: r, c: c, d: '^>v<'.indexOf(ch) };
+      });
+    });
+    return { rows: L.map.length, cols: L.map[0].length, crates: crates, sparks: sparks, start: start };
+  }
+  function unlocked(i) { return S.unlockAll || i === 0 || S.best[LEVELS[i - 1].id] > 0; }
+  var uid = 1;
+  function mk(s) {
+    if (s.indexOf('repeat') === 0) return { t: 'repeat', n: +s.slice(6) || 3, id: uid++ };
+    return { t: s, id: uid++ };
+  }
+
+  /* ---------- Program model ---------- */
+  var prog = [];
+  function matchEnds(p) {
+    var m = {}, st = [];
+    p.forEach(function (b, i) {
+      if (b.t === 'repeat') st.push(i);
+      else if (b.t === 'end') { var o = st.pop(); if (o !== undefined) { m[o] = i; m[i] = o; } }
+    });
+    return m;
+  }
+  function expand(p) {
+    var m = matchEnds(p), out = [];
+    function run(a, b, loops) {
+      for (var i = a; i < b && out.length < 500; i++) {
+        var blk = p[i];
+        if (blk.t === 'repeat') {
+          var e = m[i] !== undefined ? m[i] : p.length;
+          for (var k = 0; k < blk.n; k++) run(i + 1, e, loops.concat([{ line: i, iter: k + 1, n: blk.n }]));
+          i = e;
+        } else if (blk.t !== 'end') out.push({ t: blk.t, line: i, loops: loops });
+      }
+    }
+    run(0, p.length, []);
+    return out;
+  }
+  function blockCount() { return prog.filter(function (b) { return b.t !== 'end'; }).length; }
+  function rangeOf(i) { var m = matchEnds(prog); return prog[i].t === 'repeat' ? [i, m[i] !== undefined ? m[i] : i] : [i, i]; }
+  function insertAt(idx, t) {
+    if (blockCount() >= 30) { say('That\'s a lot of blocks! Could a repeat loop make it shorter?'); return; }
+    if (t === 'repeat') prog.splice(idx, 0, { t: 'repeat', n: 3, id: uid++ }, { t: 'end', id: uid++ });
+    else prog.splice(idx, 0, { t: t, id: uid++ });
+    sfx('add');
+  }
+  function edited() { resetRun(); renderCode(); }
+
+  /* ---------- DOM refs ---------- */
+  var board = $('board'), bot = $('bot'), dirEl = $('dir'), codeEl = $('code'), codeWrap = $('codeWrap'), dropEl = $('drop');
+  var msgEl = $('msg'), runBtn = $('run'), stepBtn = $('step'), pyEl = $('py');
+  var lv, P, cells = {}, run = null, running = false, timer = null, cur = 0;
+
+  function say(text, who) {
+    var isBug = who === 'bug';
+    msgEl.innerHTML = '<svg viewBox="' + (isBug ? '0 0 40 40' : '0 0 100 100') + '" aria-hidden="true"><use href="#' + (isBug ? 'bug' : 'mini') + '"/></svg><span></span>';
+    msgEl.querySelector('span').textContent = (isBug ? 'Glitch: ' : 'Vinc: ') + '"' + text + '"';
+  }
+
+  function renderLevels() {
+    var el = $('levels'); el.innerHTML = '';
+    [3, 4].forEach(function (w) {
+      var row = document.createElement('div'); row.className = 'world';
+      row.innerHTML = '<span class="world-name">' + WORLDS[w] + (worldDone(w) ? ' ✓' : '') + '</span>';
+      LEVELS.forEach(function (L, i) {
+        if (L.world !== w) return;
+        var b = document.createElement('button'), open = unlocked(i), best = S.best[L.id] || 0;
+        b.className = 'lvl' + (i === cur ? ' cur' : '') + (L.debug ? ' debug' : '');
+        b.disabled = !open;
+        b.setAttribute('aria-label', 'Level ' + L.id + ', ' + L.name + (open ? ', best ' + best + ' stars' : ', locked'));
+        b.innerHTML = open ? '<span>' + L.id + '</span><small>' + starsHtml(best) + '</small>' : '<svg aria-hidden="true"><use href="#lock"/></svg>';
+        b.title = L.name + (L.debug ? ' (Catch Glitch)' : '');
+        b.onclick = function () { if (!running) loadLevel(i); };
+        row.appendChild(b);
+      });
+      el.appendChild(row);
+    });
+    renderExplorer();
+  }
+
+  function renderPalette() {
+    var el = $('palette'); el.innerHTML = '';
+    var types = ['step', 'turnLeft', 'turnRight', 'jump', 'repeat'];
+    types.forEach(function (t) {
+      var b = document.createElement('button');
+      b.className = 'blk ' + t; b.dataset.t = t;
+      if ((t === 'repeat' || t === 'jump') && lv.world < 4) { b.disabled = true; b.textContent = t + ' · Class 4'; b.title = 'Unlocks in Class 4 with Spring legs'; }
+      else b.textContent = t === 'repeat' ? 'repeat 3 { }' : LABEL[t];
+      if (!b.disabled) {
+        b.addEventListener('pointerdown', function (e) { startDrag(e, { kind: 'pal', t: t }, b); });
+        b.addEventListener('click', function () { if (suppressClick || running) return; insertAt(prog.length, t); edited(); });
+      }
+      el.appendChild(b);
+    });
+  }
+
+  function buildBoard() {
+    Array.prototype.slice.call(board.querySelectorAll('.cell')).forEach(function (c) { c.remove(); });
+    board.style.setProperty('--cols', P.cols); board.style.setProperty('--rows', P.rows);
+    cells = {};
+    for (var r = 0; r < P.rows; r++) for (var c = 0; c < P.cols; c++) {
+      var k = r + ',' + c, cell = document.createElement('div'); cell.className = 'cell';
+      if (P.crates[k]) cell.innerHTML = '<svg viewBox="0 0 60 60" aria-label="crate"><use href="#crate"/></svg>';
+      if (P.sparks.indexOf(k) >= 0) cell.innerHTML = '<svg viewBox="0 0 60 60" aria-label="spark"><use href="#spark"/></svg>';
+      cells[k] = cell; board.insertBefore(cell, bot);
+    }
+    if (B3) B3.build(P);
+  }
+  function place(pos, instant, jump) {
+    bot.style.transform = 'translate(' + (pos.c * 100) + '%,' + (pos.r * 100) + '%)';
+    dirEl.style.transform = 'rotate(' + (pos.d * 90) + 'deg)';
+    if (B3) B3.place(pos, instant ? 0 : Math.min(SPEEDS[S.speed][1] * .9, jump ? 440 : 380), jump);
+  }
+
+  function updateHUD() {
+    var got = run ? run.got.length : 0, n = blockCount();
+    $('hudSparks').textContent = '✦ ' + got + ' / ' + P.sparks.length + ' sparks';
+    $('hudBlocks').textContent = 'Blocks: ' + n + ' · ★★★ at ' + lv.par + ' or fewer';
+    $('bestStars').innerHTML = 'Best ' + starsHtml(S.best[lv.id] || 0);
+  }
+
+  function pill(b, loopInfo) {
+    if (b.t === 'repeat') return '<span class="pill repeat">repeat <button class="num" aria-label="Repeat count ' + b.n + '. Tap to change">' + b.n + '</button> times</span>' + (loopInfo ? '<span class="iter">' + loopInfo.iter + '/' + loopInfo.n + '</span>' : '');
+    if (b.t === 'end') return '<span class="pill end">end repeat</span>';
+    return '<span class="pill ' + b.t + '">' + LABEL[b.t] + '</span>';
+  }
+  function renderCode(a, err) {
+    codeEl.innerHTML = '';
+    if (!prog.length) codeEl.innerHTML = '<li class="empty">Drag blocks here, or tap a block to add it.</li>';
+    var d = 0, loopAt = {};
+    if (a) a.loops.forEach(function (l) { loopAt[l.line] = l; });
+    prog.forEach(function (b, i) {
+      if (b.t === 'end') d = Math.max(0, d - 1);
+      var li = document.createElement('li');
+      li.className = 'row' + (b.t === 'end' ? ' is-end' : '') + (a && a.line === i ? (err ? ' err' : ' now') : '');
+      li.dataset.i = i;
+      li.innerHTML = '<span class="ln">' + (i + 1) + '</span><span class="ind" style="width:' + (d * 18) + 'px"></span>' + pill(b, loopAt[i]) +
+        (b.t !== 'end' ? '<button class="x" aria-label="Delete line ' + (i + 1) + '">✕</button>' : '');
+      if (b.t === 'repeat') d++;
+      codeEl.appendChild(li);
+    });
+    renderPy(); updateHUD();
+  }
+  codeEl.addEventListener('click', function (e) {
+    if (running || suppressClick) return;
+    var row = e.target.closest('.row'); if (!row) return;
+    var i = +row.dataset.i;
+    if (e.target.closest('.x')) { var r = rangeOf(i); prog.splice(r[0], r[1] - r[0] + 1); sfx('tap'); edited(); }
+    else if (e.target.closest('.num')) { var b = prog[i]; b.n = b.n >= 9 ? 2 : b.n + 1; sfx('add'); edited(); }
+  });
+  codeEl.addEventListener('pointerdown', function (e) {
+    var row = e.target.closest('.row');
+    if (!row || e.target.closest('button') || row.classList.contains('is-end')) return;
+    startDrag(e, { kind: 'prog', i: +row.dataset.i }, row);
+  });
+
+  function renderPy() {
+    var v = 'ijk', d = 0, out = ['import vinc', ''];
+    prog.forEach(function (b, i) {
+      var ind = '    '.repeat(d);
+      if (b.t === 'end') { if (prog[i - 1] && prog[i - 1].t === 'repeat') out.push(ind + 'pass'); d = Math.max(0, d - 1); return; }
+      if (b.t === 'repeat') { out.push(ind + 'for ' + (v[d] || 'n') + ' in range(' + b.n + '):'); d++; }
+      else out.push(ind + 'vinc.' + PY[b.t] + '()');
+    });
+    if (!prog.length) out.push('# your code will appear here');
+    pyEl.textContent = out.join('\n');
+  }
+
+  /* ---------- Drag and drop ---------- */
+  var drag = null, suppressClick = false;
+  function startDrag(e, src, el) {
+    if (running) return;
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    drag = { src: src, el: el, x0: e.clientX, y0: e.clientY, on: false, idx: null, inside: false };
+  }
+  function depthAt(idx, skip) {
+    var d = 0;
+    for (var i = 0; i < idx; i++) {
+      if (skip && i >= skip[0] && i <= skip[1]) continue;
+      if (prog[i].t === 'repeat') d++; else if (prog[i].t === 'end') d--;
+    }
+    return Math.max(0, d);
+  }
+  function beginDrag() {
+    drag.on = true; suppressClick = true;
+    var g;
+    if (drag.src.kind === 'pal') { g = drag.el.cloneNode(true); }
+    else {
+      drag.range = rangeOf(drag.src.i);
+      var b = prog[drag.src.i];
+      g = document.createElement('span'); g.className = 'pill ' + b.t; g.style.fontFamily = 'var(--mono)';
+      g.textContent = b.t === 'repeat' ? 'repeat ' + b.n + ' { … }' : LABEL[b.t];
+      for (var i = drag.range[0]; i <= drag.range[1]; i++) { var r = codeEl.querySelector('.row[data-i="' + i + '"]'); if (r) r.classList.add('dragging'); }
+    }
+    var rect = drag.el.getBoundingClientRect();
+    drag.gx = Math.min(drag.x0 - rect.left, 60); drag.gy = drag.y0 - rect.top;
+    g.classList.add('ghost'); g.removeAttribute('id'); document.body.appendChild(g); drag.ghost = g;
+    codeWrap.classList.add('dropping');
+  }
+  function dropIndex(y) {
+    var rows = codeEl.querySelectorAll('.row'), skip = drag.range;
+    for (var k = 0; k < rows.length; k++) {
+      var i = +rows[k].dataset.i;
+      if (skip && i >= skip[0] && i <= skip[1]) continue;
+      var b = rows[k].getBoundingClientRect();
+      if (y < b.top + b.height / 2) return i;
+    }
+    return prog.length;
+  }
+  function moveDrag(e) {
+    drag.ghost.style.transform = 'translate(' + (e.clientX - drag.gx) + 'px,' + (e.clientY - drag.gy) + 'px) rotate(-3deg)';
+    var r = codeWrap.getBoundingClientRect(), pad = 24;
+    drag.inside = e.clientX > r.left - pad && e.clientX < r.right + pad && e.clientY > r.top - pad && e.clientY < r.bottom + pad;
+    drag.ghost.classList.toggle('del', !drag.inside && drag.src.kind === 'prog');
+    if (!drag.inside) { dropEl.hidden = true; return; }
+    var idx = dropIndex(e.clientY); drag.idx = idx;
+    var top;
+    var target = codeEl.querySelector('.row[data-i="' + idx + '"]');
+    if (target && !(drag.range && idx >= drag.range[0] && idx <= drag.range[1])) top = target.offsetTop - 2;
+    else {
+      var rows = Array.prototype.filter.call(codeEl.querySelectorAll('.row'), function (rw) { var i = +rw.dataset.i; return !(drag.range && i >= drag.range[0] && i <= drag.range[1]); });
+      var last = rows[rows.length - 1];
+      top = last ? last.offsetTop + last.offsetHeight : 10;
+    }
+    dropEl.style.top = top + 'px';
+    dropEl.style.left = (40 + depthAt(idx, drag.range) * 18) + 'px';
+    dropEl.hidden = false;
+  }
+  function endDrag() {
+    var d = drag; drag = null;
+    d.ghost.remove(); dropEl.hidden = true; codeWrap.classList.remove('dropping');
+    if (d.inside && d.idx !== null) {
+      if (d.src.kind === 'pal') insertAt(d.idx, d.src.t);
+      else {
+        var a = d.range[0], b = d.range[1], idx = d.idx;
+        if (idx < a || idx > b + 1) {
+          var items = prog.splice(a, b - a + 1);
+          if (idx > b) idx -= (b - a + 1);
+          prog.splice.apply(prog, [idx, 0].concat(items)); sfx('add');
+        }
+      }
+    } else if (d.src.kind === 'prog') { prog.splice(d.range[0], d.range[1] - d.range[0] + 1); sfx('tap'); }
+    edited();
+    setTimeout(function () { suppressClick = false; }, 0);
+  }
+  document.addEventListener('pointermove', function (e) {
+    if (!drag) return;
+    if (!drag.on) { if (Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0) < 6) return; beginDrag(); }
+    e.preventDefault(); moveDrag(e);
+  });
+  document.addEventListener('pointerup', function () { if (!drag) return; if (!drag.on) { drag = null; return; } endDrag(); });
+  document.addEventListener('pointercancel', function () {
+    if (!drag) return; if (drag.on) { drag.ghost.remove(); dropEl.hidden = true; codeWrap.classList.remove('dropping'); renderCode(); setTimeout(function () { suppressClick = false; }, 0); }
+    drag = null;
+  });
+
+  /* ---------- Running ---------- */
+  function setRunBtn() { runBtn.textContent = running ? '⏸ Pause' : '▶ Run'; }
+  function resetRun() {
+    clearTimeout(timer); running = false; run = null; setRunBtn();
+    P.sparks.forEach(function (k) { cells[k].classList.remove('got'); });
+    if (B3) B3.reset();
+    place(P.start, true); updateHUD();
+  }
+  function prepare() {
+    resetRun();
+    run = { actions: expand(prog), k: 0, pos: { r: P.start.r, c: P.start.c, d: P.start.d }, got: [], status: 'ready' };
+  }
+  function finished() { return run && run.status !== 'ready'; }
+  function finish(st) {
+    run.status = st; running = false; clearTimeout(timer); setRunBtn();
+    if (st === 'win') setTimeout(onWin, reduce ? 50 : 380);
+    else if (st === 'done') say(lv.debug ? 'Vinc stopped before getting every spark. Glitch is still hiding in there!' : 'I ran out of instructions before getting every spark. Can we add more?', lv.debug ? 'bug' : null);
+    return st;
+  }
+  function execOne() {
+    var a = run.actions[run.k++], p = run.pos;
+    if (a.t === 'turnLeft') { p.d = (p.d + 3) % 4; sfx('turn'); }
+    else if (a.t === 'turnRight') { p.d = (p.d + 1) % 4; sfx('turn'); }
+    else {
+      var hop = a.t === 'jump' ? 2 : 1, nr = p.r + DR[p.d] * hop, nc = p.c + DC[p.d] * hop, off = nr < 0 || nr >= P.rows || nc < 0 || nc >= P.cols;
+      if (off || P.crates[nr + ',' + nc]) {
+        renderCode(a, true);
+        bot.classList.remove('bump'); void bot.offsetWidth; bot.classList.add('bump'); sfx('bump');
+        if (B3) B3.bump(p, nr, nc, off);
+        say('Hee hee! Vinc ' + (hop === 2 ? (off ? 'jumped right off the board' : 'landed on a crate') : 'bumped into ' + (off ? 'the edge of the board' : 'a crate')) + ' on line ' + (a.line + 1) + '. Can you find me and fix it?', 'bug');
+        return finish('bump');
+      }
+      p.r = nr; p.c = nc; sfx(hop === 2 ? 'jump' : 'step');
+      var k = nr + ',' + nc;
+      if (P.sparks.indexOf(k) >= 0 && run.got.indexOf(k) < 0) { run.got.push(k); cells[k].classList.add('got'); if (B3) B3.collect(k); sfx('spark'); }
+    }
+    place(p, false, a.t === 'jump'); renderCode(a);
+    if (run.got.length === P.sparks.length) return finish('win');
+    if (run.k >= run.actions.length) return finish('done');
+    return 'ok';
+  }
+  function loop() { if (!running) return; if (execOne() === 'ok') timer = setTimeout(loop, SPEEDS[S.speed][1]); }
+  runBtn.onclick = function () {
+    if (running) { running = false; clearTimeout(timer); setRunBtn(); say('Paused. Press Run to keep going, or Step to go one block at a time.'); return; }
+    if (!run || finished()) prepare();
+    if (!run.actions.length) { say('I need some instructions first! Drag a block into the code.'); return; }
+    running = true; setRunBtn(); say('Here I go… beep boop!');
+    timer = setTimeout(loop, 120);
+  };
+  stepBtn.onclick = function () {
+    if (running) { running = false; clearTimeout(timer); setRunBtn(); }
+    if (!run || finished()) prepare();
+    if (!run.actions.length) { say('I need some instructions first! Drag a block into the code.'); return; }
+    execOne();
+  };
+  $('reset').onclick = function () { resetRun(); renderCode(); say('Back at the start. Ready when you are!'); };
+  function setSpeedLabel() { $('speed').textContent = 'Speed ' + SPEEDS[S.speed][0] + '×'; }
+  $('speed').onclick = function () { S.speed = (S.speed + 1) % SPEEDS.length; save(); setSpeedLabel(); };
+  $('hint').onclick = function () { say(lv.hint); sfx('tap'); };
+  $('showPy').onchange = function () { pyEl.hidden = !this.checked; };
+
+  /* ---------- Winning ---------- */
+  var modal = $('modal'), card = $('modalCard'), afterClose = null;
+  function openModal(html, onClose) {
+    card.innerHTML = html; modal.hidden = false; afterClose = onClose || null;
+    var f = card.querySelector('[data-focus]') || card.querySelector('button'); if (f) f.focus();
+  }
+  function closeModal() { modal.hidden = true; var fn = afterClose; afterClose = null; if (fn) fn(); }
+  modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !modal.hidden) closeModal(); });
+
+  function onWin() {
+    var n = blockCount(), stars = n <= lv.par ? 3 : n <= lv.par + 3 ? 2 : 1;
+    var prev = S.best[lv.id] || 0, gained = 0;
+    if (stars > prev) { gained = (stars - prev) * 5; S.best[lv.id] = stars; }
+    var w = lv.world, newPart = null;
+    if (worldDone(w)) { var part = PARTS.find(function (p) { return p.world === w; }); if (part && S.parts.indexOf(part.id) < 0) { S.parts.push(part.id); newPart = part; } }
+    save(); sfx('win'); if (B3) B3.win(); confetti(B3 ? $('boardCanvas') : board); renderLevels(); updateWallet(); renderSlots(); updateHUD(); renderGarage();
+    var next = cur + 1 < LEVELS.length ? cur + 1 : null;
+    var big = '<div class="big-stars" aria-label="' + stars + ' stars">' + [0, 1, 2].map(function (i) { return '<span class="' + (i < stars ? 'on' : '') + '">★</span>'; }).join('') + '</div>';
+    var tip = stars === 3 ? 'Perfect code! You used ' + n + ' block' + (n === 1 ? '' : 's') + '.' : 'You used ' + n + ' blocks. Can you do it in ' + lv.par + ' or fewer for 3 stars?';
+    openModal(
+      big + '<h3 id="modalTitle">' + (lv.debug ? 'You caught Glitch!' : 'Level complete!') + '</h3><p>' + tip + '</p>' +
+      (gained ? '<p class="earn">+' + gained + ' sparks</p>' : '') +
+      '<div class="modal-actions"><button class="btn" data-act="again">Try again</button>' + (next !== null ? '<button class="btn primary" data-act="next" data-focus>Next level ▶</button>' : '<button class="btn primary" data-act="close" data-focus>Done</button>') + '</div>',
+      newPart ? function () { showPart(newPart); } : null
+    );
+    say(stars === 3 ? 'Woohoo! Three stars! You\'re a real engineer.' : 'We got every spark! Want to try for fewer blocks?');
+    card.querySelectorAll('[data-act]').forEach(function (b) {
+      b.onclick = function () {
+        var act = b.dataset.act, fn = afterClose; afterClose = null; modal.hidden = true;
+        var go = function () { if (act === 'next') loadLevel(next); else if (act === 'again') { resetRun(); renderCode(); } };
+        if (fn) { afterClose = go; fn(); } else go();
+      };
+    });
+  }
+  function showPart(part) {
+    var then = afterClose; afterClose = null;
+    sfx('part'); confetti(V3D.ok ? $('heroCanvas') : heroSvg);
+    var text = part.id === 'spring' ? 'Vinc can jump now! Class 4 unlocks two new blocks: jump() and repeat.' : 'Vinc can sense the world now. In the full platform, Class 5 uses the Sensor antenna to teach if / else.';
+    openModal((V3D.ok ? '<div id="part3dSlot"></div>' : '<svg class="part-icon" aria-hidden="true"><use href="#p-' + part.id + '"/></svg>') + '<div class="eyebrow">New part unlocked</div><h3 id="modalTitle">' + part.name + '!</h3><p>' + text + '</p><div class="modal-actions"><button class="btn primary" data-focus id="partOk">Awesome!</button></div>', then);
+    $('partOk').onclick = closeModal;
+    if (V3D.ok) { try { $('part3dSlot').appendChild(V3D.partCanvas(part.id)); } catch (e) {} }
+    speech.textContent = part.id === 'spring' ? 'Boing! Spring legs! Now I can jump!' : 'Beep beep! My antenna can feel everything!';
+  }
+
+  /* ---------- Curriculum explorer ---------- */
+  var TYPE_C = { 'Puzzle': 'var(--teal)', 'Catch Glitch': 'var(--rust)', 'Boss': 'var(--plum)', 'Challenge': 'var(--amber-ink)', 'Create': 'var(--olive)', 'Lab': '#3F5872', 'Unplugged': 'var(--muted)' };
+  var CLASSES = [
+    { n: 3, world: 'Workbench', concept: 'Sequencing', part: 'spring', partName: 'Spring legs', next: 'jump() and repeat in Class 4', mode: 'Blocks', playable: true,
+      blurb: 'step(), turnLeft() and turnRight(). Kids learn that order matters and every block counts.',
+      extra: [['Unplugged', 'Be the robot', 'Kids write arrow cards and "program" a classmate across a grid taped on the floor.'], ['Lab', 'First drive', 'Run a Class 3 program on the real Vinc robot at the VINC centre.'], ['Create', 'Build-a-level', 'Design a crate maze for a friend and set its star target.']] },
+    { n: 4, world: 'Rooftop Garden', concept: 'Loops + jump', part: 'antenna', partName: 'Sensor antenna', next: 'if / else in Class 5', mode: 'Blocks', playable: true,
+      blurb: 'repeat and loops inside loops, plus jump() from the Spring legs. Long programs shrink to a few blocks.',
+      extra: [['Unplugged', 'Loop dance', 'The class turns a dance routine into repeat blocks, then performs it.'], ['Lab', 'Square dance', 'Make the real Vinc drive a perfect square using one loop.'], ['Create', 'Pattern art', 'Use loops to make Vinc leave a spark trail in a repeating pattern.']] },
+    { n: 5, world: 'Night Market', concept: 'Conditions: if / else', part: 'chip', partName: 'Memory chip', next: 'variables in Class 6', mode: 'Blocks + Python view',
+      blurb: 'The Sensor antenna lets Vinc check what is around it. One program can now handle many different boards.',
+      acts: [['Puzzle', 'Lantern lane', 'Meet the sensor: if blocked() then turnRight().'], ['Puzzle', 'Left or right?', 'Use if / else to pick a turn at every fork.'], ['Puzzle', 'Repeat until home', 'repeat until atSpark() instead of counting steps.'], ['Puzzle', 'Chai stall detour', 'Crates move between runs. One program must work every time.'], ['Catch Glitch', 'Swapped else', 'Glitch reversed an if / else. Find it.'], ['Puzzle', 'Wall follower', 'Keep a hand on the wall to escape any maze.'], ['Puzzle', 'Colour tiles', 'if tileIs(red) jump(), else step().'], ['Puzzle', 'Two sensors', 'Combine checks with and / or.'], ['Catch Glitch', 'The endless loop', 'A repeat until that never stops. Fix the condition.'], ['Challenge', 'Random market', 'The same code must solve five random boards.'], ['Challenge', 'Spark Cup', 'Weekly class puzzle with a fewest-blocks leaderboard.'], ['Create', 'Build a trap', 'Design a level that needs if / else and share it with the class.'], ['Unplugged', 'Robot Simon says', 'A classroom game where "if" rules decide every move.'], ['Lab', 'Line follower', 'The real Vinc follows a black line with its IR sensor.'], ['Boss', 'Market maze', 'A maze that changes every run. Win the Memory chip.']] },
+    { n: 6, world: 'Metro Station', concept: 'Variables', part: 'gear', partName: 'Gear toolbelt', next: 'functions in Class 7', mode: 'Python',
+      blurb: 'The Memory chip lets Vinc count, remember and compare. Kids switch from blocks to typed Python.',
+      acts: [['Puzzle', 'Spark counter', 'sparks = sparks + 1 and watch the counter change.'], ['Puzzle', 'Hello, Python', 'Solve old puzzles again by typing vinc.step().'], ['Puzzle', 'Fuel tank', 'Every step uses fuel. Plan a route before it runs out.'], ['Puzzle', 'Remember the distance', 'Store a distance in a variable and reuse it.'], ['Catch Glitch', 'Wrong start', 'The counter starts at 1 instead of 0.'], ['Puzzle', 'Compare and choose', 'if sparks > 3: go to the bonus platform.'], ['Puzzle', 'Metro tickets', 'Work out fares with variables and arithmetic.'], ['Catch Glitch', 'Typo hunt', 'Missing colons and wrong indents in Python.'], ['Puzzle', 'Next train', 'A while loop with a countdown timer.'], ['Puzzle', 'Spark rain', 'Random numbers decide where sparks fall.'], ['Create', 'Quiz maker', 'Build a quiz that keeps score in a variable.'], ['Unplugged', 'Human variables', 'Kids hold labelled boxes while the class runs a program.'], ['Lab', 'Stop before the wall', 'The real Vinc stores its ultrasonic distance and stops in time.'], ['Challenge', 'Metro rush', 'Fewest lines to collect every spark with limited fuel.'], ['Boss', 'Rush hour', 'Fuel, counting and timing together. Win the Gear toolbelt.']] },
+    { n: 7, world: 'Factory', concept: 'Functions', part: 'brain', partName: 'AI brain', next: 'AI basics in Class 8', mode: 'Python',
+      blurb: 'The Gear toolbelt lets kids name their own moves, give them inputs and reuse them.',
+      acts: [['Puzzle', 'Name a move', 'def zigzag(): and call it three times.'], ['Puzzle', 'Stairs function', 'Turn the staircase pattern into a function.'], ['Puzzle', 'Parameters', 'def hop(n): jump n crates at once.'], ['Catch Glitch', 'Never called', 'A function is defined but never used.'], ['Puzzle', 'Return values', 'count_sparks() returns a number to decide the route.'], ['Puzzle', 'Toolbelt remix', 'Combine three functions to solve a giant board.'], ['Puzzle', 'Conveyor belts', 'Loops inside functions move crates on belts.'], ['Catch Glitch', 'Wrong argument', 'Glitch passed the wrong number to a function.'], ['Create', 'Draw with Vinc', 'Pen down: draw shapes with a polygon(sides, size) function.'], ['Unplugged', 'Chai recipe cards', 'Write function cards for making chai, then swap and run them.'], ['Challenge', 'Library day', 'Solve a level using a function written by a classmate.'], ['Lab', 'Dance routine', 'The real Vinc performs a dance built from functions and LEDs.'], ['Create', 'Mini arcade game', 'Build a small game where every action is a function.'], ['Challenge', 'Shortest factory', 'Fewest lines for the biggest board yet.'], ['Boss', 'Factory reboot', 'Fix and finish the whole factory. Win the AI brain.']] },
+    { n: 8, world: 'Launch Pad', concept: 'Events, lists and AI basics', part: 'rocket', partName: 'Rocket boosters', next: "Vinc's rocket launch", mode: 'Python',
+      blurb: 'The AI brain lets Vinc react to events, work with lists and learn from examples.',
+      acts: [['Puzzle', 'When clicked', 'Events: Vinc reacts when something happens.'], ['Puzzle', 'Keyboard driver', 'Drive Vinc with the arrow keys.'], ['Puzzle', 'List of sparks', 'Store spark positions in a list and visit each one.'], ['Catch Glitch', 'Off by one', 'A list index skips the last spark.'], ['Puzzle', 'Sorting line', 'Sort parts by size before loading the rocket.'], ['Puzzle', 'Teach colours', 'Train a model with example pictures so Vinc knows red from green.'], ['Puzzle', 'GreenBin sorter', 'Train Vinc to sort waste into the right bins.'], ['Catch Glitch', 'Bad data', 'Glitch mislabelled the training pictures. Clean the dataset.'], ['Puzzle', 'Chatbot Vinc', 'A rule-based chatbot using a dictionary of replies.'], ['Unplugged', 'Fair or unfair?', 'Discuss who an AI model might get wrong, and why.'], ['Lab', 'Voice commands', 'The real Vinc follows spoken commands.'], ['Create', 'Smart traffic light', 'Simulate a junction with sensors and events.'], ['Challenge', 'Data detective', 'Find the best training set with the fewest pictures.'], ['Create', 'Showcase project', 'Build and present your own Vinc project to parents.'], ['Boss', 'Launch day', 'Use everything you have learned to launch the rocket.']] }
+  ];
+  var selCls = 3;
+  function renderExplorer() {
+    var tabs = $('clsTabs'), panel = $('clsPanel'); if (!tabs) return;
+    var total = 0;
+    CLASSES.forEach(function (c) { total += c.playable ? LEVELS.filter(function (l) { return l.world === c.n; }).length + c.extra.length : c.acts.length; });
+    $('tally').innerHTML = '<span class="chip">6 classes</span><span class="chip">' + total + ' activities</span><span class="chip">30 playable levels</span><span class="chip">' + CLASSES.length + ' parts to win</span>';
+    tabs.innerHTML = '';
+    CLASSES.forEach(function (c) {
+      var b = document.createElement('button'); b.className = 'tab'; b.setAttribute('role', 'tab'); b.id = 'tab-' + c.n;
+      b.setAttribute('aria-selected', c.n === selCls ? 'true' : 'false');
+      b.innerHTML = 'Class ' + c.n + '<small>' + c.concept.split(':')[0].split(' +')[0].split(',')[0] + '</small>';
+      b.onclick = function () { selCls = c.n; renderExplorer(); };
+      tabs.appendChild(b);
+    });
+    var c = CLASSES.find(function (x) { return x.n === selCls; });
+    var items = [];
+    if (c.playable) {
+      LEVELS.forEach(function (l, i) {
+        if (l.world !== c.n) return;
+        items.push({ type: l.debug ? (l.boss ? 'Boss' : 'Catch Glitch') : 'Puzzle', title: l.name, desc: l.say, lvl: i });
+      });
+      c.extra.forEach(function (x) { items.push({ type: x[0], title: x[1], desc: x[2], extra: true }); });
+    } else c.acts.forEach(function (x) { items.push({ type: x[0], title: x[1], desc: x[2] }); });
+    var html = '<div class="cls-head"><svg aria-hidden="true"><use href="#p-' + c.part + '"/></svg><div><div class="eyebrow">Class ' + c.n + ' · World: ' + c.world + ' · ' + c.mode + '</div>' +
+      '<h3>' + c.concept + '<span class="status ' + (c.playable ? 'live">Playable now' : 'plan">Designed') + '</span></h3>' +
+      '<p>' + c.blurb + ' Finish the class to win the <b>' + c.partName + '</b>, which unlocks ' + c.next + '.</p></div></div><ol class="acts">';
+    items.forEach(function (it) {
+      var extraBtn = '';
+      if (it.lvl !== undefined) {
+        var open = unlocked(it.lvl), best = S.best[LEVELS[it.lvl].id] || 0;
+        extraBtn = '<span class="mini-stars" aria-label="best ' + best + ' stars">' + starsHtml(best) + '</span><button class="play" data-lvl="' + it.lvl + '"' + (open ? '' : ' disabled') + '>' + (open ? 'Play' : 'Locked') + '</button>';
+      }
+      html += '<li class="act' + (it.extra ? ' extra' : '') + '"><div class="act-meta"><b>' + it.title + '</b><span class="type" style="--c:' + TYPE_C[it.type] + '">' + it.type + '</span>' + extraBtn + '</div><p>' + it.desc + '</p></li>';
+    });
+    panel.setAttribute('aria-labelledby', 'tab-' + c.n);
+    panel.innerHTML = html + '</ol>';
+    panel.querySelectorAll('.play[data-lvl]').forEach(function (b) {
+      b.onclick = function () { if (running) return; loadLevel(+b.dataset.lvl); $('play').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' }); };
+    });
+  }
+
+  /* ---------- Load a level ---------- */
+  function loadLevel(i) {
+    if (!unlocked(i)) i = 0;
+    cur = i; S.cur = i; save();
+    lv = LEVELS[i]; P = parse(lv);
+    prog = (lv.code || []).map(mk);
+    $('lvlWorld').textContent = WORLDS[lv.world] + ' · Level ' + lv.id;
+    $('lvlName').textContent = lv.name;
+    var tag = $('lvlTag'); tag.hidden = !(lv.debug || lv.tag);
+    tag.textContent = lv.debug ? (lv.boss ? 'Boss · Catch Glitch' : 'Catch Glitch') : lv.tag; tag.className = 'tag' + (lv.debug ? '' : ' loop');
+    buildBoard(); renderPalette(); resetRun(); renderCode(); renderLevels();
+    say(lv.say, lv.debug ? 'bug' : null);
+  }
+
+  /* ---------- Garage ---------- */
+  function shopMsg(t) { $('shopMsg').textContent = t; }
+  function renderGarage() {
+    [['paints', PAINTS, 'paint'], ['hats', HATS, 'hat']].forEach(function (g) {
+      var el = $(g[0]); el.innerHTML = '';
+      g[1].forEach(function (it) {
+        var owned = S.owned.indexOf(it.id) >= 0, on = S[g[2]] === it.id;
+        var b = document.createElement('button'); b.className = 'item' + (on ? ' on' : '');
+        var sw = g[2] === 'paint' ? '<span class="sw" style="background:' + it.v + '"></span>' : '<span class="sw" style="background:var(--paper-2)"></span>';
+        b.innerHTML = sw + '<span class="nm">' + it.name + '</span><span class="pr">' + (on ? 'Wearing' : owned ? 'Owned · tap to wear' : '⚡ ' + it.cost + ' sparks') + '</span>';
+        b.onclick = function () { buy(it, g[2], b); };
+        el.appendChild(b);
+      });
+    });
+  }
+  function buy(it, kind, btn) {
+    var owned = S.owned.indexOf(it.id) >= 0;
+    if (!owned) {
+      var w = wallet();
+      if (w < it.cost) {
+        btn.classList.remove('no'); void btn.offsetWidth; btn.classList.add('no'); sfx('bump');
+        shopMsg('You need ' + (it.cost - w) + ' more sparks for the ' + it.name.toLowerCase() + '. Earn stars in the workshop to get them.');
+        return;
+      }
+      S.spent += it.cost; S.owned.push(it.id); sfx('buy'); shopMsg('Bought the ' + it.name.toLowerCase() + '! Vinc is wearing it now.');
+    } else { sfx('tap'); shopMsg('Vinc is wearing the ' + it.name.toLowerCase() + '.'); }
+    S[kind] = it.id; save(); applyLook(); renderGarage(); updateWallet();
+  }
+
+  /* ---------- Tools ---------- */
+  function setSoundLabel() { $('sound').textContent = 'Sound: ' + (S.sound ? 'on' : 'off'); }
+  $('sound').onclick = function () { S.sound = !S.sound; save(); setSoundLabel(); sfx('tap'); };
+  function setUnlockLabel() { $('unlockAll').textContent = S.unlockAll ? 'Preview: lock levels again' : 'Preview: unlock all levels'; }
+  $('unlockAll').onclick = function () { S.unlockAll = !S.unlockAll; save(); setUnlockLabel(); renderLevels(); };
+  var armed = false;
+  $('resetAll').onclick = function () {
+    if (!armed) { armed = true; this.textContent = 'Tap again to erase stars, sparks and parts'; var self = this; setTimeout(function () { armed = false; self.textContent = 'Reset my progress'; }, 4000); return; }
+    armed = false; this.textContent = 'Reset my progress';
+    S = defaults(); save(); applyLook(); updateWallet(); renderSlots(); renderGarage(); setSoundLabel(); setUnlockLabel(); setSpeedLabel(); loadLevel(0);
+    shopMsg('Progress reset. Fresh start!');
+  };
+
+  /* ---------- Boot ---------- */
+  if (V3D.ok) {
+    try { V3D.initHero($('heroCanvas')); B3 = V3D.initBoard($('boardCanvas')); V3D.initGarage($('garageCanvas')); document.body.classList.add('has3d'); }
+    catch (e) { V3D = { ok: false }; B3 = null; document.body.classList.remove('has3d'); if (window.console) console.warn('3D unavailable, using 2D', e); }
+  }
+  applyLook(); updateWallet(); renderSlots(); renderGarage(); setSoundLabel(); setUnlockLabel(); setSpeedLabel();
+  loadLevel(S.cur || 0);
+})();
+</script>
