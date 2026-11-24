@@ -1,5 +1,6 @@
 /**
- * Lessons for Classes 5 to 8. Each runs real Python in the browser (Pyodide) through public/lessons/harness.py.
+ * Lessons for Classes 3 to 8. Classes 3 and 4 snap blocks together (src/data/blockLessons.ts, run by src/lib/blocks.ts).
+ * Classes 5 to 8 below. Each runs real Python in the browser (Pyodide) through public/lessons/harness.py.
  * Run `npm run check:lessons` to prove every solution passes and every starter does not.
  *
  * Board symbols (Vinc lessons): "." floor, "#" crate, "*" spark, ^ > v < Vinc facing up/right/down/left,
@@ -7,12 +8,17 @@
  * sensors: blocked() crate_ahead() at_spark() spark_ahead() sparks_left() tile().
  */
 
+import { BLOCK_LESSONS } from './blockLessons';
+import { countBlocks, parseBlocks, type BlockName, type BlocksCheck } from '@/lib/blocks';
+import type { CharId } from '@/lib/crew';
+
 export type LessonType = 'Learn' | 'Puzzle' | 'Catch Glitch' | 'Challenge' | 'Boss';
 export interface Require { uses?: string[]; calls?: string[]; defines?: string[]; maxLines?: number }
 export type Check =
   | { kind: 'vinc'; maps: string[][]; require?: Require; expectOutputs?: string[]; events?: string[] | string[][] }
   | { kind: 'output'; expected?: string; cases?: { inputs?: (string | number)[]; expected: string }[]; inputs?: (string | number)[]; require?: Require }
-  | { kind: 'tests'; tests: string; require?: Require };
+  | { kind: 'tests'; tests: string; require?: Require }
+  | BlocksCheck;
 
 export interface Lesson {
   id: string; grade: number; n: number; title: string; type: LessonType;
@@ -26,11 +32,15 @@ export interface Lesson {
   hints: string[];
   solution: string;
   check: Check;
+  /** Who opens the lesson. Default: Glitch for Catch Glitch lessons, otherwise Vinc. */
+  guide?: CharId;
+  /** Block lessons: the blocks in the palette. */
+  palette?: BlockName[];
 }
 
 const L = (grade: number, n: number, l: Omit<Lesson, 'id' | 'grade' | 'n'>): Lesson => ({ id: `${grade}-L${n}`, grade, n, ...l });
 
-export const LESSONS: Lesson[] = [
+const PY_LESSONS: Lesson[] = [
   /* ============================ Class 5 · if and else ============================ */
   L(5, 1, {
     title: 'Hello, sensor', type: 'Learn',
@@ -546,9 +556,16 @@ export const LESSONS: Lesson[] = [
   })
 ];
 
-export const LESSON_GRADES = [5, 6, 7, 8];
+export const LESSONS: Lesson[] = [...BLOCK_LESSONS, ...PY_LESSONS];
+export const LESSON_GRADES = [3, 4, 5, 6, 7, 8];
+export const isBlockLesson = (l: Pick<Lesson, 'check'>) => l.check.kind === 'blocks';
+/** Block lessons: the model solution's block count, which earns 3 stars. */
+export const parOf = (l: Lesson) => (l.check.kind === 'blocks' ? countBlocks(parseBlocks(l.solution)) : 0);
+/** XP for a lesson type; stars add a bonus. */
+export const TYPE_XP: Record<LessonType, number> = { Learn: 10, Puzzle: 15, 'Catch Glitch': 20, Challenge: 25, Boss: 40 };
+export const lessonXp = (type: LessonType, stars: number) => (stars > 0 ? TYPE_XP[type] + 5 * stars : 0);
 export const lessonById = (id: string) => LESSONS.find(l => l.id === id);
 export const lessonsForGrade = (g: number) => LESSONS.filter(l => l.grade === g);
 export const LESSON_IDS = new Set(LESSONS.map(l => l.id));
 /** The check sent to the browser: everything except the model solution. */
-export const publicLesson = (l: Lesson) => { const { solution: _s, ...rest } = l; void _s; return rest; };
+export const publicLesson = (l: Lesson) => { const { solution: _s, ...rest } = l; void _s; return { ...rest, par: parOf(l) }; };

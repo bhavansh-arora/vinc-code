@@ -83,7 +83,17 @@ for (const a of ASSESSMENTS) {
     if (v === 'end' && qn.options![qn.answer] !== res.end) fail(where, `end: Vinc stops at ${res.end}, answer says ${qn.options![qn.answer]}`);
     if (v === 'sparks' && res.sparks !== qn.answer) fail(where, `sparks: ${res.sparks} collected, answer ${qn.answer}`);
     if (v === 'bump' && res.bump !== qn.answer) fail(where, `bump: at line ${res.bump}, answer ${qn.answer}`);
-    if (v !== 'bump' && res.bump !== null) fail(where, `unexpected bump at line ${res.bump}`);
+    const bumpsOnPurpose = qn.verify.kind === 'sparks' && qn.verify.bumps;
+    if (v !== 'bump' && !bumpsOnPurpose && res.bump !== null) fail(where, `unexpected bump at line ${res.bump}`);
+    if (bumpsOnPurpose && res.bump === null) fail(where, 'expected Vinc to bump');
+  }
+}
+const { SKILLS } = await import('../src/data/assessments');
+for (const a of ASSESSMENTS) {
+  if (!a.objectives?.length) fail(a.id, 'no learning objectives');
+  for (const qn of a.questions) {
+    if (!qn.skill || !SKILLS[a.grade].includes(qn.skill)) fail(`${a.id}/${qn.id}`, `skill "${qn.skill}" is not in the Class ${a.grade} list`);
+    if (!qn.level) fail(`${a.id}/${qn.id}`, 'no level');
   }
 }
 const positions = [0, 0, 0, 0];
@@ -93,7 +103,7 @@ console.log('Right answer position (A–D) across 4-option questions:', position
 if (Math.max(...positions) > mcqs * 0.4) fail('answer positions', 'too many right answers in one position');
 for (let g = 3; g <= 8; g++) {
   const n = ASSESSMENTS.filter(a => a.grade === g).length;
-  if (n < 2) fail('class ' + g, `only ${n} assessment(s)`);
+  if (n < 3) fail('class ' + g, `only ${n} assessment(s)`);
 }
 const verified = ASSESSMENTS.flatMap(a => a.questions).filter(x => x.verify).length;
 console.log(`${ASSESSMENTS.length} assessments, ${ASSESSMENTS.reduce((s, a) => s + a.questions.length, 0)} questions, ${verified} answers proven by running the code.`);

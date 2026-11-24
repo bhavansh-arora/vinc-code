@@ -1,5 +1,6 @@
 /**
- * Class-wise assessment bank. Two auto-graded assessments per class (Classes 3 to 8).
+ * Class-wise assessment bank. Three auto-graded assessments per class (Classes 3 to 8): a checkpoint,
+ * an end-of-class test and a practice challenge. Every question is tagged with a skill and a level.
  *
  * Grid questions show a board: columns A–E (left to right), rows 1–5 (top to bottom).
  * Map symbols: "." floor, "#" crate, "*" spark, and Vinc's start as ^ > v < (the way it faces).
@@ -9,7 +10,7 @@
 
 export type Verify =
   | { kind: 'end' } // answer option is the cell where Vinc stops (e.g. "D3")
-  | { kind: 'sparks' } // answer is the number of sparks collected
+  | { kind: 'sparks'; bumps?: boolean } // answer is the number of sparks collected (bumps: Vinc bumps on purpose)
   | { kind: 'bump' } // answer is the line number where Vinc bumps
   | { kind: 'moves' } // answer is how many step()/jump() blocks actually run
   | { kind: 'wins' }; // exactly the answer option's program collects every spark
@@ -26,7 +27,13 @@ export interface Question {
   code?: string[];
   lang?: 'blocks' | 'python';
   verify?: Verify;
+  /** The skill this question checks (see SKILLS). */
+  skill?: string;
+  level?: Level;
 }
+
+export type Level = 'Easy' | 'Medium' | 'Hard';
+export type AssessmentKind = 'Checkpoint' | 'End of class' | 'Practice challenge';
 
 export interface Assessment {
   id: string;
@@ -35,7 +42,20 @@ export interface Assessment {
   summary: string;
   minutes: number;
   questions: Question[];
+  kind?: AssessmentKind;
+  /** What a student who passes can do. */
+  objectives?: string[];
 }
+
+/** The skills each class's questions are tagged with, in teaching order. */
+export const SKILLS: Record<number, string[]> = {
+  3: ['Algorithms', 'Directions and turns', 'Tracing code', 'Debugging', 'Writing programs'],
+  4: ['Loops', 'Tracing loops', 'Nested loops', 'Patterns', 'Jump', 'Debugging loops'],
+  5: ['Conditions', 'If and else', 'Boolean logic', 'Loops with conditions', 'Debugging', 'Problem solving'],
+  6: ['Variables', 'Arithmetic', 'Text and input', 'Loops', 'Debugging'],
+  7: ['Functions', 'Parameters and return', 'Scope', 'Decomposition', 'Geometry with code'],
+  8: ['Events', 'Lists', 'Loops over lists', 'AI and data', 'Responsible AI']
+};
 
 /** Questions as written: the right option is usually listed first. They are shuffled below. */
 const WRITTEN: Assessment[] = [
@@ -397,7 +417,6 @@ function shuffled(assessmentId: string, qn: Question): Question {
   return { ...qn, options: order.map(i => qn.options![i]), answer: order.indexOf(qn.answer) };
 }
 
-export const ASSESSMENTS: Assessment[] = WRITTEN.map(a => ({ ...a, questions: a.questions.map(qn => shuffled(a.id, qn)) }));
 
 export function assessmentById(id: string): Assessment | undefined {
   return ASSESSMENTS.find(a => a.id === id);
@@ -419,3 +438,256 @@ export function grade(a: Assessment, answers: Record<string, string>): { score: 
   }
   return { score, max: a.questions.length, correct };
 }
+
+/* ------------------------------ Skills, levels and objectives ------------------------------ */
+/** Skill and level for each written question, as "skill|E/M/H", in question order. */
+const META: Record<string, string[]> = {
+  'c3-a': ['Algorithms|E', 'Tracing code|E', 'Directions and turns|E', 'Directions and turns|M', 'Tracing code|M', 'Directions and turns|E', 'Debugging|M', 'Writing programs|M'],
+  'c3-b': ['Algorithms|E', 'Tracing code|M', 'Debugging|E', 'Debugging|M', 'Tracing code|M', 'Writing programs|M', 'Debugging|M', 'Writing programs|H'],
+  'c4-a': ['Tracing loops|E', 'Loops|E', 'Tracing loops|M', 'Nested loops|M', 'Loops|E', 'Jump|E', 'Jump|M', 'Debugging loops|M'],
+  'c4-b': ['Patterns|M', 'Tracing loops|M', 'Nested loops|H', 'Tracing loops|M', 'Jump|M', 'Debugging loops|M', 'Patterns|H', 'Jump|E'],
+  'c5-a': ['Conditions|E', 'If and else|E', 'Boolean logic|M', 'Boolean logic|M', 'Boolean logic|E', 'If and else|E', 'Conditions|E', 'Problem solving|M'],
+  'c5-b': ['Loops with conditions|M', 'Debugging|M', 'Boolean logic|M', 'Problem solving|H', 'Boolean logic|M', 'If and else|M', 'Problem solving|H', 'Problem solving|E'],
+  'c6-a': ['Variables|E', 'Variables|M', 'Text and input|E', 'Text and input|M', 'Arithmetic|M', 'Arithmetic|M', 'Variables|E', 'Text and input|M'],
+  'c6-b': ['Loops|M', 'Loops|M', 'Loops|H', 'Debugging|E', 'Debugging|M', 'Arithmetic|E', 'Text and input|M', 'Loops|M'],
+  'c7-a': ['Functions|M', 'Parameters and return|E', 'Parameters and return|E', 'Parameters and return|H', 'Parameters and return|E', 'Decomposition|E', 'Parameters and return|M', 'Geometry with code|M'],
+  'c7-b': ['Geometry with code|M', 'Scope|H', 'Parameters and return|H', 'Parameters and return|M', 'Decomposition|E', 'Functions|M', 'Functions|E', 'Decomposition|M'],
+  'c8-a': ['Events|E', 'Lists|E', 'Lists|E', 'Lists|M', 'Lists|M', 'Lists|M', 'Loops over lists|M', 'Lists|H'],
+  'c8-b': ['AI and data|E', 'AI and data|M', 'AI and data|M', 'AI and data|M', 'AI and data|M', 'AI and data|M', 'Responsible AI|E', 'Responsible AI|E']
+};
+const LEVEL: Record<string, Level> = { E: 'Easy', M: 'Medium', H: 'Hard' };
+
+const OBJECTIVES: Record<string, string[]> = {
+  'c3-a': ['Explain what an algorithm is', 'Predict where Vinc ends up after a short program', 'Use turns to face any direction'],
+  'c3-b': ['Put steps in the right order', 'Find the line where a program goes wrong', 'Write the shortest program for a simple path'],
+  'c3-c': ['Trace programs with turns and crates', 'Work out three left turns as one right turn', 'Fix a program that turns the wrong way'],
+  'c4-a': ['Count how many times a loop runs its blocks', 'Replace repeated blocks with repeat', 'Use jump() to clear a crate'],
+  'c4-b': ['Spot the pattern in a long program', 'Trace nested loops', 'Debug a loop that runs the wrong number of times'],
+  'c4-c': ['Count moves in loops and nested loops', 'Choose the loop that matches a pattern', 'Plan a square path with nested repeats'],
+  'c5-a': ['Read if / else and say which part runs', 'Work out and / or / not', 'Explain why one program can solve different boards'],
+  'c5-b': ['Use a loop that repeats until a condition', 'Find endless-loop bugs', 'Pick a strategy for any simple maze'],
+  'c5-c': ['Follow if / elif / else on coloured tiles', 'Trace a while loop that counts', 'Reason about the wall-follower rule'],
+  'c6-a': ['Store and update values in variables', 'Use Python maths: //, % and *', 'Know that input() gives text'],
+  'c6-b': ['Trace while and for loops', 'Build counters and totals', 'Fix syntax and logic errors'],
+  'c6-c': ['Know that b = a copies the value, not the name', 'Apply the order of operations', 'Explain why text and numbers cannot be added'],
+  'c7-a': ['Define and call functions', 'Use parameters and return values', 'Explain return vs print'],
+  'c7-b': ['Break a problem into functions', 'Explain local variables (scope)', 'Turn shapes into angles with code'],
+  'c7-c': ['Trace functions that call functions', 'Spot a missing argument', 'Explain why a local variable does not change a global one'],
+  'c8-a': ['React to events', 'Index, add to and sort lists', 'Total a list with a loop'],
+  'c8-b': ['Explain training data, labels and accuracy', 'Recognise bias in data', 'Decide when people must check an AI'],
+  'c8-c': ['Use max, min, insert and dictionaries', 'Count with a loop over a list', 'Predict a nearest-neighbour answer and its accuracy']
+};
+const KIND = (id: string): AssessmentKind => (id.endsWith('-a') ? 'Checkpoint' : id.endsWith('-b') ? 'End of class' : 'Practice challenge');
+
+function annotate(a: Assessment): Assessment {
+  const meta = META[a.id];
+  return {
+    ...a, kind: a.kind ?? KIND(a.id), objectives: a.objectives ?? OBJECTIVES[a.id] ?? [],
+    questions: a.questions.map((qn, i) => {
+      if (qn.skill && qn.level) return qn;
+      const [skill, lv] = (meta?.[i] ?? 'General|M').split('|');
+      return { ...qn, skill: qn.skill ?? skill, level: qn.level ?? LEVEL[lv] };
+    })
+  };
+}
+
+/* ------------------------------ Practice challenges (one more per class) ------------------------------ */
+const PRACTICE: Assessment[] = [
+  {
+    id: 'c3-c', grade: 3, minutes: 20,
+    title: "Practice challenge: Pip's obstacle course",
+    summary: 'Harder tracing with turns and crates, three-turn puzzles and fixing a wrong turn.',
+    questions: [
+      { id: 'q1', kind: 'mcq', prompt: 'Where does Vinc stop?', skill: 'Tracing code', level: 'Medium',
+        map: ['>....', '.....', '.....', '.....', '.....'], code: ['step()', 'turnRight()', 'step()', 'step()', 'turnLeft()', 'step()'],
+        options: ['C3', 'B3', 'C2', 'D3'], answer: 0, verify: { kind: 'end' },
+        explain: 'B1, then Vinc faces down: B2, B3. Turning left makes it face right again, and one step reaches C3.' },
+      { id: 'q2', kind: 'number', prompt: 'Vinc stops when it bumps. How many sparks has it collected by then?', skill: 'Tracing code', level: 'Medium',
+        map: ['>*#*.', '.....', '.....', '.....', '.....'], code: ['step()', 'step()', 'step()'], answer: 1, verify: { kind: 'sparks', bumps: true },
+        explain: 'The first step collects the spark on B1. The second step bumps into the crate on C1, so the spark on D1 is never reached.' },
+      { id: 'q3', kind: 'mcq', prompt: 'Vinc faces down. It runs turnLeft() three times. Which way does it face now?', skill: 'Directions and turns', level: 'Hard',
+        options: ['Left', 'Right', 'Up', 'Down'], answer: 0,
+        explain: 'Down → right → up → left. Three left turns are the same as one right turn.' },
+      { id: 'q4', kind: 'number', prompt: 'Vinc bumps into a crate. On which line does it happen?', skill: 'Debugging', level: 'Medium',
+        map: ['.....', '.#...', '.....', '^....', '.....'], code: ['step()', 'turnRight()', 'step()', 'turnLeft()', 'step()'], answer: 5, verify: { kind: 'bump' },
+        explain: 'Vinc goes up to A3, turns right and steps to B3, then faces up. Line 5 tries to step onto B2, where the crate is.' },
+      { id: 'q5', kind: 'mcq', prompt: 'Which program collects the spark?', skill: 'Writing programs', level: 'Medium',
+        map: ['.....', '.....', '..*..', '.....', '>....'],
+        options: ['step(), step(), turnLeft(), step(), step()', 'turnLeft(), step(), step(), step(), step()', 'step(), step(), turnRight(), step(), step()', 'step(), turnLeft(), step(), step(), step()'],
+        answer: 0, verify: { kind: 'wins' },
+        explain: 'The spark is 2 squares right and 2 squares up. Turning right would make Vinc face down, off the board.' },
+      { id: 'q6', kind: 'mcq', prompt: 'Pip says an algorithm must be in the right order. Which is the right algorithm to plant a seed?', skill: 'Algorithms', level: 'Easy',
+        options: ['Dig a hole → put the seed in → cover it with soil → water it', 'Water it → dig a hole → put the seed in → cover it', 'Put the seed in → dig a hole → cover it → water it', 'Cover it → water it → dig a hole → put the seed in'], answer: 0,
+        explain: 'You cannot put a seed in a hole you have not dug yet. The order of steps matters.' },
+      { id: 'q7', kind: 'number', prompt: 'Vinc faces right. The spark is 2 squares right and 2 squares down. How many blocks are needed, at the fewest?', skill: 'Writing programs', level: 'Hard', answer: 5,
+        explain: 'step(), step(), turnRight(), step(), step(): four moves and one turn.' },
+      { id: 'q8', kind: 'mcq', prompt: "Glitch's program should reach the spark on C1, but Vinc goes off the board. What is the fix?", skill: 'Debugging', level: 'Medium',
+        map: ['..*..', '.....', '>....', '.....', '.....'], code: ['step()', 'step()', 'turnRight()', 'step()', 'step()'],
+        options: ['Change turnRight() to turnLeft()', 'Add another step()', 'Delete the first step()', 'Change step() to jump()'], answer: 0,
+        explain: 'The spark is up, so Vinc must turn left. Turning right makes it face down, towards the edge.' }
+    ]
+  },
+  {
+    id: 'c4-c', grade: 4, minutes: 20,
+    title: "Practice challenge: Loopa's loop lab",
+    summary: 'Counting moves in loops, nested loops, loops with jumps and choosing the right pattern.',
+    questions: [
+      { id: 'q1', kind: 'number', prompt: 'How many step() blocks run?', skill: 'Tracing loops', level: 'Easy',
+        code: ['repeat 3:', '  step()', '  step()', 'step()'], answer: 7, verify: { kind: 'moves' },
+        explain: 'The loop runs 2 steps 3 times (6), and the last step() is outside the loop: 7.' },
+      { id: 'q2', kind: 'number', prompt: 'How many step() blocks run?', skill: 'Nested loops', level: 'Medium',
+        code: ['repeat 3:', '  repeat 2:', '    step()', '  turnLeft()', 'step()'], answer: 7, verify: { kind: 'moves' },
+        explain: 'The inner loop runs 2 steps, 3 times: 6. Then one more step after the loops: 7.' },
+      { id: 'q3', kind: 'mcq', prompt: 'Where does Vinc stop?', skill: 'Tracing loops', level: 'Medium',
+        map: ['.....', '.....', '.....', '.....', '>....'], code: ['repeat 2:', '  step()', '  turnLeft()', '  step()', '  turnRight()'],
+        options: ['C3', 'B4', 'D3', 'C2'], answer: 0, verify: { kind: 'end' },
+        explain: 'Each round goes one square right and one square up: B4 after the first round, C3 after the second.' },
+      { id: 'q4', kind: 'number', prompt: 'How many sparks does Vinc collect?', skill: 'Jump', level: 'Easy',
+        map: ['>#*#*', '.....', '.....', '.....', '.....'], code: ['repeat 2:', '  jump()'], answer: 2, verify: { kind: 'sparks' },
+        explain: 'Each jump clears a crate and lands on a spark: C1, then E1.' },
+      { id: 'q5', kind: 'number', prompt: 'Vinc bumps. On which line is the block that bumps?', skill: 'Debugging loops', level: 'Medium',
+        map: ['>..#.', '.....', '.....', '.....', '.....'], code: ['repeat 4:', '  step()'], answer: 2, verify: { kind: 'bump' },
+        explain: 'Line 2 runs: B1, C1, then the crate on D1. The loop number is too big, or a jump() is needed.' },
+      { id: 'q6', kind: 'mcq', prompt: 'Which program does the same as: step(), turnLeft(), step(), turnLeft(), step(), turnLeft(), step(), turnLeft()?', skill: 'Patterns', level: 'Easy',
+        options: ['repeat 4: step(), turnLeft()', 'repeat 2: step(), turnLeft()', 'repeat 4: step()', 'repeat 8: turnLeft()'], answer: 0,
+        explain: 'The pair step(), turnLeft() is written 4 times.' },
+      { id: 'q7', kind: 'mcq', prompt: 'Loopa wants Vinc to walk round a square with 2 steps on each side. Which program works?', skill: 'Nested loops', level: 'Hard',
+        options: ['repeat 4: (repeat 2: step()), turnRight()', 'repeat 2: (repeat 4: step()), turnRight()', 'repeat 4: step(), turnRight()', 'repeat 3: step(), step(), turnRight()'], answer: 0,
+        explain: 'A square has 4 sides. Each side is 2 steps, then a turn.' },
+      { id: 'q8', kind: 'number', prompt: 'A repeat 5 has a repeat 4 inside it, with one step() inside that. How many steps run?', skill: 'Nested loops', level: 'Medium', answer: 20,
+        explain: 'The inside loop runs 4 steps each time. The outside loop runs it 5 times: 4 × 5 = 20.' }
+    ]
+  },
+  {
+    id: 'c5-c', grade: 5, minutes: 25,
+    title: "Practice challenge: Hoot's decision maze",
+    summary: 'if / elif / else on tiles, while loops, logic puzzles and the wall-follower rule.',
+    questions: [
+      { id: 'q1', kind: 'mcq', prompt: 'Vinc is blocked. What does it do?', skill: 'If and else', level: 'Easy', lang: 'python',
+        code: ['if blocked():', '    turn_left()', 'else:', '    step()'], options: ['Turns left', 'Steps forward', 'Turns left and then steps', 'Nothing'], answer: 0,
+        explain: 'blocked() is True, so only the if part runs. The else part is skipped.' },
+      { id: 'q2', kind: 'mcq', prompt: 'x = 3. Which condition is True?', skill: 'Boolean logic', level: 'Medium',
+        options: ['x > 2 and x < 4', 'x > 3', 'x == 4 or x < 3', 'not x == 3'], answer: 0,
+        explain: '3 is more than 2 and less than 4, so both parts are True. The others are all False.' },
+      { id: 'q3', kind: 'number', prompt: 'What does this print?', skill: 'Loops with conditions', level: 'Hard', lang: 'python',
+        code: ['n = 0', 'while n < 5:', '    n = n + 2', 'print(n)'], answer: 6,
+        explain: 'n goes 0 → 2 → 4 → 6. At 6 the condition n < 5 is False, so the loop stops and 6 is printed.' },
+      { id: 'q4', kind: 'mcq', prompt: 'Which line keeps Vinc moving until it reaches a spark?', skill: 'Loops with conditions', level: 'Easy',
+        options: ['while not at_spark():', 'while at_spark():', 'if at_spark():', 'repeat 3:'], answer: 0,
+        explain: 'while not at_spark() repeats as long as Vinc is not on a spark.' },
+      { id: 'q5', kind: 'mcq', prompt: 'The wall-follower rule is: if blocked, turn left; else step. What happens in a dead end?', skill: 'Problem solving', level: 'Hard',
+        options: ['Vinc keeps turning until it faces the way out', 'Vinc stops for ever', 'Vinc jumps over the wall', 'The program crashes'], answer: 0,
+        explain: 'Each time round the loop Vinc is blocked, so it turns. After enough turns it faces the open square it came from.' },
+      { id: 'q6', kind: 'mcq', prompt: 'Vinc is on a blue tile. What does it do?', skill: 'If and else', level: 'Medium', lang: 'python',
+        code: ['if tile() == "red":', '    turn_right()', 'elif tile() == "green":', '    step()', 'else:', '    turn_left()'],
+        options: ['turn_left()', 'turn_right()', 'step()', 'Nothing'], answer: 0,
+        explain: 'Blue is not red and not green, so the else part runs.' },
+      { id: 'q7', kind: 'mcq', prompt: 'Why does this loop never end?', skill: 'Debugging', level: 'Medium', lang: 'python',
+        code: ['while not at_spark():', '    turn_left()'],
+        options: ['Vinc only turns, so it never reaches the spark', 'The loop needs a semicolon', 'turn_left() is spelled wrong', 'There is no bug'], answer: 0,
+        explain: 'Nothing in the loop moves Vinc, so at_spark() never becomes True.' },
+      { id: 'q8', kind: 'number', prompt: 'How many of these are True?  4 > 2   ·   3 == 3   ·   2 > 5   ·   not False', skill: 'Boolean logic', level: 'Hard', answer: 3,
+        explain: '4 > 2 is True, 3 == 3 is True, 2 > 5 is False and not False is True: three are True.' }
+    ]
+  },
+  {
+    id: 'c6-c', grade: 6, minutes: 25,
+    title: "Practice challenge: Pocket's Python workshop",
+    summary: 'Copying values, order of operations, text and numbers, and loops that halve.',
+    questions: [
+      { id: 'q1', kind: 'number', prompt: 'What does this print?', skill: 'Variables', level: 'Hard', lang: 'python',
+        code: ['a = 5', 'b = a', 'a = 9', 'print(b)'], answer: 5,
+        explain: 'b = a copies the value 5 into b. Changing a afterwards does not change b.' },
+      { id: 'q2', kind: 'number', prompt: 'What does this print?', skill: 'Loops', level: 'Easy', lang: 'python',
+        code: ['score = 0', 'for i in range(3):', '    score = score + 10', 'print(score)'], answer: 30,
+        explain: 'The loop adds 10 three times: 10, 20, 30.' },
+      { id: 'q3', kind: 'mcq', prompt: 'What does print("Vinc" * 3) show?', skill: 'Text and input', level: 'Medium',
+        options: ['VincVincVinc', 'Vinc3', 'Error', 'Vinc Vinc Vinc'], answer: 0,
+        explain: 'Multiplying text repeats it, with no spaces added.' },
+      { id: 'q4', kind: 'number', prompt: 'What does print(2 + 3 * 4) show?', skill: 'Arithmetic', level: 'Medium', answer: 14,
+        explain: 'Python multiplies before it adds: 3 × 4 = 12, then 2 + 12 = 14.' },
+      { id: 'q5', kind: 'number', prompt: 'What does this print?', skill: 'Arithmetic', level: 'Medium', lang: 'python',
+        code: ['x = 17', 'print(x % 5)'], answer: 2,
+        explain: '% gives the remainder: 17 ÷ 5 is 3 remainder 2.' },
+      { id: 'q6', kind: 'mcq', prompt: 'The user types 11. What happens?', skill: 'Debugging', level: 'Hard', lang: 'python',
+        code: ['age = input("Age? ")', 'print(age + 1)'],
+        options: ['An error: text and a number cannot be added', 'It prints 12', 'It prints 111', 'It prints 11'], answer: 0,
+        explain: 'input() gives text ("11"). Use int(age) + 1 to do maths with it.' },
+      { id: 'q7', kind: 'number', prompt: 'What does this print?', skill: 'Loops', level: 'Hard', lang: 'python',
+        code: ['n = 10', 'while n > 1:', '    n = n // 2', 'print(n)'], answer: 1,
+        explain: 'n goes 10 → 5 → 2 → 1. At 1 the loop stops, so 1 is printed.' },
+      { id: 'q8', kind: 'mcq', prompt: 'A metro ride costs ₹20 and students pay half. Which line is right?', skill: 'Arithmetic', level: 'Easy',
+        options: ['fare = 20 / 2', 'fare = "20" / 2', 'fare = 20 // 0', 'fare = 20 - half'], answer: 0,
+        explain: '20 / 2 is 10.0. Text cannot be divided, dividing by 0 is an error, and half is not defined.' }
+    ]
+  },
+  {
+    id: 'c7-c', grade: 7, minutes: 25,
+    title: "Practice challenge: Chef Tadka's function kitchen",
+    summary: 'Functions that call functions, missing arguments, scope and angles.',
+    questions: [
+      { id: 'q1', kind: 'number', prompt: 'What does this print?', skill: 'Parameters and return', level: 'Medium', lang: 'python',
+        code: ['def square(n):', '    return n * n', 'print(square(4) + square(2))'], answer: 20,
+        explain: 'square(4) is 16 and square(2) is 4: 16 + 4 = 20.' },
+      { id: 'q2', kind: 'mcq', prompt: 'What happens when this runs?', skill: 'Parameters and return', level: 'Medium', lang: 'python',
+        code: ['def hello(name):', '    print("Hi " + name)', 'hello()'],
+        options: ['An error: the name argument is missing', 'It prints Hi', 'It prints Hi name', 'Nothing'], answer: 0,
+        explain: 'hello needs one argument. Calling hello() without it is a TypeError.' },
+      { id: 'q3', kind: 'number', prompt: 'What does this print?', skill: 'Functions', level: 'Hard', lang: 'python',
+        code: ['def walk(n):', '    return n * 2', 'def run(n):', '    return walk(n) + 1', 'print(run(5))'], answer: 11,
+        explain: 'run(5) calls walk(5), which returns 10. Then 10 + 1 = 11.' },
+      { id: 'q4', kind: 'mcq', prompt: 'Which line calls a function?', skill: 'Functions', level: 'Easy',
+        options: ['make_pizza(2)', 'def make_pizza(n):', 'return n', 'pizza = 2'], answer: 0,
+        explain: 'A call is the function name followed by brackets with any arguments. def only defines it.' },
+      { id: 'q5', kind: 'number', prompt: "Chef Tadka's cook(dish) function runs 3 steps. A program calls it 4 times. How many steps run?", skill: 'Decomposition', level: 'Easy', answer: 12,
+        explain: 'Each call runs all 3 steps: 3 × 4 = 12. The recipe is written once but used 4 times.' },
+      { id: 'q6', kind: 'mcq', prompt: 'What is printed?', skill: 'Scope', level: 'Hard', lang: 'python',
+        code: ['total = 0', 'def add(x):', '    total = x', 'add(5)', 'print(total)'],
+        options: ['0', '5', 'Error', 'x'], answer: 0,
+        explain: 'total = x inside the function makes a new local variable. The total outside stays 0.' },
+      { id: 'q7', kind: 'number', prompt: 'How many degrees should Vinc turn at each corner of a regular pentagon (5 sides)?', skill: 'Geometry with code', level: 'Medium', answer: 72,
+        explain: 'Vinc turns 360 degrees in total: 360 ÷ 5 = 72.' },
+      { id: 'q8', kind: 'mcq', prompt: 'What is the best way to write "Vinc tidies the lab" with functions?', skill: 'Decomposition', level: 'Easy',
+        options: ['pick_up(), sort(), put_away()', 'One function with 200 lines', 'No functions at all', 'tidy(tidy(tidy()))'], answer: 0,
+        explain: 'Small functions with clear names are easier to read, test and reuse.' }
+    ]
+  },
+  {
+    id: 'c8-c', grade: 8, minutes: 25,
+    title: "Practice challenge: Nova's data lab",
+    summary: 'List and dictionary tools, counting with loops, events and judging an AI model.',
+    questions: [
+      { id: 'q1', kind: 'number', prompt: 'What does this print?', skill: 'Lists', level: 'Medium', lang: 'python',
+        code: ['nums = [3, 8, 1, 6]', 'print(max(nums) - min(nums))'], answer: 7,
+        explain: 'The biggest is 8 and the smallest is 1: 8 - 1 = 7.' },
+      { id: 'q2', kind: 'mcq', prompt: 'What does this print?', skill: 'Lists', level: 'Hard', lang: 'python',
+        code: ['parts = ["wheels", "antenna"]', 'parts.insert(0, "gears")', 'print(parts[1])'],
+        options: ['wheels', 'gears', 'antenna', 'Error'], answer: 0,
+        explain: 'insert(0, ...) puts "gears" first, so the list is gears, wheels, antenna. Index 1 is "wheels".' },
+      { id: 'q3', kind: 'number', prompt: 'What does this print?', skill: 'Loops over lists', level: 'Medium', lang: 'python',
+        code: ['count = 0', 'for t in ["cat", "dog", "cat", "cat"]:', '    if t == "cat":', '        count += 1', 'print(count)'], answer: 3,
+        explain: 'The loop checks each item and counts the three "cat" items.' },
+      { id: 'q4', kind: 'mcq', prompt: 'The up key is pressed. What does Vinc do?', skill: 'Events', level: 'Easy', lang: 'python',
+        code: ['def on_key(key):', '    if key == "space":', '        jump()', '    elif key == "up":', '        step()'],
+        options: ['step()', 'jump()', 'Nothing', 'Both'], answer: 0,
+        explain: 'The handler gets key = "up". It is not "space", so the elif part runs.' },
+      { id: 'q5', kind: 'mcq', prompt: 'A nearest-neighbour model was trained on (10, "small") and (90, "big"). What does it say for 30?', skill: 'AI and data', level: 'Medium',
+        options: ['small', 'big', 'It cannot answer', 'medium'], answer: 0,
+        explain: '30 is 20 away from 10 and 60 away from 90. The nearest example is labelled "small".' },
+      { id: 'q6', kind: 'number', prompt: 'A model got 18 of 24 test answers right. What is its accuracy, in percent?', skill: 'AI and data', level: 'Medium', answer: 75,
+        explain: '18 ÷ 24 = 0.75, which is 75%.' },
+      { id: 'q7', kind: 'mcq', prompt: 'A face-unlock app works badly for people with darker skin. What is the most likely cause?', skill: 'Responsible AI', level: 'Medium',
+        options: ['Its training data had too few photos of people with darker skin', 'The phone is too old', 'Their faces move too fast', 'AI is always 100% accurate'], answer: 0,
+        explain: 'A model learns from its examples. If some groups are missing from the data, it works worse for them. This is called bias.' },
+      { id: 'q8', kind: 'mcq', prompt: 'What does this print?', skill: 'Lists', level: 'Easy', lang: 'python',
+        code: ['scores = {"Asha": 7, "Ravi": 9}', 'print(scores["Ravi"])'],
+        options: ['9', '7', 'Ravi', 'Error'], answer: 0,
+        explain: 'A dictionary looks up a value by its key. The key "Ravi" holds 9.' }
+    ]
+  }
+];
+
+export const ASSESSMENTS: Assessment[] = [...WRITTEN, ...PRACTICE]
+  .map(annotate)
+  .sort((a, b) => a.grade - b.grade || a.id.localeCompare(b.id))
+  .map(a => ({ ...a, questions: a.questions.map(qn => shuffled(a.id, qn)) }));

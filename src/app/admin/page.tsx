@@ -61,8 +61,8 @@ export default async function AdminHome() {
           </table></div>
         ) : <p className="small muted" style={{ marginBottom: 12 }}>No School IDs issued yet.</p>}
         <ActionForm action={issueSchoolIdAction} submit="Issue a School ID" className="form-grid">
-          <div className="field"><label htmlFor="note">Which school is it for? (optional)</label><input className="input" id="note" name="note" maxLength={60} placeholder="e.g. Sunflower Public School, Hubballi" /></div>
-          <div className="field"><label htmlFor="inviteEmail">School&apos;s email (optional)</label><input className="input" id="inviteEmail" name="email" type="email" maxLength={80} placeholder="principal@school.edu.in" /><span className="help">They get the School ID, a sign-up link and the next steps.</span></div>
+          <div className="field"><label htmlFor="note">Which school is it for?</label><input className="input" id="note" name="note" maxLength={60} required placeholder="e.g. Sunflower Public School, Hubballi" /></div>
+          <div className="field"><label htmlFor="inviteEmail">School&apos;s email</label><input className="input" id="inviteEmail" name="email" type="email" maxLength={80} required placeholder="principal@school.edu.in" /></div>
         </ActionForm>
       </section>
       <section className="card">

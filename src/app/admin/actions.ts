@@ -49,13 +49,14 @@ export async function issueSchoolIdAction(_p: ActionState, form: FormData): Prom
   const note = cleanName(String(form.get('note') ?? '')).slice(0, 60) || null;
   const email = String(form.get('email') ?? '').trim().toLowerCase().slice(0, 80) || null;
   const { emailOk } = await import('@/lib/signup');
-  if (email && !emailOk(email)) return { error: 'That email address does not look right.' };
+  if (!note) return { error: 'Enter the name of the school this ID is for.' };
+  if (!email) return { error: "Enter the school's email so we can send the onboarding email." };
+  if (!emailOk(email)) return { error: 'That email address does not look right.' };
   const { schoolId } = await import('@/lib/codes');
   let code = schoolId();
   while (q.get('SELECT 1 FROM school_invites WHERE code = ?', code)) code = schoolId();
   q.run('INSERT INTO school_invites (code, note, email, created_by, created_at) VALUES (?, ?, ?, ?, ?)', code, note, email, admin.id, now());
   revalidatePath('/admin');
-  if (!email) return { ok: `School ID ${code} is ready. Send it to the school${note ? ` (${note})` : ''}. They register at /signup?role=school&id=${code}` };
   const { sendOnboarding } = await import('@/lib/onboarding');
   const r = await sendOnboarding(code);
   return r.ok ? { ok: `School ID ${code} is ready. ${r.message}` } : { error: `School ID ${code} was created, but: ${r.message}` };

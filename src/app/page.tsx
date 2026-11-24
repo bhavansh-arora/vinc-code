@@ -11,6 +11,12 @@ import { getCurrentUser } from '@/lib/auth';
 import { ROLE_HOME } from '@/lib/types';
 import { ASSESSMENTS } from '@/data/assessments';
 import { LEVELS } from '@/lib/levels';
+import { LESSONS } from '@/data/lessons';
+import { CREW } from '@/lib/crew';
+import { RANKS } from '@/lib/xp';
+import CrewArt from '@/components/CrewArt';
+import CountUp from '@/components/landing/CountUp';
+import LessonDemo from '@/components/landing/LessonDemo';
 
 export const metadata: Metadata = { title: 'VINC Code · Learn to code with Vinc the robot' };
 
@@ -21,6 +27,16 @@ const CLASSES = [
   { n: 6, topic: 'Variables in Python', blurb: 'From blocks to typed Python: counting sparks, fuel and scores.', part: 'gear', partName: 'Gear toolbelt', live: true },
   { n: 7, topic: 'Functions', blurb: 'Kids build their own moves like stair() and walk(n), with parameters and return.', part: 'brain', partName: 'AI brain', live: true },
   { n: 8, topic: 'Events, lists and AI', blurb: 'Train Vinc to sort waste, spot bad data, and launch the rocket.', part: 'rocket', partName: 'Rocket boosters', live: true }
+];
+
+const TICKER = ['step()', 'turnLeft()', 'repeat 4:', 'jump()', 'if blocked():', 'else:', 'while not at_spark():', 'score = score + 1', 'input()', 'def walk(n):', 'return', 'for part in parts:', 'on_key(key)', 'training data', 'accuracy', 'debugging'];
+const FAQ = [
+  ['Does my child need to know how to type?', 'No. Classes 3 and 4 snap blocks together by tapping or dragging. Typing starts in Class 5, one line at a time, with buttons that insert the code.'],
+  ['Is it real coding?', 'Yes. Blocks are real programs with sequences, loops and jumps, and from Class 5 students write real Python that runs in the browser. Every lesson is checked automatically.'],
+  ['What does a student need?', 'Any laptop, Chromebook or tablet with a modern browser. Nothing to install. The 3D board falls back to a flat board on older devices.'],
+  ['How do teachers track progress?', 'Teachers see each student\'s lessons, stars, game levels and assessment scores, question by question. They can assign assessments and reset passwords.'],
+  ['Is it safe for children?', 'Students have no email address, chat or ads. They sign in with a username from their school, and only their school and linked parents can see their work.'],
+  ['How does a school join?', 'Contact VINC Lab. We send a School ID by email; the school registers, then shares joining codes with its teachers and students.']
 ];
 
 const SPARKS = Array.from({ length: 14 }, (_, i) => ({
@@ -44,6 +60,7 @@ export default async function Home() {
         <nav aria-label="Sections">
           <a href="#how">How it works</a>
           <a href="#classes">Classes 3–8</a>
+          <a href="#crew">The crew</a>
           <a href="#schools">For schools</a>
           <Link href="/contact">Contact</Link>
         </nav>
@@ -69,7 +86,7 @@ export default async function Home() {
             <ul className="lp-facts lp-rise" style={{ animationDelay: '320ms' }}>
               <li><b>{LEVELS.length}</b> playable 3D levels</li>
               <li><b>{ASSESSMENTS.length}</b> assessments, <b>{questions}</b> questions</li>
-              <li><b>48</b> Python lessons</li>
+              <li><b>{LESSONS.length}</b> block and Python lessons</li>
               <li><b>6</b> classes, one part each</li>
             </ul>
           </div>
@@ -81,6 +98,16 @@ export default async function Home() {
             <span className="lp-chip c2">repeat 3:</span>
             <span className="lp-chip c3">jump()</span>
           </div>
+        </section>
+
+        <div className="lp-ticker" aria-hidden="true"><div className="lp-ticker-track">
+          {[...TICKER, ...TICKER].map((t, i) => <span key={i}>{t}</span>)}
+        </div></div>
+
+        <section className="lp-numbers" aria-label="VINC Code in numbers">
+          {[[LESSONS.length, 'lessons'], [LEVELS.length, '3D game levels'], [ASSESSMENTS.length, 'assessments'], [questions, 'quiz questions'], [CREW.length, 'characters'], [6, 'classes']].map(([n, l]) => (
+            <div key={l as string} className="lp-num"><b><CountUp to={n as number} /></b><span>{l}</span></div>
+          ))}
         </section>
 
         <section className="lp-section" id="how">
@@ -120,9 +147,78 @@ export default async function Home() {
                   <h3>{c.topic}</h3>
                   <p>{c.blurb}</p>
                   <div className="lp-class-part"><PartIcon id={c.part} /><span>Wins: <b>{c.partName}</b></span></div>
+                  <div className="lp-class-buddy"><CrewArt id={CREW.find(m => m.joins === c.n)!.id} className="lp-class-crew" label="" /><span>New friend: <b>{CREW.find(m => m.joins === c.n)!.name}</b> · {CREW.find(m => m.joins === c.n)!.idea}</span></div>
                 </article>
               </Reveal>
             ))}
+          </div>
+        </section>
+
+        <section className="lp-section" id="lessons">
+          <div className="lp-split">
+            <Reveal>
+              <div className="lp-head" style={{ marginBottom: 0 }}>
+                <div className="eyebrow">Inside a lesson</div>
+                <h2>Snap blocks. Press Run. Watch it happen in 3D.</h2>
+                <p>Every lesson has a short explanation from one of Vinc&apos;s friends, an example, a task and hints. Students build the program, press Run and watch Vinc follow it on a real 3D board, one glowing block at a time.</p>
+                <ul className="lp-ticks">
+                  <li>Classes 3 and 4 drag and tap blocks: steps, turns, loops and jumps</li>
+                  <li>Classes 5 to 8 write real Python that runs in the browser</li>
+                  <li>Fewer blocks or fewer hints earn more stars</li>
+                  <li>Every bump shows exactly which block went wrong</li>
+                </ul>
+              </div>
+            </Reveal>
+            <Reveal delay={120}><LessonDemo /></Reveal>
+          </div>
+        </section>
+
+        <section className="lp-section" id="crew">
+          <Reveal>
+            <div className="lp-head">
+              <div className="eyebrow">Meet the crew</div>
+              <h2>A new friend joins every class.</h2>
+              <p>The cast grows as children do. Each friend stands for one big coding idea and explains it in the lessons. Hover or tap a card to meet them.</p>
+            </div>
+          </Reveal>
+          <div className="lp-crew">
+            {CREW.map((c, i) => (
+              <Reveal key={c.id} delay={i * 70}>
+                <div className="lp-flip" tabIndex={0} style={{ ['--c' as string]: c.color }}>
+                  <div className="lp-flip-in">
+                    <div className="lp-flip-f">
+                      <span className="lp-joins">{c.joins ? `Joins in Class ${c.joins}` : 'From day one'}</span>
+                      <CrewArt id={c.id} className="lp-crew-art" label={c.name} />
+                      <b>{c.name}</b><span className="small muted">the {c.what}</span>
+                    </div>
+                    <div className="lp-flip-b">
+                      <span className="lp-joins">{c.idea}</span>
+                      <p>{c.bio}</p>
+                      <q>{c.line}</q>
+                    </div>
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </section>
+
+        <section className="lp-section" id="ranks">
+          <div className="lp-split">
+            <Reveal>
+              <div className="lp-head" style={{ marginBottom: 0 }}>
+                <div className="eyebrow">Stars, XP and ranks</div>
+                <h2>Every lesson levels you up.</h2>
+                <p>Lessons earn up to three stars and XP. Boss lessons earn the most. As XP grows, students climb from Spark Rookie to Vinc Legend, and a celebration with the crew marks every lesson they finish.</p>
+              </div>
+            </Reveal>
+            <Reveal delay={120}>
+              <ol className="lp-ladder">
+                {RANKS.slice().reverse().map((r, i) => (
+                  <li key={r.name} style={{ ['--w' as string]: `${100 - i * 11}%` }}><span className="lp-ladder-ico" aria-hidden="true">{r.icon}</span><b>{r.name}</b><span className="mono small">{r.xp} XP</span></li>
+                ))}
+              </ol>
+            </Reveal>
           </div>
         </section>
 
@@ -135,11 +231,11 @@ export default async function Home() {
           </Reveal>
           <div className="lp-roles">
             <Reveal delay={0}><div className="lp-role"><span className="lp-role-tag" style={{ background: 'var(--amber)' }}>Students</span>
-              <ul><li>30 levels in a 3D workshop</li><li>Stars, sparks, hats and paint jobs</li><li>Short quizzes with explanations for every answer</li><li>Progress saved to their own account</li></ul></div></Reveal>
+              <ul><li>{LESSONS.length} lessons and {LEVELS.length} levels in 3D</li><li>Stars, XP, ranks, hats and paint jobs</li><li>Short quizzes with explanations for every answer</li><li>Progress saved to their own account</li></ul></div></Reveal>
             <Reveal delay={120}><div className="lp-role"><span className="lp-role-tag" style={{ background: 'var(--teal)' }}>Teachers</span>
               <ul><li>Add a whole class in a minute</li><li>Print login cards, reset passwords</li><li>Assign class-wise assessments</li><li>See results question by question</li></ul></div></Reveal>
             <Reveal delay={240}><div className="lp-role"><span className="lp-role-tag" style={{ background: 'var(--plum)' }}>Schools</span>
-              <ul><li>Manage teachers and sections</li><li>See every class at a glance</li><li>Two auto-graded assessments per class</li><li>Hands-on robotics at VINC Lab</li></ul></div></Reveal>
+              <ul><li>Manage teachers and sections</li><li>See every class at a glance</li><li>Three auto-graded assessments per class</li><li>Hands-on robotics at VINC Lab</li></ul></div></Reveal>
           </div>
           <Reveal>
             <div className="lp-safe">
@@ -147,6 +243,15 @@ export default async function Home() {
               <p><b>Built for children.</b> No ads, no chat, and no email addresses for students. Children sign in with a username and password from their teacher, and only their own school can see their work.</p>
             </div>
           </Reveal>
+        </section>
+
+        <section className="lp-section" id="faq">
+          <Reveal><div className="lp-head"><div className="eyebrow">Questions from parents and schools</div><h2>Good to know</h2></div></Reveal>
+          <div className="lp-faq">
+            {FAQ.map(([q, a], i) => (
+              <Reveal key={q} delay={i * 60}><details><summary>{q}</summary><p>{a}</p></details></Reveal>
+            ))}
+          </div>
         </section>
 
         <section className="lp-final">

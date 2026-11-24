@@ -834,13 +834,20 @@ footer { padding-block: 28px 40px; border-top: 1px solid var(--line); font-famil
     canvas.addEventListener('pointermove', function (e) { if (!dragging) return; yawAim = clamp(yawAim + (e.clientX - lx) * .007, -.9, .9); lx = e.clientX; });
     ['pointerup', 'pointercancel'].forEach(function (n) { canvas.addEventListener(n, function () { dragging = false; }); });
     canvas.addEventListener('dblclick', function () { yawAim = 0; });
+    var TILE_HEX = { red: '#D8614A', green: '#6FA046', blue: '#4B86C6' }, tileMs = {};
+    function tileM(name) { return tileMs[name] || (tileMs[name] = std({ color: L(TILE_HEX[name] || '#888888'), roughness: .6, emissive: L(TILE_HEX[name] || '#888888'), emissiveIntensity: .12 })); }
     var B = {};
     B.refresh = refresh;
+    B.dispose = function () {
+      var i = views.indexOf(v); if (i >= 0) views.splice(i, 1);
+      mo.disconnect();
+      try { v.renderer.dispose(); v.renderer.forceContextLoss(); } catch (e) {}
+    };
     B.build = function (P) {
       rows = P.rows; cols = P.cols; clear(tilesG); clear(propsG); sparks = {}; refresh();
       var base = mesh(new T.BoxGeometry(cols + .45, .4, rows + .45), baseM); base.position.y = -.25; tilesG.add(base);
       for (var r = 0; r < rows; r++) for (var c = 0; c < cols; c++) {
-        var k = r + ',' + c, tile = mesh(tileGeo, (r + c) % 2 ? tileB : tileA, false); tile.position.set(wx(c), 0, wz(r)); tilesG.add(tile);
+        var k = r + ',' + c, tm = P.tiles && P.tiles[k] ? tileM(P.tiles[k]) : (r + c) % 2 ? tileB : tileA, tile = mesh(tileGeo, tm, false); tile.position.set(wx(c), 0, wz(r)); tilesG.add(tile);
         if (P.crates[k]) { var cr = mesh(crateGeo, crateM); cr.position.set(wx(c), FY + .38, wz(r)); cr.rotation.y = ((r * 7 + c * 3) % 5 - 2) * .04; propsG.add(cr); }
         if (P.sparks.indexOf(k) >= 0) {
           var sg = new T.Group(), star = mesh(sGeo, sparkM), glow = new T.Sprite(glowM);

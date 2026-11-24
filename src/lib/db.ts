@@ -119,6 +119,7 @@ function open(): DB {
   db.exec(SCHEMA);
   migrate(db);
   migrateV3(db);
+  migrateV4(db);
   bootstrapAdmin(db);
   return db;
 }
@@ -198,6 +199,19 @@ function migrate(db: DB) {
 }
 
 /** Version 3: School IDs can be emailed to the school (onboarding email), with the send status kept. */
+/** v4: best stars per lesson (XP is worked out from stars and the lesson type). */
+function migrateV4(db: DB) {
+  const version = (db.prepare('PRAGMA user_version').get() as { user_version: number }).user_version;
+  if (version >= 4) return;
+  const cols = (db.prepare('PRAGMA table_info(lesson_progress)').all() as { name: string }[]).map(c => c.name);
+  db.exec('BEGIN IMMEDIATE');
+  try {
+    if (!cols.includes('stars')) db.exec('ALTER TABLE lesson_progress ADD COLUMN stars INTEGER NOT NULL DEFAULT 0');
+    db.exec('UPDATE lesson_progress SET stars = 2 WHERE passed_at IS NOT NULL AND stars = 0');
+    db.exec('PRAGMA user_version = 4'); db.exec('COMMIT');
+  } catch (e) { db.exec('ROLLBACK'); throw e; }
+}
+
 function migrateV3(db: DB) {
   const version = (db.prepare('PRAGMA user_version').get() as { user_version: number }).user_version;
   if (version >= 3) return;

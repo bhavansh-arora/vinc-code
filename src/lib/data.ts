@@ -191,7 +191,7 @@ export function schoolInvites() {
 
 /* ---------- lessons (Classes 5 to 8) ---------- */
 export function lessonProgressOf(studentId: number) {
-  const rows = q.all<{ lesson_id: string; code: string | null; passed_at: string | null }>(`SELECT lesson_id, code, passed_at FROM lesson_progress WHERE student_id = ?`, studentId);
+  const rows = q.all<{ lesson_id: string; code: string | null; passed_at: string | null; stars: number }>(`SELECT lesson_id, code, passed_at, stars FROM lesson_progress WHERE student_id = ?`, studentId);
   return new Map(rows.map(r => [r.lesson_id, r]));
 }
 

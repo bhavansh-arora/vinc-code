@@ -49,7 +49,7 @@ export default async function ClassPage({ params }: { params: Promise<{ id: stri
           <div className="card-head"><h2>Students</h2><span className="small muted">Levels count towards Class {section.grade}{section.grade > 4 ? ' (practising on the Class 3–4 levels for now)' : ''}</span></div>
           {students.length ? (
             <div className="table-wrap"><table className="data">
-              <thead><tr><th>Name</th><th>Username</th>{lessonTotal > 0 && <th>Python lessons</th>}<th>Game levels</th><th className="num">Stars</th><th className="num">Avg. score</th><th>Last sign-in</th></tr></thead>
+              <thead><tr><th>Name</th><th>Username</th>{lessonTotal > 0 && <th>Lessons</th>}<th>Game levels</th><th className="num">Stars</th><th className="num">Avg. score</th><th>Last sign-in</th></tr></thead>
               <tbody>{students.map(s => (
                 <tr key={s.id}><td><b>{s.name}</b></td><td className="mono small">{s.username}</td>
                   {lessonTotal > 0 && <td style={{ minWidth: 140 }}><Bar amber value={(lessonsDone.get(s.id) ?? 0) / lessonTotal * 100} label="lessons done" /><span className="small muted">{lessonsDone.get(s.id) ?? 0} of {lessonTotal}</span></td>}

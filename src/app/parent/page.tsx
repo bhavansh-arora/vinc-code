@@ -30,7 +30,7 @@ export default async function ParentHome() {
             <div className="stats">
               <div className="stat"><span className="label">Levels done</span><span className="value">{done} / {h.levels.length}</span></div>
               <div className="stat"><span className="label">Stars</span><span className="value">★ {h.totalStars}</span></div>
-              {kidLessons.length > 0 && <div className="stat"><span className="label">Python lessons</span><span className="value">{lessonsDone} / {kidLessons.length}</span></div>}
+              {kidLessons.length > 0 && <div className="stat"><span className="label">Lessons</span><span className="value">{lessonsDone} / {kidLessons.length}</span></div>}
               <div className="stat"><span className="label">Assessments</span><span className="value">{finished.length} done</span><span className="hint">{todo.length ? `${todo.length} still to do` : 'nothing pending'}</span></div>
             </div>
             <div><span className="small">Game progress for their class</span><Bar value={h.levels.length ? done / h.levels.length * 100 : 0} /></div>

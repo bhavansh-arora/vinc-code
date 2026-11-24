@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Shell from '@/components/Shell';
 import LessonList from '@/components/lessons/LessonList';
 import { requireRole } from '@/lib/auth';
-import { LESSON_GRADES, lessonsForGrade } from '@/data/lessons';
+import { LESSONS, LESSON_GRADES, lessonsForGrade } from '@/data/lessons';
 
 export const metadata: Metadata = { title: 'Lessons' };
 
@@ -11,9 +11,10 @@ export default async function StaffLessons() {
   return (
     <Shell user={user}>
       <div className="stack">
-        <div><div className="eyebrow">Classes 5 to 8</div><h1>Python lessons</h1>
-          <p className="muted">48 lessons that run real Python in the browser. Open one to try it yourself and see the model solution. Students see the lessons for their own class and the classes before it.</p></div>
-        {LESSON_GRADES.map(g => <LessonList key={g} grade={g} lessons={lessonsForGrade(g)} done={new Set()} hrefFor={id => `/lessons/${id}`} staff />)}
+        <div><div className="eyebrow">Classes 3 to 8</div><h1>Lessons</h1>
+          <p className="muted">{LESSONS.length} lessons. Classes 3 and 4 snap blocks together; Classes 5 to 8 write real Python in the browser. Every lesson runs on a 3D board or checks the output.
+            Open one to try it and see the model solution. Students see their own class and the classes before it, and earn stars and XP.</p></div>
+        {LESSON_GRADES.map(g => <LessonList key={g} grade={g} lessons={lessonsForGrade(g)} stars={new Map()} hrefFor={id => `/lessons/${id}`} staff />)}
       </div>
     </Shell>
   );

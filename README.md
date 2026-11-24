@@ -70,24 +70,47 @@ reaches their own sections, a school admin only their own school).
 
 ## Assessments
 
-`src/data/assessments.ts` holds **12 auto-graded assessments, two per class (Classes 3–8), 96 questions**:
+`src/data/assessments.ts` holds **18 auto-graded assessments, three per class (Classes 3–8), 144 questions**: a checkpoint,
+an end-of-class test and a harder practice challenge. Every question is tagged with a **skill** and a **level** (Easy, Medium, Hard),
+and every assessment lists its learning objectives. The bank page shows skill coverage, the difficulty mix and question formats per class:
 
 | Class | Topic | Assessments |
 |---|---|---|
-| 3 | Sequencing and debugging | Checkpoint · End of class |
-| 4 | Loops and jump() | Checkpoint · End of class |
-| 5 | if / else, conditions | Checkpoint · End of class |
-| 6 | Variables in Python | Checkpoint · End of class |
-| 7 | Functions | Checkpoint · End of class |
-| 8 | Events, lists, AI basics | Checkpoint · End of class |
+| 3 | Sequencing and debugging | Checkpoint · End of class · Pip's obstacle course |
+| 4 | Loops and jump() | Checkpoint · End of class · Loopa's loop lab |
+| 5 | if / else, conditions | Checkpoint · End of class · Hoot's decision maze |
+| 6 | Variables in Python | Checkpoint · End of class · Pocket's Python workshop |
+| 7 | Functions | Checkpoint · End of class · Chef Tadka's function kitchen |
+| 8 | Events, lists, AI basics | Checkpoint · End of class · Nova's data lab |
 
 Classes 3 and 4 include board questions ("Where does Vinc stop?"). Run `npm run check:content`
 to prove those answers by running the code on the board, and to check answer positions are spread out.
 Answers are graded on the server and never sent to the browser before a student submits.
 
-## Python lessons (Classes 5 to 8)
+## Lessons (Classes 3 to 8)
 
-`src/data/lessons.ts` holds **48 lessons, 12 per class**, each with an explanation, an example, a task,
+**72 lessons, 12 per class.** Every Vinc lesson plays on a 3D board (the same Three.js engine as the game, with a flat
+board as a fallback), and finishing one opens a celebration with stars, XP and the crew.
+
+**Classes 3 and 4 use blocks** (`src/data/blockLessons.ts`): students tap or drag `step`, `turn left`, `turn right`, `jump` and
+`repeat` blocks into a program. `src/lib/blocks.ts` runs them in the browser, on the server (so passes and stars cannot be faked)
+and in `npm run check:lessons`. Fewer blocks earn more stars: the model solution's size is par.
+
+| Class | Topic | Highlights |
+|---|---|---|
+| 3 | Sequencing | steps and turns, crates, one program for two rooms, Glitch's wrong-order bugs, crate-maze boss |
+| 4 | Loops and jumps | repeat, patterns, nested loops, jump over crates, hurdle-stairs boss |
+
+**Stars and XP.** Block lessons: 3 stars at par, 2 within two blocks, 1 otherwise. Python lessons: 3 stars with no hints, 2 with one.
+XP = 10–40 by lesson type + 5 per star; ranks run from Spark Rookie to Vinc Legend (`src/lib/xp.ts`).
+
+**The crew** (`src/lib/crew.ts`, art in `src/components/CrewArt.tsx`). A new friend joins each class and explains its idea:
+Pip (sequencing, Class 3), Loopa (loops, 4), Hoot (if/else, 5), Pocket (variables, 6), Chef Tadka (functions, 7) and Nova
+(data and AI, 8), alongside Vinc and Glitch.
+
+### Python lessons (Classes 5 to 8)
+
+`src/data/lessons.ts` holds **48 Python lessons, 12 per class**, each with an explanation, an example, a task,
 starter code, hints, a model solution and an automatic check. Students write real Python, run in the
 browser by Pyodide (`public/lessons/worker.js`, loaded from cdn.jsdelivr.net), so the server needs no Python.
 
@@ -155,6 +178,6 @@ first. All database code lives in `src/lib/db.ts` and `src/lib/data.ts` to make 
 
 ## Not built yet
 
-- Game levels for Classes 5–8 (their students practise on the Class 3–4 levels for now).
+- Game levels for Classes 5–8 (their students practise on the Class 3–4 levels for now; their lessons have 3D boards).
 - Editing the assessment bank from the admin screen (it is edited in `src/data/assessments.ts`).
 - Timed assessments, bulk import of students from a spreadsheet, and parent accounts.
