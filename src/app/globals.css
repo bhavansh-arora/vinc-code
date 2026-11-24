@@ -522,3 +522,6 @@ html { scroll-behavior: smooth; }
 .ls-li-txt { min-width: 0; }
 .ls-li-txt small { display: block; color: var(--muted); font-size: .8rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 @media (max-width: 960px) { .ls { grid-template-columns: minmax(0, 1fr); } .ls-info { position: static; max-height: none; } }
+.invite-resend summary { cursor: pointer; color: var(--amber-ink); white-space: nowrap; }
+.invite-resend[open] { min-width: 240px; }
+.invite-resend form { margin-top: 8px; }

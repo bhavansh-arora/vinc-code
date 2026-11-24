@@ -118,6 +118,7 @@ function open(): DB {
   const db = new DatabaseSync(file);
   db.exec(SCHEMA);
   migrate(db);
+  migrateV3(db);
   bootstrapAdmin(db);
   return db;
 }
@@ -193,6 +194,22 @@ function migrate(db: DB) {
     throw e;
   } finally {
     db.exec('PRAGMA foreign_keys = ON');
+  }
+}
+
+/** Version 3: School IDs can be emailed to the school (onboarding email), with the send status kept. */
+function migrateV3(db: DB) {
+  const version = (db.prepare('PRAGMA user_version').get() as { user_version: number }).user_version;
+  if (version >= 3) return;
+  const cols = (db.prepare('PRAGMA table_info(school_invites)').all() as { name: string }[]).map(c => c.name);
+  db.exec('BEGIN IMMEDIATE');
+  try {
+    for (const c of ['email', 'email_status', 'email_sent_at', 'email_error']) if (!cols.includes(c)) db.exec(`ALTER TABLE school_invites ADD COLUMN ${c} TEXT`);
+    db.exec('PRAGMA user_version = 3');
+    db.exec('COMMIT');
+  } catch (e) {
+    db.exec('ROLLBACK');
+    throw e;
   }
 }
 

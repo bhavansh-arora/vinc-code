@@ -184,8 +184,9 @@ export function schoolCodes(schoolId: number) {
 }
 
 export function schoolInvites() {
-  return q.all<{ code: string; note: string | null; created_at: string; used_at: string | null; school_name: string | null }>(`
-    SELECT i.code, i.note, i.created_at, i.used_at, s.name AS school_name FROM school_invites i LEFT JOIN schools s ON s.id = i.school_id ORDER BY i.created_at DESC LIMIT 50`);
+  return q.all<{ code: string; note: string | null; email: string | null; email_status: string | null; email_sent_at: string | null; email_error: string | null; created_at: string; used_at: string | null; school_name: string | null }>(`
+    SELECT i.code, i.note, i.email, i.email_status, i.email_sent_at, i.email_error, i.created_at, i.used_at, s.name AS school_name
+    FROM school_invites i LEFT JOIN schools s ON s.id = i.school_id ORDER BY i.created_at DESC LIMIT 50`);
 }
 
 /* ---------- lessons (Classes 5 to 8) ---------- */

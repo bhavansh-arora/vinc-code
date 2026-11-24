@@ -130,10 +130,11 @@ Test it once, then schedule it for 02:15 every night (this adds the line to root
 `VACUUM INTO` will not overwrite an existing file, which is why the script removes `backup.db` before and after.
 Copy backups off the server too, for example to cloud storage.
 
-## 8. Email for the contact form
+## 8. Email (contact form and school onboarding)
 
-Messages from `/contact` are always saved (Admin → Messages). To also email them to the inbox,
-add the mailbox settings to `/opt/vinc-code/.env`. This asks for the password without showing it
+Messages from `/contact` are always saved (Admin → Messages). School IDs issued with an email
+address (Admin → School IDs) send the school an onboarding email with its ID and sign-up link.
+To send email, add the mailbox settings to `/opt/vinc-code/.env`. This asks for the password without showing it
 or saving it in the shell history:
 
 ```bash
@@ -143,6 +144,11 @@ cd /opt/vinc-code && read -rsp "Mailbox password: " P && echo && printf 'SMTP_HO
 Check that the VPS can reach the mail server: `nc -zv send.one.com 465` should say "succeeded".
 Then send a test message from https://code.vinc-lab.com/contact. Admin → Messages shows
 "email sent" or the exact error.
+
+Onboarding emails link to the address the admin page was opened on. To pin it, add
+`APP_URL=https://code.vinc-lab.com` to `.env` and run `docker compose up -d`. In Admin → School IDs,
+the Email column shows "sent", "failed" (hover for the error) or "not set up", and **Resend email**
+sends it again, optionally to a corrected address.
 
 ## Updating
 

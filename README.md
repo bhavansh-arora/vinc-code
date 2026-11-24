@@ -42,7 +42,7 @@ People log in with a User ID and password. To sign up, they choose who they are:
 | Student | The school's **student joining code** (from their teacher), then picks class and section | A **family code** for their parent |
 | Teacher | The school's **teacher joining code** (from the coordinator); can pick sections that have no teacher yet | Their sections on the teacher dashboard |
 | Parent | Their child's **family code** (on the child's dashboard) | A dashboard with each linked child's progress and results |
-| School | A **School ID** issued by VINC (Admin → School IDs) | The school, its coordinator account, and its two joining codes |
+| School | A **School ID** issued by VINC (Admin → School IDs; add the school's email and it gets an onboarding email with the ID and a sign-up link) | The school, its coordinator account, and its two joining codes |
 
 Students are never asked for an email address, phone number or date of birth. The User ID is
 suggested from the name and checked live; passwords need 8+ characters and show a strength meter.

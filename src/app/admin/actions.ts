@@ -47,12 +47,33 @@ export async function toggleSchoolAction(_p: ActionState, form: FormData): Promi
 export async function issueSchoolIdAction(_p: ActionState, form: FormData): Promise<ActionState> {
   const admin = await requireRole('admin');
   const note = cleanName(String(form.get('note') ?? '')).slice(0, 60) || null;
+  const email = String(form.get('email') ?? '').trim().toLowerCase().slice(0, 80) || null;
+  const { emailOk } = await import('@/lib/signup');
+  if (email && !emailOk(email)) return { error: 'That email address does not look right.' };
   const { schoolId } = await import('@/lib/codes');
   let code = schoolId();
   while (q.get('SELECT 1 FROM school_invites WHERE code = ?', code)) code = schoolId();
-  q.run('INSERT INTO school_invites (code, note, created_by, created_at) VALUES (?, ?, ?, ?)', code, note, admin.id, now());
+  q.run('INSERT INTO school_invites (code, note, email, created_by, created_at) VALUES (?, ?, ?, ?, ?)', code, note, email, admin.id, now());
   revalidatePath('/admin');
-  return { ok: `School ID ${code} is ready. Send it to the school${note ? ` (${note})` : ''}. They register at /signup?role=school&id=${code}` };
+  if (!email) return { ok: `School ID ${code} is ready. Send it to the school${note ? ` (${note})` : ''}. They register at /signup?role=school&id=${code}` };
+  const { sendOnboarding } = await import('@/lib/onboarding');
+  const r = await sendOnboarding(code);
+  return r.ok ? { ok: `School ID ${code} is ready. ${r.message}` } : { error: `School ID ${code} was created, but: ${r.message}` };
+}
+
+export async function resendOnboardingAction(_p: ActionState, form: FormData): Promise<ActionState> {
+  await requireRole('admin');
+  const code = String(form.get('code') ?? '');
+  const newEmail = String(form.get('email') ?? '').trim().toLowerCase().slice(0, 80);
+  if (newEmail) {
+    const { emailOk } = await import('@/lib/signup');
+    if (!emailOk(newEmail)) return { error: 'That email address does not look right.' };
+    q.run('UPDATE school_invites SET email = ? WHERE code = ? AND school_id IS NULL', newEmail, code);
+  }
+  const { sendOnboarding } = await import('@/lib/onboarding');
+  const r = await sendOnboarding(code);
+  revalidatePath('/admin');
+  return r.ok ? { ok: r.message } : { error: r.message };
 }
 
 export async function markHandledAction(_p: ActionState, form: FormData): Promise<ActionState> {

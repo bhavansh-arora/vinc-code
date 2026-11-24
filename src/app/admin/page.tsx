@@ -5,7 +5,7 @@ import { Empty, ScoreBadge, Stat, pct, when } from '@/components/ui';
 import { requireRole } from '@/lib/auth';
 import { platformStats, schoolInvites, schoolsWithCounts } from '@/lib/data';
 import { ASSESSMENTS } from '@/data/assessments';
-import { createSchoolAction, issueSchoolIdAction } from './actions';
+import { createSchoolAction, issueSchoolIdAction, resendOnboardingAction } from './actions';
 
 export const metadata: Metadata = { title: 'Admin' };
 
@@ -40,18 +40,29 @@ export default async function AdminHome() {
         ) : <Empty>No schools yet. Add the first one below.</Empty>}
       </section>
       <section className="card">
-        <div className="card-head"><h2>School IDs for self-registration</h2><span className="small muted">A school registers itself at /signup with its School ID</span></div>
+        <div className="card-head"><h2>School IDs for self-registration</h2><span className="small muted">Add the school&apos;s email and they get an onboarding email with a sign-up link</span></div>
         {invites.length ? (
           <div className="table-wrap" style={{ marginBottom: 14 }}><table className="data">
-            <thead><tr><th>School ID</th><th>For</th><th>Issued</th><th>Status</th></tr></thead>
+            <thead><tr><th>School ID</th><th>For</th><th>Email</th><th>Issued</th><th>Status</th><th /></tr></thead>
             <tbody>{invites.map(i => (
-              <tr key={i.code}><td className="mono"><b>{i.code}</b></td><td>{i.note ?? '—'}</td><td className="small">{when(i.created_at)}</td>
-                <td>{i.school_name ? <span className="badge good">used by {i.school_name}</span> : <span className="badge plain">waiting</span>}</td></tr>
+              <tr key={i.code}><td className="mono"><b>{i.code}</b></td><td>{i.note ?? '—'}</td>
+                <td className="small">{i.email ? <>{i.email}<br /><span className={'badge ' + (i.email_status === 'sent' ? 'good' : i.email_status === 'failed' ? 'bad' : 'plain')} title={i.email_error ?? ''}>{i.email_status === 'sent' ? `sent ${when(i.email_sent_at)}` : i.email_status ?? 'not sent'}</span></> : '—'}</td>
+                <td className="small">{when(i.created_at)}</td>
+                <td>{i.school_name ? <span className="badge good">used by {i.school_name}</span> : <span className="badge plain">waiting</span>}</td>
+                <td>{!i.school_name && (
+                  <details className="invite-resend"><summary className="small">{i.email ? 'Resend email' : 'Email it'}</summary>
+                    <ActionForm action={resendOnboardingAction} submit="Send onboarding email" className="stack" buttonClass="btn small">
+                      <input type="hidden" name="code" value={i.code} />
+                      <input className="input" name="email" type="email" maxLength={80} defaultValue={i.email ?? ''} placeholder="school@example.com" aria-label={`Email for ${i.code}`} required={!i.email} />
+                    </ActionForm>
+                  </details>
+                )}</td></tr>
             ))}</tbody>
           </table></div>
         ) : <p className="small muted" style={{ marginBottom: 12 }}>No School IDs issued yet.</p>}
         <ActionForm action={issueSchoolIdAction} submit="Issue a School ID" className="form-grid">
           <div className="field"><label htmlFor="note">Which school is it for? (optional)</label><input className="input" id="note" name="note" maxLength={60} placeholder="e.g. Sunflower Public School, Hubballi" /></div>
+          <div className="field"><label htmlFor="inviteEmail">School&apos;s email (optional)</label><input className="input" id="inviteEmail" name="email" type="email" maxLength={80} placeholder="principal@school.edu.in" /><span className="help">They get the School ID, a sign-up link and the next steps.</span></div>
         </ActionForm>
       </section>
       <section className="card">
