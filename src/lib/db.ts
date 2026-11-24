@@ -8,6 +8,7 @@ import { hashPassword } from './passwords';
 const { DatabaseSync } = process.getBuiltinModule('node:sqlite') as typeof import('node:sqlite');
 
 const SCHEMA = `
+PRAGMA busy_timeout = 5000;
 PRAGMA foreign_keys = ON;
 PRAGMA journal_mode = WAL;
 CREATE TABLE IF NOT EXISTS schools (
@@ -108,8 +109,12 @@ function bootstrapAdmin(db: DB) {
   console.log(`Created the first VINC admin "${username}". You can now remove ADMIN_PASSWORD from the .env file.`);
 }
 
+// Opened on first use, never at import time: `next build` loads modules in several processes
+// at once, and none of them should touch (or create) the database.
 const g = globalThis as unknown as { __vincDb?: DB };
-export const db: DB = g.__vincDb ?? (g.__vincDb = open());
+function getDb(): DB {
+  return g.__vincDb ?? (g.__vincDb = open());
+}
 
 export function now(): string {
   return new Date().toISOString();
@@ -117,7 +122,8 @@ export function now(): string {
 
 /** Run fn inside a transaction. */
 export function tx<T>(fn: () => T): T {
-  db.exec('BEGIN');
+  const db = getDb();
+  db.exec('BEGIN IMMEDIATE');
   try {
     const out = fn();
     db.exec('COMMIT');
@@ -132,13 +138,13 @@ type Row = Record<string, unknown>;
 type Param = string | number | bigint | null;
 export const q = {
   get<T = Row>(sql: string, ...params: Param[]): T | undefined {
-    return db.prepare(sql).get(...params) as T | undefined;
+    return getDb().prepare(sql).get(...params) as T | undefined;
   },
   all<T = Row>(sql: string, ...params: Param[]): T[] {
-    return db.prepare(sql).all(...params) as T[];
+    return getDb().prepare(sql).all(...params) as T[];
   },
   run(sql: string, ...params: Param[]): { id: number; changes: number } {
-    const r = db.prepare(sql).run(...params);
+    const r = getDb().prepare(sql).run(...params);
     return { id: Number(r.lastInsertRowid), changes: Number(r.changes) };
   }
 };
