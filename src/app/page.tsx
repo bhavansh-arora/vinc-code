@@ -106,7 +106,7 @@ export default async function Home() {
 
         <section className="lp-numbers" aria-label="VINC Code in numbers">
           {[[LESSONS.length, 'lessons'], [LEVELS.length, '3D game levels'], [ASSESSMENTS.length, 'assessments'], [questions, 'quiz questions'], [CREW.length, 'characters'], [6, 'classes']].map(([n, l]) => (
-            <div key={l as string} className="lp-num"><b><CountUp to={n as number} /></b><span>{l}</span></div>
+            <div key={l as string} className="lp-stat"><b><CountUp to={n as number} /></b><span>{l}</span></div>
           ))}
         </section>
 
@@ -215,7 +215,7 @@ export default async function Home() {
             <Reveal delay={120}>
               <ol className="lp-ladder">
                 {RANKS.slice().reverse().map((r, i) => (
-                  <li key={r.name} style={{ ['--w' as string]: `${100 - i * 11}%` }}><span className="lp-ladder-ico" aria-hidden="true">{r.icon}</span><b>{r.name}</b><span className="mono small">{r.xp} XP</span></li>
+                  <li key={r.name} style={{ ['--w' as string]: `${100 - i * 6}%` }}><span className="lp-ladder-ico" aria-hidden="true">{r.icon}</span><b>{r.name}</b><span className="mono small">{r.xp} XP</span></li>
                 ))}
               </ol>
             </Reveal>
