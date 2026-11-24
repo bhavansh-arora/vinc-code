@@ -18,6 +18,7 @@ import CrewArt from '@/components/CrewArt';
 import CountUp from '@/components/landing/CountUp';
 import LessonDemo from '@/components/landing/LessonDemo';
 import Deco3D from '@/components/landing/Deco3D';
+import { TrailerButton } from '@/components/play/Cutscene';
 
 export const metadata: Metadata = { title: 'VINC Code · Learn to code with Vinc the robot' };
 
@@ -82,6 +83,7 @@ export default async function Home() {
             </p>
             <div className="lp-cta lp-rise" style={{ animationDelay: '240ms' }}>
               <Link className="btn primary lp-big lp-play" href="/play">▶ Start playing</Link>
+              <TrailerButton className="btn lp-big lp-trailer" />
               <Link className="btn lp-big" href="/signup">Create an account</Link>
             </div>
             <p className="lp-free lp-rise" style={{ animationDelay: '280ms' }}>Free to play, no login needed. Log in to save stars to your account.</p>

@@ -57,10 +57,12 @@ function Board2D({ map, trace, frame }: { map: string[]; trace: TraceStep[]; fra
  * Vinc's board in 3D (the same Three.js engine as the game). `frame` is how far through `trace` the animation is;
  * -1 shows the start. Moving `frame` forward animates each step; `won` plays the victory dance at the end.
  */
-export default function Board3D({ map, trace, frame, won, stepMs, theme, onTile, marks, className, hint = true, onReady }: {
+export default function Board3D({ map, trace, frame, won, stepMs, theme, onTile, marks, className, hint = true, onReady, pulse }: {
   map: string[]; trace: TraceStep[]; frame: number; won: boolean; stepMs: number;
   /** A themed world around the board (the /play game). */
   theme?: string; onTile?: (t: { r: number; c: number } | null) => void; marks?: string[]; className?: string; hint?: boolean; onReady?: (is3d: boolean) => void;
+  /** Make Vinc react without a trace: a victory dance, or a bump with dizzy stars. */
+  pulse?: { kind: 'win' | 'oops'; n: number } | null;
 }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const eng = useRef<Engine | null>(null);
@@ -90,6 +92,11 @@ export default function Board3D({ map, trace, frame, won, stepMs, theme, onTile,
   }, [ready, map, theme]);
 
   useEffect(() => { const B = eng.current; if (ready && B) B.onTile = onTile ?? null; }, [ready, onTile]);
+  useEffect(() => {
+    const B = eng.current; if (!ready || !B || !pulse) return;
+    if (pulse.kind === 'win') B.win();
+    else { const s = startOf(map); B.bump(s, s.r + DR[s.d], s.c + DC[s.d], false); }
+  }, [ready, pulse, map]);
   useEffect(() => { const B = eng.current; if (ready && B?.mark) B.mark(marks ?? []); }, [ready, marks, map]);
 
   // Play the trace up to `frame`.

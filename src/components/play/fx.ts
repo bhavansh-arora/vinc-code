@@ -12,6 +12,8 @@ function store(key: string, v: string) { try { localStorage.setItem(key, v); } c
 export const settings = {
   get sound() { return load('vinc-sound') !== 'off'; },
   set sound(on: boolean) { store('vinc-sound', on ? 'on' : 'off'); },
+  get music() { return load('vinc-music') !== 'off'; },
+  set music(on: boolean) { store('vinc-music', on ? 'on' : 'off'); },
   get voice() { return load('vinc-voice') !== 'off'; },
   set voice(on: boolean) { store('vinc-voice', on ? 'on' : 'off'); if (!on) stopSpeaking(); }
 };
@@ -66,6 +68,8 @@ export function speak(text: string, force = false) {
   const u = new SpeechSynthesisUtterance(text.replace(/`/g, '').replace(/_/g, ' ').replace(/\(\)/g, '').replace(/\(([^)]*)\)/g, ' $1'));
   const v = pickVoice(); if (v) { u.voice = v; u.lang = v.lang; }
   u.rate = 0.95; u.pitch = 1.1;
+  const tell = (on: boolean) => window.dispatchEvent(new CustomEvent('vinc-speak', { detail: on }));
+  u.onstart = () => tell(true); u.onend = () => tell(false); u.onerror = () => tell(false);
   s.speak(u);
 }
 export function stopSpeaking() { if (canSpeak()) window.speechSynthesis.cancel(); }

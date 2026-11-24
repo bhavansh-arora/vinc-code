@@ -49,7 +49,19 @@ when a student logs in, those levels are re-checked and saved to their account. 
   friendly error messages ("Did you mean step?") and a 3-star win screen. Fewer blocks or lines earn more stars.
 - Every level is a themed 3D world (meadow, orchard, hills, river, beach, lagoon, jungle, factory) built by the game engine.
 - Teachers and school admins can open any level, and a 👁 button loads the answer.
-- Class 3–4 students' **Lessons** link now opens the Junior game; Classes 5–8 keep their Python lessons and also get Adventure.
+- **Python Quest** (Classes 5–8): the 48 Python lessons as four worlds, one per class (Sensor Canyon, Number Bazaar,
+  Tadka's Kitchen, Space Station). Real Python runs in the browser; Vinc lessons play on the 3D board and print/input/test
+  lessons show their output on a glowing "Vinc's screen". Every world is open (students: up to their own class), levels open one by one.
+- **Story cutscenes** (`src/data/stories.ts`, `Cutscene.tsx`): an animated prologue trailer (also on the landing page) and a
+  short intro for each of the 12 worlds, shown the first time a world is opened. Characters walk in, hop, sneak and dance;
+  captions are typed out and read aloud; ▶/❚❚, ⏭ and Skip controls. 🎬 replays them.
+- **Music** (`music.ts`): an original tune for every world, composed live with Web Audio (no audio files), quieter while
+  the narrator speaks; 🎵 switches it off. **Sound effects** and **narration** have their own switches.
+- **Moving worlds** (`Ambient.tsx`): birds, gulls, butterflies, petals, bubbles, fireflies, vines, gears, steam, kites,
+  bunting, a circling hawk, tumbleweeds, shooting stars. **Reactions**: the world's buddy pops up with funny lines when Vinc
+  sets off, grabs a spark, bumps, wins or waits; Vinc hops for sparks and sees dizzy stars after a bump.
+- All lesson links for students now open the game (Junior for Classes 3–4, Python Quest for Classes 5–8); staff keep the
+  lesson previews at `/lessons`.
 
 `npm run check:lessons` proves every Junior and Adventure model answer wins with 3 stars and every starter fails.
 

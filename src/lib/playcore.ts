@@ -11,11 +11,11 @@ export const playStars = (size: number, par: number) => (size <= par ? 3 : size 
  * Which chapters and levels are open. `chapters` are one track's chapters in order.
  * A chapter opens when the one before it is finished; inside a chapter, levels open one by one.
  */
-export function unlockedFrom(chapters: { key: string; levels: string[] }[], done: Set<string>) {
+export function unlockedFrom(chapters: { key: string; levels: string[] }[], done: Set<string>, free = false) {
   const open = new Set<string>(), keys = new Set<string>();
   let prevDone = true;
   for (const ch of chapters) {
-    if (!prevDone) break;
+    if (!prevDone && !free) break;
     keys.add(ch.key);
     for (const id of ch.levels) { open.add(id); if (!done.has(id)) break; }
     prevDone = ch.levels.every(l => done.has(l));

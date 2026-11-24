@@ -2,15 +2,16 @@ import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import GameJunior from '@/components/play/GameJunior';
 import GameAdventure from '@/components/play/GameAdventure';
+import GamePython from '@/components/play/GamePython';
 import { getCurrentUser } from '@/lib/auth';
-import { lessonProgressOf } from '@/lib/data';
+import { getSection, lessonProgressOf } from '@/lib/data';
 import { chaptersOf, nextLevel, playLevel, unlocked } from '@/data/play';
 import { totalXp } from '@/lib/xp';
 import type { GameLevel } from '@/components/play/types';
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const p = playLevel((await params).id);
-  return { title: p ? (p.kind === 'junior' ? p.lesson.title : p.level.title) : 'Play' };
+  return { title: p ? (p.kind === 'adventure' ? p.level.title : p.lesson.title) : 'Play' };
 }
 
 export default async function LevelPage({ params }: { params: Promise<{ id: string }> }) {
@@ -23,7 +24,8 @@ export default async function LevelPage({ params }: { params: Promise<{ id: stri
   if (user?.role === 'student') {
     const prog = lessonProgressOf(user.id);
     const done = new Set([...prog.values()].filter(r => r.passed_at).map(r => r.lesson_id));
-    if (!unlocked(done).open.has(id)) redirect('/play?track=' + p.chapter.track);
+    const grade = user.sectionId ? getSection(user.sectionId)?.grade : undefined;
+    if (!unlocked(done, grade).open.has(id)) redirect('/play?track=' + p.chapter.track);
     const row = prog.get(id);
     if (row) saved = { code: row.code, stars: row.passed_at ? Math.max(1, row.stars) : 0 };
     xp = totalXp([...prog.values()].map(r => [r.lesson_id, r.stars] as [string, number]));
@@ -43,6 +45,13 @@ export default async function LevelPage({ params }: { params: Promise<{ id: stri
       hints: l.hints, maps: l.check.maps, require: l.check.require, starter: l.starter, palette: l.palette ?? ['step', 'turnLeft', 'turnRight'],
       xpType: l.type, boss: l.type === 'Boss', debug: l.type === 'Catch Glitch', ...(staff ? { solution: l.solution } : {})
     };
+  } else if (p.kind === 'python') {
+    const l = p.lesson, { solution: _s, ...pub } = l; void _s;
+    level = {
+      ...base, kind: 'python', title: l.title, tutor: l.guide ?? (l.type === 'Catch Glitch' ? 'glitch' : p.chapter.tutor), intro: l.intro, explain: l.explain, example: l.example,
+      task: l.task, hints: l.hints, maps: l.check.kind === 'vinc' ? l.check.maps : [], check: pub.check, starter: l.starter, grade: l.grade, free: true,
+      xpType: l.type, boss: l.type === 'Boss', debug: l.type === 'Catch Glitch', ...(staff ? { solution: l.solution } : {})
+    };
   } else {
     const l = p.level;
     level = {
@@ -52,7 +61,7 @@ export default async function LevelPage({ params }: { params: Promise<{ id: stri
     };
   }
   const u = user ? { name: user.name, role: user.role } : null;
-  return level.kind === 'junior'
-    ? <GameJunior key={id} level={level} user={u} saved={saved} xp={xp} />
-    : <GameAdventure key={id} level={level} user={u} saved={saved} xp={xp} />;
+  if (level.kind === 'junior') return <GameJunior key={id} level={level} user={u} saved={saved} xp={xp} />;
+  if (level.kind === 'python') return <GamePython key={id} level={level} user={u} saved={saved} xp={xp} />;
+  return <GameAdventure key={id} level={level} user={u} saved={saved} xp={xp} />;
 }

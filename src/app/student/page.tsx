@@ -27,7 +27,7 @@ export default async function StudentHome() {
   const nextLesson = myLessons.find(l => !lp.get(l.id)?.passed_at);
   const xp = totalXp([...lp.values()].map(r => [r.lesson_id, r.stars] as [string, number])), rank = rankOf(xp);
   const lessonStars = myLessons.reduce((t, l) => t + (lp.get(l.id)?.stars ?? 0), 0);
-  const junior = h.grade <= 4, lessonHref = (id: string) => (junior ? `/play/${id}` : `/student/lessons/${id}`);
+  const junior = h.grade <= 4, lessonHref = (id: string) => `/play/${id}`;
   const advDone = ADVENTURE.filter(l => lp.get(l.id)?.passed_at).length, nextAdv = ADVENTURE.find(l => !lp.get(l.id)?.passed_at);
   return (
     <div className="stack">
@@ -43,9 +43,9 @@ export default async function StudentHome() {
       {myLessons.length > 0 && (
         <section className="card stack" style={{ gap: 14 }}>
           <div className="spread">
-            <div><div className="eyebrow">{junior ? 'Junior game' : 'Python lessons'} · Class {h.grade}</div><h2>{lessonsDone} of {myLessons.length} lessons done</h2>
+            <div><div className="eyebrow">{junior ? 'Junior game' : 'Python Quest'} · Class {h.grade}</div><h2>{lessonsDone} of {myLessons.length} lessons done</h2>
               <p className="small muted">{nextLesson ? `Next up: Lesson ${nextLesson.n}, ${nextLesson.title}.` : 'You finished every lesson for your class. Amazing!'}</p></div>
-            <div style={{ minWidth: 220, display: 'grid', gap: 8 }}><Bar value={lessonsDone / myLessons.length * 100} /><Link className="btn small" href={junior ? '/play?track=junior' : '/student/lessons'}>{junior ? 'Open the world map' : 'See all lessons'}</Link></div>
+            <div style={{ minWidth: 220, display: 'grid', gap: 8 }}><Bar value={lessonsDone / myLessons.length * 100} /><Link className="btn small" href={junior ? '/play?track=junior' : '/play?track=python'}>{junior ? 'Open the world map' : 'Open Python Quest'}</Link></div>
           </div>
           <div className="xp-strip">
             <div className="xp-rank"><span className="xp-icon" aria-hidden="true">{rank.icon}</span><div><b>{rank.name}</b><span className="small muted">Level {rank.level} · {xp} XP · ★ {lessonStars} lesson stars</span></div></div>

@@ -5,21 +5,28 @@ import CrewArt from '@/components/CrewArt';
 import GameTop from './GameTop';
 import { clearLocal, localProgress, sfx } from './fx';
 import { unlockedFrom } from '@/lib/playcore';
+import { useMusic } from './music';
+import Cutscene, { StoryGate, markSeen, storyFor, storySeen } from './Cutscene';
 import type { GameUser, MapChapter, TrackId } from './types';
 
 /* Where the chapter medallions sit on the world, in % of its width and height. */
 const SPOTS = [[13, 64], [37, 34], [62, 62], [86, 32]];
 const PATH = 'M 4 78 C 10 72, 10 66, 13 64 S 26 40, 37 34 S 52 66, 62 62 S 78 30, 86 32 S 96 22, 99 18';
 
-export default function PlayMap({ chapters, tracks, serverStars, user, initialTrack }: {
+export default function PlayMap({ chapters, tracks, serverStars, user, initialTrack, grade = null }: {
   chapters: MapChapter[]; tracks: Record<TrackId, { title: string; who: string; blurb: string }>;
-  serverStars: Record<string, number> | null; user: GameUser | null; initialTrack: TrackId;
+  serverStars: Record<string, number> | null; user: GameUser | null; initialTrack: TrackId; grade?: number | null;
 }) {
   const [track, setTrack] = useState<TrackId>(initialTrack);
   const [stars, setStars] = useState<Record<string, number>>(serverStars ?? {});
   const [sheet, setSheet] = useState<string | null>(null);
   const [synced, setSynced] = useState('');
   const isStudent = user?.role === 'student';
+  const theme = track === 'junior' ? 'meadow' : track === 'adventure' ? 'beach' : 'space';
+  useMusic(theme);
+  const [gate, setGate] = useState<string | null>(null);
+  const [movie, setMovie] = useState<string | null>(null);
+  useEffect(() => { if (!storySeen('prologue')) setGate('prologue'); }, []);
 
   // Guests keep progress in this browser. When a student logs in, progress from this browser is saved to their account.
   useEffect(() => {
@@ -31,7 +38,7 @@ export default function PlayMap({ chapters, tracks, serverStars, user, initialTr
       const merged = { ...serverStars };
       for (const id of ids) {
         try {
-          const r = await fetch('/api/play/progress', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, code: local[id].code }) });
+          const r = await fetch('/api/play/progress', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, code: local[id].code, passed: true, hints: 3 - local[id].stars }) });
           const j = await r.json(); if (j.passed) merged[id] = Math.max(merged[id] ?? 0, j.best ?? j.stars);
         } catch { /* try again next time */ return; }
       }
@@ -44,8 +51,9 @@ export default function PlayMap({ chapters, tracks, serverStars, user, initialTr
   const staff = !!user && user.role !== 'student' && user.role !== 'parent';
   const { open, chapters: openCh } = useMemo(() => {
     if (staff) return { open: new Set(list.flatMap(c => c.levels.map(l => l.id))), chapters: new Set(list.map(c => c.key)) };
-    return unlockedFrom(list.map(c => ({ key: c.key, levels: c.levels.map(l => l.id) })), done);
-  }, [list, done, staff]);
+    const usable = track === 'python' && grade ? list.filter(c => (c.grade ?? 0) <= grade) : list;
+    return unlockedFrom(usable.map(c => ({ key: c.key, levels: c.levels.map(l => l.id) })), done, track === 'python');
+  }, [list, done, staff, track, grade]);
   const nextId = list.flatMap(c => c.levels).find(l => open.has(l.id) && !done.has(l.id))?.id ?? list[0]?.levels[0]?.id;
   const current = list.find(c => c.levels.some(l => l.id === nextId))?.key;
   const sheetCh = list.find(c => c.key === sheet);
@@ -67,8 +75,9 @@ export default function PlayMap({ chapters, tracks, serverStars, user, initialTr
             <h1>Where shall Vinc go today?</h1>
             <p>{tracks[track].blurb}</p>
           </div>
+          <button type="button" className="pm-story" onClick={() => setMovie('prologue')}>🎬 Watch the story</button>
           <div className="pm-tracks" role="tablist" aria-label="Choose a game">
-            {(['junior', 'adventure'] as TrackId[]).map(t => (
+            {(['junior', 'adventure', 'python'] as TrackId[]).map(t => (
               <button key={t} type="button" role="tab" aria-selected={track === t} className={'pm-track' + (track === t ? ' on' : '')} onClick={() => { sfx('click'); setTrack(t); setSheet(null); }}>
                 <b>{tracks[t].title}</b><span>{tracks[t].who}</span>
               </button>
@@ -88,14 +97,14 @@ export default function PlayMap({ chapters, tracks, serverStars, user, initialTr
             return (
               <button key={c.key} type="button" className={'pm-node' + (locked ? ' locked' : '') + (isCur ? ' current' : '') + (n === c.levels.length ? ' complete' : '')}
                 style={{ left: SPOTS[i][0] + '%', top: SPOTS[i][1] + '%', animationDelay: i * 120 + 'ms' }}
-                onClick={() => { sfx(locked ? 'bump' : 'pop'); if (!locked) setSheet(c.key); }}
-                aria-label={`${c.title}: ${c.idea}. ${locked ? `Locked. Finish ${prev?.title} to unlock.` : `${n} of ${c.levels.length} levels done.`}`}>
+                onClick={() => { sfx(locked ? 'bump' : 'pop'); if (locked) return; setSheet(c.key); if (!storySeen(c.key)) setMovie(c.key); }}
+                aria-label={`${c.title}: ${c.idea}. ${locked ? (c.grade ? `For Class ${c.grade} and up.` : `Locked. Finish ${prev?.title} to unlock.`) : `${n} of ${c.levels.length} levels done.`}`}>
                 <span className="pm-ribbon">{c.title}</span>
                 <span className="pm-medal"><CrewArt id={c.tutor} label="" still={locked} />{locked && <span className="pm-lock">🔒</span>}</span>
                 <span className="pm-count">{n}/{c.levels.length}</span>
                 <span className="pm-stars">★ {s}/{c.levels.length * 3}</span>
                 {isCur && !locked && <span className="pm-here">Play ▶</span>}
-                {locked && prev && <span className="pm-unlock">Finish {prev.title} to unlock</span>}
+                {locked && (c.grade ? <span className="pm-unlock">For Class {c.grade} and up</span> : prev && <span className="pm-unlock">Finish {prev.title} to unlock</span>)}
               </button>
             );
           })}
@@ -109,6 +118,7 @@ export default function PlayMap({ chapters, tracks, serverStars, user, initialTr
             <div className="pm-sheet-head">
               <CrewArt id={sheetCh.tutor} className="pm-sheet-tutor" label="" />
               <div><span className="pm-kicker">{tracks[track].title} · {sheetCh.idea}</span><h2 id="pm-sheet-title">{sheetCh.title}</h2></div>
+              {storyFor(sheetCh.key) && <button type="button" className="gm-round small" onClick={() => setMovie(sheetCh.key)} aria-label="Watch this world's story">🎬</button>}
               <button type="button" className="gm-x" onClick={() => setSheet(null)} aria-label="Close">✕</button>
             </div>
             <ol className="pm-levels">
@@ -130,6 +140,8 @@ export default function PlayMap({ chapters, tracks, serverStars, user, initialTr
           </div>
         </div>
       )}
+      {gate && <StoryGate id={gate} resumeTheme={theme} onDone={() => setGate(null)} />}
+      {movie && storyFor(movie) && <Cutscene story={storyFor(movie)!} resumeTheme={theme} onClose={() => { markSeen(movie); setMovie(null); }} />}
     </div>
   );
 }

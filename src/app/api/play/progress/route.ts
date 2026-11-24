@@ -14,7 +14,7 @@ export async function POST(req: Request) {
   if (!u || u.role !== 'student') return NextResponse.json({ error: 'Log in as a student to save your progress.' }, { status: 401 });
   const text = await req.text();
   if (text.length > 25000) return NextResponse.json({ error: 'Too large.' }, { status: 413 });
-  let body: { id?: string; code?: string };
+  let body: { id?: string; code?: string; passed?: boolean; hints?: number };
   try { body = JSON.parse(text); } catch { return NextResponse.json({ error: 'Bad data.' }, { status: 400 }); }
   const level = playLevel(String(body.id ?? ''));
   if (!level) return NextResponse.json({ error: 'Unknown level.' }, { status: 404 });
@@ -25,6 +25,11 @@ export async function POST(req: Request) {
     if (level.kind === 'junior' && level.lesson.check.kind === 'blocks') {
       const r = checkBlocks(level.lesson.check, parseBlocks(code));
       passed = r.passed; if (passed) stars = playStars(r.blocks, level.par);
+    } else if (level.kind === 'python') {
+      // Python runs in the browser (Pyodide), so, as with the Python lessons, the pass and hints come from the browser.
+      passed = !!body.passed;
+      const h = Math.max(0, Math.floor(Number(body.hints) || 0));
+      if (passed) stars = h === 0 ? 3 : h === 1 ? 2 : 1;
     } else if (level.kind === 'adventure') {
       const r = checkScript(level.level.check, code);
       passed = r.passed; if (passed) stars = playStars(r.blocks, level.par);

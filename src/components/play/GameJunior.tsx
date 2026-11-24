@@ -4,6 +4,10 @@ import Link from 'next/link';
 import CrewArt from '@/components/CrewArt';
 import Board3D from '@/components/lessons/Board3D';
 import GameTop from './GameTop';
+import Ambient from './Ambient';
+import Buddy, { type BuddyEvent } from './Buddy';
+import { useMusic } from './music';
+import { StoryGate, storySeen } from './Cutscene';
 import JuniorStrip from './JuniorStrip';
 import { OopsBubble, TutorCard, WinCard, saveRun, usePlayback } from './GameParts';
 import { localProgress, sfx, speak } from './fx';
@@ -23,6 +27,11 @@ export default function GameJunior({ level, user, saved, xp }: { level: Junior; 
   const [win, setWin] = useState<{ stars: number; xp: number } | null>(null);
   const [hint, setHint] = useState(-1);
   const pb = usePlayback();
+  const [bev, setBev] = useState<{ kind: BuddyEvent; n: number } | null>(null);
+  const react = useCallback((kind: BuddyEvent) => setBev(b => ({ kind, n: (b?.n ?? 0) + 1 })), []);
+  useMusic(level.theme);
+  const [story, setStory] = useState(false);
+  useEffect(() => { if (level.levelNo === 1 && !storySeen(level.chapterKey)) setStory(true); }, [level]);
   const flat = useMemo(() => flatten(prog), [prog]);
   const mapHref = `/play?track=junior`;
   const tray = useRef<HTMLButtonElement>(null), slot = useRef<HTMLSpanElement>(null), playBtn = useRef<HTMLButtonElement>(null);
@@ -41,14 +50,15 @@ export default function GameJunior({ level, user, saved, xp }: { level: Junior; 
     sfx('pop');
     const r = checkBlocks({ kind: 'blocks', maps: level.maps, require: level.require }, prog);
     setResult(r); setPhase('run'); setWin(null);
-    const res = await pb.play(r.runs);
-    if (!res.ok && r.runs[res.board]?.ok === false) { setPhase('lost'); sfx('lose'); speak(r.runs[res.board].error ?? 'Not yet. Try again!'); return; }
-    if (!r.passed) { setPhase('lost'); sfx('lose'); speak(r.missing[0] ?? 'Not yet!'); return; }
+    react('start');
+    const res = await pb.play(r.runs, react);
+    if (!res.ok && r.runs[res.board]?.ok === false) { setPhase('lost'); sfx('lose'); react('fail'); speak(r.runs[res.board].error ?? 'Not yet. Try again!'); return; }
+    if (!r.passed) { setPhase('lost'); sfx('lose'); react('fail'); speak(r.missing[0] ?? 'Not yet!'); return; }
     const stars = playStars(r.blocks, level.par), newBest = Math.max(best, stars);
     const gained = student ? lessonXp(level.xpType, newBest) - lessonXp(level.xpType, best) : 0;
     const saving = saveRun(level.id, blocksToText(prog), stars, student);
     await new Promise(res => setTimeout(res, 1100));
-    sfx('win'); setWin({ stars, xp: gained }); setPhase('won');
+    sfx('win'); react('win'); setWin({ stars, xp: gained }); setPhase('won');
     setBest((await saving) ?? newBest);
   }, [phase, prog, level, pb, best, student]);
 
@@ -87,15 +97,17 @@ export default function GameJunior({ level, user, saved, xp }: { level: Junior; 
         {best > 0 && <span className="gm-best" aria-label={`Best: ${best} stars`}>{'★'.repeat(best)}{'☆'.repeat(3 - best)}</span>}
       </GameTop>
       <div className="gm-stage">
-        <div className="gm-sky" aria-hidden="true"><span className="pm-cloud c1" /><span className="pm-cloud c2" /></div>
+        <Ambient theme={level.theme} layer="bg" />
         <Board3D map={level.maps[pb.board] ?? level.maps[0]} trace={pb.trace} frame={pb.frame} won={!!result?.passed && lastBoard} stepMs={pb.stepMs} theme={level.theme} className="gm-board" hint={false} />
+        <Ambient theme={level.theme} layer="fg" />
+        {phase !== 'intro' && phase !== 'lost' && <Buddy who={level.tutor} event={bev} />}
         <div className="gm-goal">
           <CrewArt id={level.tutor} className="gm-goal-art" label="" />
           <p>{level.task}</p>
           <button type="button" className="gm-round small" onClick={() => speak(task, true)} aria-label="Read it to me">🔊</button>
         </div>
         <div className="gm-side">
-          {level.hints.length > 0 && <button type="button" className="gm-round" onClick={() => { const h = (hint + 1) % level.hints.length; setHint(h); speak(level.hints[h].replace(/`/g, '')); sfx('click'); }} aria-label="Show a hint">💡</button>}
+          {level.hints.length > 0 && <button type="button" className="gm-round" onClick={() => { const h = (hint + 1) % level.hints.length; setHint(h); speak(level.hints[h].replace(/`/g, '')); sfx('click'); react('hint'); }} aria-label="Show a hint">💡</button>}
           <button type="button" className="gm-round" onClick={() => { pb.stop(); setProg(safe(level.starter)); setPhase('edit'); setResult(null); sfx('pop'); }} aria-label="Start again">↺</button>
           {staff && level.solution && <button type="button" className="gm-round" onClick={() => { pb.stop(); setProg(safe(level.solution!)); setPhase('edit'); }} aria-label="Show the answer (teachers only)">👁</button>}
         </div>
@@ -107,7 +119,8 @@ export default function GameJunior({ level, user, saved, xp }: { level: Junior; 
         activeId={activeId} errorId={errorId} disabled={phase === 'run'} minSlots={Math.max(8, level.par + 2)}
         onPlay={run} playLabel={phase === 'run' ? 'Stop' : 'Play'} refs={{ tray, slot, play: playBtn }} />
       {hand && <span className="gj-hand" aria-hidden="true" style={{ ['--fx' as string]: hand.fx + 'px', ['--fy' as string]: hand.fy + 'px', ['--tx' as string]: hand.tx + 'px', ['--ty' as string]: hand.ty + 'px' }}>👆</span>}
-      {phase === 'intro' && <TutorCard tutor={level.tutor} title={level.title} text={task} button="Let's go" onGo={() => setPhase('edit')} />}
+      {story && <StoryGate id={level.chapterKey} resumeTheme={level.theme} onDone={() => setStory(false)} />}
+      {phase === 'intro' && !story && <TutorCard tutor={level.tutor} title={level.title} text={task} button="Let's go" onGo={() => setPhase('edit')} />}
       {phase === 'won' && win && <WinCard stars={win.stars} par={level.par} unit="blocks" xpGained={win.xp} next={level.next} mapHref={mapHref} guest={!user}
         onReplay={() => { pb.stop(); setPhase('edit'); setWin(null); }} />}
     </div>

@@ -15,7 +15,8 @@ export function usePlayback() {
   const [runs, setRuns] = useState<BoardRun[] | null>(null);
   const token = useRef(0);
   const stop = useCallback(() => { token.current++; setRuns(null); setFrame(-1); }, []);
-  const play = useCallback(async (rs: BoardRun[], speed = 1): Promise<{ ok: boolean; board: number }> => {
+  const play = useCallback(async (rs: BoardRun[], onEvent?: (e: 'spark' | 'bump') => void): Promise<{ ok: boolean; board: number }> => {
+    const speed = 1;
     const my = ++token.current;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     setRuns(rs);
@@ -29,7 +30,8 @@ export function usePlayback() {
         setFrame(i);
         const s = t[i];
         sfx(s.a === 'bump' ? 'bump' : s.a === 'jump' ? 'jump' : s.a === 'turn' ? 'turn' : 'step');
-        if (s.got > (i ? t[i - 1].got : 0)) setTimeout(() => sfx('spark'), 120);
+        if (s.a === 'bump') onEvent?.('bump');
+        if (s.got > (i ? t[i - 1].got : 0)) { setTimeout(() => sfx('spark'), 120); onEvent?.('spark'); }
         await sleep(ms);
       }
       if (!rs[b].ok) return { ok: false, board: b };
@@ -93,7 +95,7 @@ export function WinCard({ stars, par, unit, xpGained, next, mapHref, onReplay, g
           {[1, 2, 3].map(i => <span key={i} className={i <= stars ? 'on' : ''} style={{ animationDelay: 0.15 + i * 0.25 + 's' }}>★</span>)}
         </div>
         <h2 id="gm-win-t">{cheer}</h2>
-        <p>{stars === 3 ? `Perfect! ${par} ${unit} or fewer.` : `Solved! Can you do it in ${par} ${unit} for 3 stars?`}</p>
+        <p>{!unit ? (stars === 3 ? 'Perfect! No hints needed.' : 'Solved! Next time, try it with fewer hints for 3 stars.') : stars === 3 ? `Perfect! ${par} ${unit} or fewer.` : `Solved! Can you do it in ${par} ${unit} for 3 stars?`}</p>
         {xpGained > 0 && <p className="gm-xp">+{xpGained} XP</p>}
         {guest && <p className="gm-small">Playing as a guest: stars are saved on this device. <Link href="/login">Log in</Link> to keep them.</p>}
         <div className="gm-row center">

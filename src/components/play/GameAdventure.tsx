@@ -4,6 +4,10 @@ import Link from 'next/link';
 import CrewArt from '@/components/CrewArt';
 import Board3D, { startOf } from '@/components/lessons/Board3D';
 import GameTop from './GameTop';
+import Ambient from './Ambient';
+import Buddy, { type BuddyEvent } from './Buddy';
+import { useMusic } from './music';
+import { StoryGate, storySeen } from './Cutscene';
 import CodeEditor, { type EditorApi } from './CodeEditor';
 import { OopsBubble, TutorCard, WinCard, saveRun, usePlayback } from './GameParts';
 import { localProgress, sfx, speak } from './fx';
@@ -35,6 +39,11 @@ export default function GameAdventure({ level, user, saved, xp }: { level: Adv; 
   const [view, setView] = useState(0);
   const ed = useRef<EditorApi>(null);
   const pb = usePlayback();
+  const [bev, setBev] = useState<{ kind: BuddyEvent; n: number } | null>(null);
+  const react = useCallback((kind: BuddyEvent) => setBev(b => ({ kind, n: (b?.n ?? 0) + 1 })), []);
+  useMusic(level.theme);
+  const [story, setStory] = useState(false);
+  useEffect(() => { if (level.levelNo === 1 && !storySeen(level.chapterKey)) setStory(true); }, [level]);
   const mapHref = '/play?track=adventure';
   void xp;
 
@@ -51,15 +60,16 @@ export default function GameAdventure({ level, user, saved, xp }: { level: Adv; 
     setMeasure(null); setRuler(false); sfx('pop');
     const r = checkScript({ kind: 'script', maps: level.maps, require: level.require }, code);
     setResult(r); setWin(null);
-    if (!r.runs.length) { setPhase('lost'); sfx('lose'); return; }
+    if (!r.runs.length) { setPhase('lost'); sfx('lose'); react('error'); return; }
     setPhase('run');
-    const res = await pb.play(r.runs);
-    if (!res.ok || !r.passed) { setPhase('lost'); sfx('lose'); return; }
+    react('start');
+    const res = await pb.play(r.runs, react);
+    if (!res.ok || !r.passed) { setPhase('lost'); sfx('lose'); react('fail'); return; }
     const stars = playStars(r.blocks, level.par), newBest = Math.max(best, stars);
     const gained = student ? lessonXp(level.xpType, newBest) - lessonXp(level.xpType, best) : 0;
     const saving = saveRun(level.id, code, stars, student);
     await new Promise(res2 => setTimeout(res2, 1100));
-    sfx('win'); setWin({ stars, xp: gained }); setPhase('won');
+    sfx('win'); react('win'); setWin({ stars, xp: gained }); setPhase('won');
     setBest((await saving) ?? newBest);
   }, [phase, code, level, pb, best, student]);
 
@@ -97,9 +107,11 @@ export default function GameAdventure({ level, user, saved, xp }: { level: Adv; 
       </GameTop>
       <div className="ga-main">
         <div className="gm-stage">
-          <div className="gm-sky" aria-hidden="true"><span className="pm-cloud c1" /><span className="pm-cloud c2" /></div>
+          <Ambient theme={level.theme} layer="bg" />
           <Board3D map={map} trace={phase === 'edit' || phase === 'intro' ? [] : pb.trace} frame={phase === 'edit' || phase === 'intro' ? -1 : pb.frame} won={!!result?.passed && lastBoard} stepMs={pb.stepMs}
             theme={level.theme} className="gm-board" hint={false} onTile={onTile} marks={measure?.marks} />
+          <Ambient theme={level.theme} layer="fg" />
+          {phase !== 'intro' && phase !== 'lost' && <Buddy who={level.tutor} event={bev} />}
           <div className="gm-side">
             <button type="button" className={'gm-round' + (ruler ? ' on' : '')} aria-pressed={ruler} onClick={() => { setRuler(!ruler); setMeasure(null); sfx('click'); }} aria-label="Ruler: tap a square to measure">📏</button>
           </div>
@@ -126,13 +138,14 @@ export default function GameAdventure({ level, user, saved, xp }: { level: Adv; 
           <div className="ga-actions">
             <button type="button" className="ga-run" onClick={run}>{phase === 'run' ? '■ Stop' : '▶ RUN!'}</button>
             <button type="button" className="gm-round" onClick={() => { pb.stop(); setCode(level.starter); setPhase('edit'); setResult(null); sfx('pop'); }} aria-label="Start again">↺</button>
-            {level.hints.length > 0 && <button type="button" className="gm-round" onClick={() => { const h = (hint + 1) % level.hints.length; setHint(h); speak(level.hints[h]); }} aria-label="Show a hint">💡</button>}
+            {level.hints.length > 0 && <button type="button" className="gm-round" onClick={() => { const h = (hint + 1) % level.hints.length; setHint(h); speak(level.hints[h]); react('hint'); }} aria-label="Show a hint">💡</button>}
             {staff && level.solution && <button type="button" className="gm-round" onClick={() => { pb.stop(); setCode(level.solution!); setPhase('edit'); }} aria-label="Show the answer (teachers only)">👁</button>}
             <span className="ga-count">{(n => `${n} ${n === 1 ? 'line' : 'lines'}`)(code.split('\n').filter(l => l.replace(/#.*/, '').trim()).length)} · 3★ at {level.par}</span>
           </div>
         </section>
       </div>
-      {phase === 'intro' && <TutorCard tutor={level.tutor} title={level.title} text={level.say} button="OK" onGo={() => setPhase('edit')} />}
+      {story && <StoryGate id={level.chapterKey} resumeTheme={level.theme} onDone={() => setStory(false)} />}
+      {phase === 'intro' && !story && <TutorCard tutor={level.tutor} title={level.title} text={level.say} button="OK" onGo={() => setPhase('edit')} />}
       {phase === 'won' && win && <WinCard stars={win.stars} par={level.par} unit="lines" xpGained={win.xp} next={level.next} mapHref={mapHref} guest={!user}
         onReplay={() => { pb.stop(); setPhase('edit'); setWin(null); }} />}
     </div>

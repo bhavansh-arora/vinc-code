@@ -870,7 +870,11 @@ footer { padding-block: 28px 40px; border-top: 1px solid var(--line); font-famil
       beach: { ground: '#EBD3A0', props: 'palm', leaf: '#3E9B4F', water: '#45B3CF', extra: 'shell' },
       lagoon: { ground: '#E3CF9C', props: 'palm', leaf: '#2F8C55', water: '#2FA3B8', extra: 'rock' },
       jungle: { ground: '#3F7D3A', props: 'tree', leaf: '#2E6B2C', fruit: '#E8B030', extra: 'fern' },
-      factory: { ground: '#6B6F7A', props: 'pipe', leaf: '#8C3557', extra: 'crate' }
+      factory: { ground: '#6B6F7A', props: 'pipe', leaf: '#8C3557', extra: 'crate' },
+      canyon: { ground: '#D9895A', props: 'cactus', leaf: '#4E8A3A', extra: 'rock' },
+      bazaar: { ground: '#E7B56C', props: 'stall', leaf: '#E9558E', extra: 'pot' },
+      kitchen: { ground: '#EFE4D2', props: 'pot', leaf: '#C2502A', extra: 'jar' },
+      space: { ground: '#3B3F5C', props: 'crystal', leaf: '#7FE0D0', extra: 'antenna' }
     };
     function rnd(i) { var x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); }
     function scenery(name) {
@@ -894,6 +898,12 @@ footer { padding-block: 28px 40px; border-top: 1px solid var(--line); font-famil
         else if (kind === 'shell') { var sh = mesh(new T.ConeGeometry(.12, .2, 8), std({ color: L('#F2B8A8') })); sh.position.y = .1; sh.rotation.z = PI / 2; o.add(sh); }
         else if (kind === 'fern') { for (var fe = 0; fe < 4; fe++) { var fn = mesh(new T.ConeGeometry(.08, .5, 4), leafM); fn.position.set(0, .2, 0); fn.rotation.set(Math.cos(fe * 1.57) * .8, 0, Math.sin(fe * 1.57) * .8); o.add(fn); } }
         else if (kind === 'crate') { var cb = mesh(new T.BoxGeometry(.45, .45, .45), crateM); cb.position.y = .22; o.add(cb); }
+        else if (kind === 'cactus') { var cm = std({ color: L('#4E8A3A'), roughness: .7 }), c1 = mesh(new T.CylinderGeometry(.12, .14, .9, 10), cm); c1.position.y = .45; o.add(c1); [-1, 1].forEach(function (sd) { var ar = mesh(new T.CylinderGeometry(.07, .07, .35, 8), cm); ar.position.set(sd * .2, .55 + sd * .08, 0); var ar2 = mesh(new T.CylinderGeometry(.07, .07, .14, 8), cm); ar2.rotation.z = PI / 2; ar2.position.set(sd * .14, .4 + sd * .08, 0); o.add(ar, ar2); }); }
+        else if (kind === 'stall') { var cols2 = ['#E9558E', '#22A39A', '#F0A83A', '#8F6BE8'], sc = cols2[i % 4]; var bx = mesh(new T.BoxGeometry(.7, .4, .5), std({ color: L('#B9824A') })); bx.position.y = .2; var rf = mesh(new T.ConeGeometry(.6, .35, 4), std({ color: L(sc), roughness: .6 })); rf.position.y = .8; rf.rotation.y = PI / 4; [-.3, .3].forEach(function (px) { var po = mesh(new T.CylinderGeometry(.025, .025, .5, 6), trunkM); po.position.set(px, .6, .2); o.add(po); }); var fr2 = mesh(new T.SphereGeometry(.07, 8, 6), std({ color: L('#F0A83A') })); fr2.position.set(0, .45, 0); o.add(bx, rf, fr2); }
+        else if (kind === 'pot') { var pm = std({ color: L(name === 'kitchen' ? '#9AA3AE' : '#C2502A'), roughness: .35, metalness: name === 'kitchen' ? .6 : 0 }), pb = mesh(new T.CylinderGeometry(.22, .18, .34, 16), pm); pb.position.y = .17; o.add(pb); if (name === 'kitchen') { var lid = mesh(new T.SphereGeometry(.22, 16, 8, 0, PI * 2, 0, PI / 2), pm); lid.position.y = .34; o.add(lid); } }
+        else if (kind === 'jar') { var jm = mesh(new T.CylinderGeometry(.12, .12, .3, 12), std({ color: L(['#F0A83A', '#6CB33F', '#E9558E'][i % 3]), roughness: .3, transparent: true, opacity: .85 })); jm.position.y = .15; o.add(jm); }
+        else if (kind === 'crystal') { var cr2 = mesh(new T.OctahedronGeometry(.22, 0), std({ color: L(i % 2 ? '#7FE0D0' : '#B39AF5'), emissive: L(i % 2 ? '#2FA3B8' : '#8F6BE8'), emissiveIntensity: .6, roughness: .2 })); cr2.position.y = .3; cr2.scale.set(.8, 1.6, .8); o.add(cr2); }
+        else if (kind === 'antenna') { var am = mesh(new T.CylinderGeometry(.03, .05, .9, 6), greyM); am.position.y = .45; var ab = mesh(new T.SphereGeometry(.08, 10, 8), std({ color: L('#E9558E'), emissive: L('#E9558E'), emissiveIntensity: .8 })); ab.position.y = .92; o.add(am, ab); }
         sceneG.add(o);
       }
     }
@@ -932,14 +942,16 @@ footer { padding-block: 28px 40px; border-top: 1px solid var(--line); font-famil
         fxG.add(m);
       }
     }
-    B.collect = function (k) { var s = sparks[k]; if (!s) return; s.st = clock; burst(s.g.position.clone(), 16, false); };
+    var hopT = -9, dizzyT = -9, dizzyG = new T.Group(); world.add(dizzyG); dizzyG.visible = false;
+    for (var dz = 0; dz < 3; dz++) { var dst = mesh(sGeo, sparkM, false); dst.scale.setScalar(.35); dst.position.set(Math.cos(dz * 2.09) * .22, 0, Math.sin(dz * 2.09) * .22); dizzyG.add(dst); }
+    B.collect = function (k) { var s = sparks[k]; if (!s) return; s.st = clock; hopT = clock; burst(s.g.position.clone(), 16, false); };
     B.bump = function (pos, nr, nc, off) {
       bumpT = clock; shakeT = clock;
       var gx, gz, gy;
       if (off) { gx = (wx(pos.c) + wx(nc)) / 2; gz = (wz(pos.r) + wz(nr)) / 2; gy = FY; }
       else { gx = wx(nc); gz = wz(nr); gy = FY + .76; }
       glitch.group.position.set(gx, gy, gz); glitch.group.rotation.y = Math.atan2(cur.x - gx, cur.z - gz);
-      glitch.group.visible = true; glitchT = clock + .22; glitch.group.scale.setScalar(.001);
+      glitch.group.visible = true; glitchT = clock + .22; glitch.group.scale.setScalar(.001); dizzyT = clock + .25;
     };
     B.win = function () { winT = clock; if (!reduce) burst(new T.Vector3(cur.x, FY + 1, cur.z), 90, true); };
     v.update = function (t, dt) {
@@ -968,6 +980,11 @@ footer { padding-block: 28px 40px; border-top: 1px solid var(--line); font-famil
         glitch.group.scale.setScalar(gp <= 0 ? .001 : backOut(Math.min(1, gp)) * .95);
         if (!reduce) { glitch.inner.rotation.y = Math.sin(t * 9) * .3; glitch.inner.position.y = Math.abs(Math.sin(t * 7)) * .06; }
       }
+      var hp = (t - hopT) / .38;
+      if (hp >= 0 && hp < 1 && !reduce) bot.root.position.y += Math.sin(hp * PI) * .55;
+      var dzp = t - dizzyT;
+      dizzyG.visible = dzp >= 0 && dzp < 1.8;
+      if (dizzyG.visible) { dizzyG.position.set(bot.group.position.x, FY + 1.12, bot.group.position.z); dizzyG.rotation.y = t * 7; dizzyG.children.forEach(function (c, i) { c.rotation.z = t * 5 + i; }); }
       var wp = (t - winT) / 1.3;
       if (wp >= 0 && wp < 1) {
         bot.root.position.y += Math.abs(Math.sin(wp * PI * 2)) * (reduce ? .3 : 1.6);

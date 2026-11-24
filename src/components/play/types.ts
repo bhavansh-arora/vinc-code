@@ -2,10 +2,11 @@ import type { CharId } from '@/lib/crew';
 import type { BlockName, BlockRequire } from '@/lib/blocks';
 import type { ScriptCheck } from '@/lib/vincscript';
 import type { LessonType } from '@/lib/playcore';
+import type { Check } from '@/data/lessons';
 
-export type TrackId = 'junior' | 'adventure';
+export type TrackId = 'junior' | 'adventure' | 'python';
 export interface MapLevel { id: string; n: number; title: string; boss?: boolean; debug?: boolean }
-export interface MapChapter { key: string; track: TrackId; title: string; idea: string; tutor: CharId; theme: string; levels: MapLevel[] }
+export interface MapChapter { key: string; track: TrackId; title: string; idea: string; tutor: CharId; theme: string; levels: MapLevel[]; grade?: number }
 export interface GameUser { name: string; role: string }
 
 interface Base {
@@ -21,4 +22,5 @@ interface Base {
 }
 export type GameLevel =
   | (Base & { kind: 'junior'; intro: string; task: string; palette: BlockName[]; require?: BlockRequire })
-  | (Base & { kind: 'adventure'; say: string; goal: string; chapter: number; require?: ScriptCheck['require'] });
+  | (Base & { kind: 'adventure'; say: string; goal: string; chapter: number; require?: ScriptCheck['require'] })
+  | (Base & { kind: 'python'; intro: string; explain: string[]; example?: { code: string; note?: string }; task: string; check: Check; grade: number; free: true });

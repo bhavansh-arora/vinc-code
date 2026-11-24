@@ -22,11 +22,12 @@ export default async function PlayPage({ searchParams }: { searchParams: Promise
     key: c.key, track: c.track, title: c.title, idea: c.idea, tutor: c.tutor, theme: c.theme,
     levels: c.levels.map(id => {
       const p = playLevel(id)!;
-      return p.kind === 'junior'
-        ? { id, n: p.index + 1, title: p.lesson.title.replace(/^Boss: /, ''), boss: p.lesson.type === 'Boss', debug: p.lesson.type === 'Catch Glitch' }
-        : { id, n: p.index + 1, title: p.level.title.replace(/^Boss: /, ''), boss: p.level.boss, debug: p.level.debug };
-    })
+      return p.kind === 'adventure'
+        ? { id, n: p.index + 1, title: p.level.title.replace(/^Boss: /, ''), boss: p.level.boss, debug: p.level.debug }
+        : { id, n: p.index + 1, title: p.lesson.title.replace(/^Boss: /, ''), boss: p.lesson.type === 'Boss', debug: p.lesson.type === 'Catch Glitch' };
+    }),
+    ...(c.grade ? { grade: c.grade } : {})
   }));
-  const track: TrackId = sp.track === 'adventure' || sp.track === 'junior' ? sp.track : grade && grade >= 5 ? 'adventure' : 'junior';
-  return <PlayMap chapters={chapters} tracks={TRACKS} serverStars={stars} user={user ? { name: user.name, role: user.role } : null} initialTrack={track} />;
+  const track: TrackId = sp.track === 'adventure' || sp.track === 'junior' || sp.track === 'python' ? sp.track : grade && grade >= 5 ? 'python' : 'junior';
+  return <PlayMap chapters={chapters} tracks={TRACKS} serverStars={stars} user={user ? { name: user.name, role: user.role } : null} initialTrack={track} grade={grade ?? null} />;
 }
