@@ -65,6 +65,23 @@ when a student logs in, those levels are re-checked and saved to their account. 
 
 `npm run check:lessons` proves every Junior and Adventure model answer wins with 3 stars and every starter fails.
 
+### Recorded voices
+
+Narration uses natural neural voices, recorded ahead of time into `public/voice/` (about 470 short MP3 clips), with a
+different voice for each character (`src/lib/voice.ts`): the narrator and Pip (Heart), Vinc (Puck), Glitch (Fenrir),
+Loopa (Emma), Hoot (George), Pocket (Bella), Chef Tadka (Lewis) and Nova (Nicole). Lines that change at run time (for
+example Python error messages) use the most natural voice the device has.
+
+The voices come from **Kokoro-82M** (Apache-2.0), run offline. After changing any lesson, level or story text:
+
+```bash
+pip install kokoro-onnx soundfile          # once; ffmpeg must be installed
+# once: download model.onnx and the voices/*.bin files from huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX,
+# then pack the voices:  python3 -c "import numpy as n,glob,os; n.savez('voices.npz', **{os.path.basename(f)[:-4]: n.fromfile(f,'float32').reshape(-1,1,256) for f in glob.glob('voices/*.bin')})"
+KOKORO_DIR=/path/to/kokoro npm run voice   # records only new or changed lines
+npm run check:voice                        # every line has a recording
+```
+
 ## Logging in and signing up
 
 `/login` and `/signup` are one page with two tabs, **Log in** and **Create account**.

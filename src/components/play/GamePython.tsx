@@ -81,7 +81,7 @@ export default function GamePython({ level, user, saved, xp }: { level: Py; user
     else await new Promise(res => setTimeout(res, 900));
     if (!ok) {
       setPhase('lost'); sfx('lose'); setPulse(p => ({ kind: 'oops', n: (p?.n ?? 0) + 1 }));
-      speak(r.error?.split('\n')[0] ?? r.missing?.[0] ?? 'Not yet!'); return;
+      speak(r.error?.split('\n')[0] ?? r.missing?.[0] ?? 'Not yet!', false, 'glitch'); return;
     }
     const stars = hints === 0 ? 3 : hints === 1 ? 2 : 1, newBest = Math.max(best, stars);
     const gained = student ? lessonXp(level.xpType, newBest) - lessonXp(level.xpType, best) : 0;
@@ -147,7 +147,7 @@ export default function GamePython({ level, user, saved, xp }: { level: Py; user
           <div className="ga-goal">
             <CrewArt id={level.tutor} className="gm-goal-art" label="" />
             <p><b>Mission:</b> <Rich text={level.task} /></p>
-            <button type="button" className="gm-round small" onClick={() => speak(`${level.intro} ${level.task}`, true)} aria-label="Read it to me">🔊</button>
+            <button type="button" className="gm-round small" onClick={() => speak(`${level.intro} ${level.task}`, true, level.tutor)} aria-label="Read it to me">🔊</button>
           </div>
           <details className="py-learn" open={learn} onToggle={e => setLearn((e.currentTarget as HTMLDetailsElement).open)}>
             <summary>📜 Learn: how it works</summary>
@@ -164,7 +164,7 @@ export default function GamePython({ level, user, saved, xp }: { level: Py; user
           <div className="ga-actions">
             <button type="button" className="ga-run" onClick={run} disabled={py === 'error'}>{phase === 'run' ? '■ Stop' : py === 'loading' ? '⏳ Loading Python…' : '▶ RUN!'}</button>
             <button type="button" className="gm-round" onClick={() => { pb.stop(); setCode(level.starter); setPhase('edit'); setResult(null); sfx('pop'); }} aria-label="Start again">↺</button>
-            {hints < level.hints.length && <button type="button" className="gm-round" onClick={() => { setHints(h => h + 1); speak(level.hints[hints].replace(/`/g, '')); react('hint'); }} aria-label={`Show hint ${hints + 1} (costs a star)`}>💡</button>}
+            {hints < level.hints.length && <button type="button" className="gm-round" onClick={() => { setHints(h => h + 1); speak(level.hints[hints], false, level.tutor); react('hint'); }} aria-label={`Show hint ${hints + 1} (costs a star)`}>💡</button>}
             {staff && level.solution && <button type="button" className="gm-round" onClick={() => { pb.stop(); setCode(level.solution!); setPhase('edit'); }} aria-label="Show the answer (teachers only)">👁</button>}
             <span className="ga-count">{hints === 0 ? '★★★ no hints used' : hints === 1 ? '★★ one hint used' : '★ hints used'}</span>
           </div>

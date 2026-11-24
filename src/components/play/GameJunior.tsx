@@ -52,8 +52,8 @@ export default function GameJunior({ level, user, saved, xp }: { level: Junior; 
     setResult(r); setPhase('run'); setWin(null);
     react('start');
     const res = await pb.play(r.runs, react);
-    if (!res.ok && r.runs[res.board]?.ok === false) { setPhase('lost'); sfx('lose'); react('fail'); speak(r.runs[res.board].error ?? 'Not yet. Try again!'); return; }
-    if (!r.passed) { setPhase('lost'); sfx('lose'); react('fail'); speak(r.missing[0] ?? 'Not yet!'); return; }
+    if (!res.ok && r.runs[res.board]?.ok === false) { setPhase('lost'); sfx('lose'); react('fail'); speak(r.runs[res.board].error ?? 'Not yet. Try again!', false, 'glitch'); return; }
+    if (!r.passed) { setPhase('lost'); sfx('lose'); react('fail'); speak(r.missing[0] ?? 'Not yet!', false, 'glitch'); return; }
     const stars = playStars(r.blocks, level.par), newBest = Math.max(best, stars);
     const gained = student ? lessonXp(level.xpType, newBest) - lessonXp(level.xpType, best) : 0;
     const saving = saveRun(level.id, blocksToText(prog), stars, student);
@@ -104,10 +104,10 @@ export default function GameJunior({ level, user, saved, xp }: { level: Junior; 
         <div className="gm-goal">
           <CrewArt id={level.tutor} className="gm-goal-art" label="" />
           <p>{level.task}</p>
-          <button type="button" className="gm-round small" onClick={() => speak(task, true)} aria-label="Read it to me">🔊</button>
+          <button type="button" className="gm-round small" onClick={() => speak(task, true, level.tutor)} aria-label="Read it to me">🔊</button>
         </div>
         <div className="gm-side">
-          {level.hints.length > 0 && <button type="button" className="gm-round" onClick={() => { const h = (hint + 1) % level.hints.length; setHint(h); speak(level.hints[h].replace(/`/g, '')); sfx('click'); react('hint'); }} aria-label="Show a hint">💡</button>}
+          {level.hints.length > 0 && <button type="button" className="gm-round" onClick={() => { const h = (hint + 1) % level.hints.length; setHint(h); speak(level.hints[h], false, level.tutor); sfx('click'); react('hint'); }} aria-label="Show a hint">💡</button>}
           <button type="button" className="gm-round" onClick={() => { pb.stop(); setProg(safe(level.starter)); setPhase('edit'); setResult(null); sfx('pop'); }} aria-label="Start again">↺</button>
           {staff && level.solution && <button type="button" className="gm-round" onClick={() => { pb.stop(); setProg(safe(level.solution!)); setPhase('edit'); }} aria-label="Show the answer (teachers only)">👁</button>}
         </div>

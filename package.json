@@ -11,7 +11,9 @@
     "check:content": "node --conditions=react-server --import tsx scripts/check-content.mts",
     "typecheck": "tsc --noEmit",
     "predev": "node scripts/build-game.mjs",
-    "check:lessons": "node --conditions=react-server --import tsx scripts/check-lessons.mts"
+    "check:lessons": "node --conditions=react-server --import tsx scripts/check-lessons.mts",
+    "voice": "node --conditions=react-server --import tsx scripts/voice-lines.mts > .voice-lines.json && python3 scripts/voice-render.py .voice-lines.json",
+    "check:voice": "node --conditions=react-server --import tsx scripts/voice-lines.mts --check"
   },
   "engines": {
     "node": ">=22.13"

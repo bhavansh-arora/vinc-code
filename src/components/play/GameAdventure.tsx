@@ -127,7 +127,7 @@ export default function GameAdventure({ level, user, saved, xp }: { level: Adv; 
           <div className="ga-goal">
             <CrewArt id={level.tutor} className="gm-goal-art" label="" />
             <p><b>Goal:</b> {level.goal}</p>
-            <button type="button" className="gm-round small" onClick={() => speak(`${level.say} ${level.goal}`, true)} aria-label="Read it to me">🔊</button>
+            <button type="button" className="gm-round small" onClick={() => speak(`${level.say} ${level.goal}`, true, level.tutor)} aria-label="Read it to me">🔊</button>
           </div>
           <div className="ga-snips" aria-label="Insert a command">
             {snippets.map(s => <button key={s.label} type="button" className="ga-snip" onClick={() => { ed.current?.insert(s.text); sfx('click'); }} disabled={phase === 'run'}>{s.label}</button>)}
@@ -138,7 +138,7 @@ export default function GameAdventure({ level, user, saved, xp }: { level: Adv; 
           <div className="ga-actions">
             <button type="button" className="ga-run" onClick={run}>{phase === 'run' ? '■ Stop' : '▶ RUN!'}</button>
             <button type="button" className="gm-round" onClick={() => { pb.stop(); setCode(level.starter); setPhase('edit'); setResult(null); sfx('pop'); }} aria-label="Start again">↺</button>
-            {level.hints.length > 0 && <button type="button" className="gm-round" onClick={() => { const h = (hint + 1) % level.hints.length; setHint(h); speak(level.hints[h]); react('hint'); }} aria-label="Show a hint">💡</button>}
+            {level.hints.length > 0 && <button type="button" className="gm-round" onClick={() => { const h = (hint + 1) % level.hints.length; setHint(h); speak(level.hints[h], false, level.tutor); react('hint'); }} aria-label="Show a hint">💡</button>}
             {staff && level.solution && <button type="button" className="gm-round" onClick={() => { pb.stop(); setCode(level.solution!); setPhase('edit'); }} aria-label="Show the answer (teachers only)">👁</button>}
             <span className="ga-count">{(n => `${n} ${n === 1 ? 'line' : 'lines'}`)(code.split('\n').filter(l => l.replace(/#.*/, '').trim()).length)} · 3★ at {level.par}</span>
           </div>

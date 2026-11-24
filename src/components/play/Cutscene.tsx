@@ -53,7 +53,7 @@ export default function Cutscene({ story, onClose, resumeTheme }: { story: Story
   useEffect(() => { playMusic(story.music); return () => { stopSpeaking(); if (resumeTheme) playMusic(resumeTheme); else stopMusic(); }; }, [story, resumeTheme]);
   useEffect(() => {
     if (paused) { stopSpeaking(); return; }
-    if (settings.voice) speak(scene.caption);
+    if (settings.voice) speak(scene.caption, false, scene.speaker ?? 'narrator');
     sfx('pop');
     const t = setTimeout(next, scene.dur * 1000 + (settings.voice ? 600 : 0));
     return () => clearTimeout(t);

@@ -1,4 +1,5 @@
 'use client';
+import { speechText, voiceKey, type Speaker } from '@/lib/voice';
 /**
  * Game sound effects (made with Web Audio, so there are no sound files to download),
  * spoken narration (the browser's built-in speech), and progress saved in this browser for players who are not logged in.
@@ -52,27 +53,71 @@ export function sfx(kind: Sfx) {
 }
 
 /* ---------------- narration ---------------- */
+// 1. Recorded natural voices (public/voice, made by `npm run voice`), one voice per character.
+// 2. Otherwise the most natural voice this device has (neural / "Natural" / premium voices first).
+let manifest: Set<string> | null = null;
+function loadManifest() {
+  if (manifest || typeof window === 'undefined') return;
+  manifest = new Set();
+  fetch('/voice/manifest.json').then(r => (r.ok ? r.json() : [])).then((keys: string[]) => { keys.forEach(k => manifest!.add(k)); }).catch(() => {});
+}
+if (typeof window !== 'undefined') loadManifest();
+
 let voiceCache: SpeechSynthesisVoice | null | undefined;
+function voiceScore(v: SpeechSynthesisVoice) {
+  const n = v.name;
+  let s = 0;
+  if (!v.lang.toLowerCase().startsWith('en')) return -1000;
+  if (/natural|neural/i.test(n)) s += 100;
+  if (/premium|enhanced/i.test(n)) s += 60;
+  if (/google/i.test(n)) s += 45;
+  if (/online/i.test(n)) s += 25;
+  if (/samantha|ava|allison|serena|daniel|karen|moira|tessa|zoe|evan|nathan|libby|sonia|neerja|prabhat|aria|jenny|guy/i.test(n)) s += 30;
+  if (/espeak|robot|zira|david|mark|hazel|fred|albert|bad news|bells|boing|bubbles|cellos|whisper|zarvox|trinoids|junior|ralph|kathy|princess/i.test(n)) s -= 80;
+  if (/en-IN/i.test(v.lang)) s += 12; else if (/en-GB|en-US/i.test(v.lang)) s += 8;
+  if (v.localService === false) s += 5;
+  return s;
+}
 function pickVoice(): SpeechSynthesisVoice | null {
-  if (voiceCache !== undefined) return voiceCache;
+  if (voiceCache) return voiceCache;
   const vs = window.speechSynthesis?.getVoices() ?? [];
   if (!vs.length) return null;
-  voiceCache = vs.find(v => v.lang === 'en-IN') ?? vs.find(v => v.lang === 'en-GB') ?? vs.find(v => v.lang.startsWith('en')) ?? null;
+  voiceCache = [...vs].sort((a, b) => voiceScore(b) - voiceScore(a))[0] ?? null;
   return voiceCache;
 }
-export const canSpeak = () => typeof window !== 'undefined' && 'speechSynthesis' in window;
-/** Reads text aloud (after the player has tapped something, as browsers require). Backticks and code are read as words. */
-export function speak(text: string, force = false) {
-  if (!canSpeak() || (!force && !settings.voice)) return;
+if (typeof window !== 'undefined' && 'speechSynthesis' in window) window.speechSynthesis.addEventListener?.('voiceschanged', () => { voiceCache = undefined; });
+
+export const canSpeak = () => typeof window !== 'undefined' && ('speechSynthesis' in window || typeof Audio !== 'undefined');
+const tell = (on: boolean) => window.dispatchEvent(new CustomEvent('vinc-speak', { detail: on }));
+let clip: HTMLAudioElement | null = null;
+
+/** Reads a line aloud in a character's voice (after the player has tapped something, as browsers require). */
+export function speak(text: string, force = false, who: Speaker = 'narrator') {
+  if (typeof window === 'undefined' || (!force && !settings.voice)) return;
+  stopSpeaking();
+  const key = voiceKey(text, who);
+  if (manifest?.has(key)) {
+    clip = new Audio(`/voice/${key}.mp3`);
+    clip.onplay = () => tell(true); clip.onended = () => tell(false); clip.onerror = () => { tell(false); device(text); };
+    clip.play().catch(() => device(text));
+    return;
+  }
+  device(text);
+}
+function device(text: string) {
+  if (!('speechSynthesis' in window)) return;
   const s = window.speechSynthesis; s.cancel();
-  const u = new SpeechSynthesisUtterance(text.replace(/`/g, '').replace(/_/g, ' ').replace(/\(\)/g, '').replace(/\(([^)]*)\)/g, ' $1'));
-  const v = pickVoice(); if (v) { u.voice = v; u.lang = v.lang; }
-  u.rate = 0.95; u.pitch = 1.1;
-  const tell = (on: boolean) => window.dispatchEvent(new CustomEvent('vinc-speak', { detail: on }));
+  const u = new SpeechSynthesisUtterance(speechText(text));
+  const v = pickVoice(); if (v) { u.voice = v; u.lang = v.lang; } else u.lang = 'en-IN';
+  u.rate = 0.98; u.pitch = 1;
   u.onstart = () => tell(true); u.onend = () => tell(false); u.onerror = () => tell(false);
   s.speak(u);
 }
-export function stopSpeaking() { if (canSpeak()) window.speechSynthesis.cancel(); }
+export function stopSpeaking() {
+  if (typeof window === 'undefined') return;
+  if (clip) { clip.pause(); clip = null; tell(false); }
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+}
 
 /* ---------------- progress for players who are not logged in ---------------- */
 export type LocalProgress = Record<string, { stars: number; code: string }>;

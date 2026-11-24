@@ -12,7 +12,11 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   devIndicators: false,
   async headers() {
-    return [{ source: '/:path*', headers: securityHeaders }];
+    return [
+      { source: '/:path*', headers: securityHeaders },
+      // Recorded voice clips are named after their text, so a changed line gets a new file.
+      { source: '/voice/:file([a-z0-9]+\\.mp3)', headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }] }
+    ];
   },
   async rewrites() {
     return [

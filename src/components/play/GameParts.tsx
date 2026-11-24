@@ -68,8 +68,8 @@ export function TutorCard({ tutor, title, text, button, onGo }: { tutor: CharId;
           <h2 id="gm-tutor-t">{title}</h2>
           <p>{text}</p>
           <div className="gm-row">
-            <button ref={ref} type="button" className="gm-bigbtn" onClick={() => { sfx('pop'); speak(text); onGo(); }}>{button} ▶</button>
-            <button type="button" className="gm-round" onClick={() => speak(text, true)} aria-label="Read it to me">🔊</button>
+            <button ref={ref} type="button" className="gm-bigbtn" onClick={() => { sfx('pop'); speak(text, false, tutor); onGo(); }}>{button} ▶</button>
+            <button type="button" className="gm-round" onClick={() => speak(text, true, tutor)} aria-label="Read it to me">🔊</button>
           </div>
         </div>
       </div>
@@ -77,7 +77,7 @@ export function TutorCard({ tutor, title, text, button, onGo }: { tutor: CharId;
   );
 }
 
-const CHEERS = ['Brilliant!', 'You did it!', 'Super coder!', 'Amazing!', 'Fantastic!'];
+import { WIN_CHEERS as CHEERS, winLine } from '@/lib/voice';
 const CONFETTI = Array.from({ length: 40 }, (_, i) => ({ l: (i * 37) % 100, d: (i % 10) * 0.06, t: 1.5 + (i % 5) * 0.3, c: ['#D98A1C', '#1F6F66', '#C2502A', '#8C3557', '#4C7424', '#E8B030', '#4FA9D8'][i % 7] }));
 
 /** The level-complete screen: stars dropping onto the scene, XP, and Replay / Next / Map. */
@@ -86,7 +86,7 @@ export function WinCard({ stars, par, unit, xpGained, next, mapHref, onReplay, g
 }) {
   const cheer = CHEERS[(par + stars) % CHEERS.length];
   const ref = useRef<HTMLAnchorElement>(null);
-  useEffect(() => { ref.current?.focus(); speak(`${cheer} ${stars} ${stars === 1 ? 'star' : 'stars'}!`); }, [cheer, stars]);
+  useEffect(() => { ref.current?.focus(); speak(winLine(cheer, stars)); }, [cheer, stars]);
   return (
     <div className="gm-veil win">
       <div className="gm-confetti" aria-hidden="true">{CONFETTI.map((c, i) => <i key={i} style={{ left: c.l + '%', background: c.c, animationDelay: c.d + 's', animationDuration: c.t + 's' }} />)}</div>
