@@ -17,6 +17,7 @@ import { RANKS } from '@/lib/xp';
 import CrewArt from '@/components/CrewArt';
 import CountUp from '@/components/landing/CountUp';
 import LessonDemo from '@/components/landing/LessonDemo';
+import Deco3D from '@/components/landing/Deco3D';
 
 export const metadata: Metadata = { title: 'VINC Code · Learn to code with Vinc the robot' };
 
@@ -111,13 +112,13 @@ export default async function Home() {
         </section>
 
         <section className="lp-section" id="how">
-          <Reveal>
+          <div className="lp-headrow"><Reveal>
             <div className="lp-head">
               <div className="eyebrow">How it works</div>
               <h2>Write the code. Watch Vinc run it.</h2>
               <p>Children drag blocks or type Python. Vinc follows every line in a 3D workshop, so they see exactly what their code does.</p>
             </div>
-          </Reveal>
+          </Reveal><Deco3D kind="cube" /></div>
           <div className="lp-how">
             <Reveal><CodeDemo /></Reveal>
             <ol className="lp-steps">
@@ -129,13 +130,13 @@ export default async function Home() {
         </section>
 
         <section className="lp-section" id="classes">
-          <Reveal>
+          <div className="lp-headrow"><Reveal>
             <div className="lp-head">
               <div className="eyebrow">Classes 3 to 8</div>
               <h2>One coding idea a year, and a new part to win.</h2>
               <p>Each class has at least 15 activities: puzzles, Glitch debug levels, challenges, offline classroom games and lab sessions with a real robot.</p>
             </div>
-          </Reveal>
+          </Reveal><Deco3D kind="stairs" /></div>
           <div className="lp-classes">
             {CLASSES.map((c, i) => (
               <Reveal key={c.n} delay={i * 80}>
@@ -174,13 +175,13 @@ export default async function Home() {
         </section>
 
         <section className="lp-section" id="crew">
-          <Reveal>
+          <div className="lp-headrow"><Reveal>
             <div className="lp-head">
               <div className="eyebrow">Meet the crew</div>
               <h2>A new friend joins every class.</h2>
               <p>The cast grows as children do. Each friend stands for one big coding idea and explains it in the lessons. Hover or tap a card to meet them.</p>
             </div>
-          </Reveal>
+          </Reveal><Deco3D kind="orbit" /></div>
           <div className="lp-crew">
             {CREW.map((c, i) => (
               <Reveal key={c.id} delay={i * 70}>
@@ -210,7 +211,7 @@ export default async function Home() {
                 <div className="eyebrow">Stars, XP and ranks</div>
                 <h2>Every lesson levels you up.</h2>
                 <p>Lessons earn up to three stars and XP. Boss lessons earn the most. As XP grows, students climb from Spark Rookie to Vinc Legend, and a celebration with the crew marks every lesson they finish.</p>
-              </div>
+              <Deco3D kind="coin" /></div>
             </Reveal>
             <Reveal delay={120}>
               <ol className="lp-ladder">
@@ -223,12 +224,12 @@ export default async function Home() {
         </section>
 
         <section className="lp-section" id="schools">
-          <Reveal>
+          <div className="lp-headrow"><Reveal>
             <div className="lp-head">
               <div className="eyebrow">For everyone in the classroom</div>
               <h2>Made for students, teachers and schools.</h2>
             </div>
-          </Reveal>
+          </Reveal><Deco3D kind="blocks" /></div>
           <div className="lp-roles">
             <Reveal delay={0}><div className="lp-role"><span className="lp-role-tag" style={{ background: 'var(--amber)' }}>Students</span>
               <ul><li>{LESSONS.length} lessons and {LEVELS.length} levels in 3D</li><li>Stars, XP, ranks, hats and paint jobs</li><li>Short quizzes with explanations for every answer</li><li>Progress saved to their own account</li></ul></div></Reveal>
@@ -246,7 +247,7 @@ export default async function Home() {
         </section>
 
         <section className="lp-section" id="faq">
-          <Reveal><div className="lp-head"><div className="eyebrow">Questions from parents and schools</div><h2>Good to know</h2></div></Reveal>
+          <div className="lp-headrow"><Reveal><div className="lp-head"><div className="eyebrow">Questions from parents and schools</div><h2>Good to know</h2></div></Reveal><Deco3D kind="question" /></div>
           <div className="lp-faq">
             {FAQ.map(([q, a], i) => (
               <Reveal key={q} delay={i * 60}><details><summary>{q}</summary><p>{a}</p></details></Reveal>
@@ -266,6 +267,7 @@ export default async function Home() {
                   <Link className="btn lp-big lp-light" href="/signup?role=school">Have a School ID? Register</Link>
                 </div>
               </div>
+            <Deco3D kind="gears" />
             </div>
           </Reveal>
         </section>
