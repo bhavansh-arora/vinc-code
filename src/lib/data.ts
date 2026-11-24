@@ -187,3 +187,17 @@ export function schoolInvites() {
   return q.all<{ code: string; note: string | null; created_at: string; used_at: string | null; school_name: string | null }>(`
     SELECT i.code, i.note, i.created_at, i.used_at, s.name AS school_name FROM school_invites i LEFT JOIN schools s ON s.id = i.school_id ORDER BY i.created_at DESC LIMIT 50`);
 }
+
+/* ---------- lessons (Classes 5 to 8) ---------- */
+export function lessonProgressOf(studentId: number) {
+  const rows = q.all<{ lesson_id: string; code: string | null; passed_at: string | null }>(`SELECT lesson_id, code, passed_at FROM lesson_progress WHERE student_id = ?`, studentId);
+  return new Map(rows.map(r => [r.lesson_id, r]));
+}
+
+/** Lessons passed per student in a section, for the given class. */
+export function lessonsDoneInSection(sectionId: number, grade: number): Map<number, number> {
+  const rows = q.all<{ student_id: number; n: number }>(`
+    SELECT p.student_id, COUNT(*) AS n FROM lesson_progress p JOIN users u ON u.id = p.student_id
+    WHERE u.section_id = ? AND p.passed_at IS NOT NULL AND p.lesson_id LIKE ? GROUP BY p.student_id`, sectionId, `${grade}-L%`);
+  return new Map(rows.map(r => [r.student_id, r.n]));
+}

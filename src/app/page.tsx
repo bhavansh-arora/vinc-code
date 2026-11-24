@@ -17,10 +17,10 @@ export const metadata: Metadata = { title: 'VINC Code · Learn to code with Vinc
 const CLASSES = [
   { n: 3, topic: 'Sequencing', blurb: 'Steps, turns and order. Kids learn that robots do exactly what they are told.', part: 'spring', partName: 'Spring legs', live: true },
   { n: 4, topic: 'Loops and jumps', blurb: 'repeat and loops inside loops turn 14 blocks into 4. Plus jump() over crates.', part: 'antenna', partName: 'Sensor antenna', live: true },
-  { n: 5, topic: 'If and else', blurb: 'Vinc senses crates and walls, so one program can solve many boards.', part: 'chip', partName: 'Memory chip' },
-  { n: 6, topic: 'Variables in Python', blurb: 'From blocks to typed Python: counting sparks, fuel and scores.', part: 'gear', partName: 'Gear toolbelt' },
-  { n: 7, topic: 'Functions', blurb: 'Kids name their own moves, pass in numbers, and draw with code.', part: 'brain', partName: 'AI brain' },
-  { n: 8, topic: 'Events, lists and AI', blurb: 'Train Vinc to sort waste, spot bad data, and launch the rocket.', part: 'rocket', partName: 'Rocket boosters' }
+  { n: 5, topic: 'If and else', blurb: 'Vinc gets sensors. One Python program has to solve many different boards.', part: 'chip', partName: 'Memory chip', live: true },
+  { n: 6, topic: 'Variables in Python', blurb: 'From blocks to typed Python: counting sparks, fuel and scores.', part: 'gear', partName: 'Gear toolbelt', live: true },
+  { n: 7, topic: 'Functions', blurb: 'Kids build their own moves like stair() and walk(n), with parameters and return.', part: 'brain', partName: 'AI brain', live: true },
+  { n: 8, topic: 'Events, lists and AI', blurb: 'Train Vinc to sort waste, spot bad data, and launch the rocket.', part: 'rocket', partName: 'Rocket boosters', live: true }
 ];
 
 const SPARKS = Array.from({ length: 14 }, (_, i) => ({
@@ -69,6 +69,7 @@ export default async function Home() {
             <ul className="lp-facts lp-rise" style={{ animationDelay: '320ms' }}>
               <li><b>{LEVELS.length}</b> playable 3D levels</li>
               <li><b>{ASSESSMENTS.length}</b> assessments, <b>{questions}</b> questions</li>
+              <li><b>48</b> Python lessons</li>
               <li><b>6</b> classes, one part each</li>
             </ul>
           </div>

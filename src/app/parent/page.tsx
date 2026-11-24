@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import ActionForm from '@/components/ActionForm';
 import { Bar, Empty, ScoreBadge, Stars, when } from '@/components/ui';
 import { requireRole } from '@/lib/auth';
-import { childrenOfParent } from '@/lib/data';
+import { childrenOfParent, lessonProgressOf } from '@/lib/data';
+import { lessonsForGrade } from '@/data/lessons';
 import { linkChildAction } from './actions';
 
 export const metadata: Metadata = { title: 'My children' };
@@ -16,6 +17,7 @@ export default async function ParentHome() {
         <p className="muted">See how your child is doing with Vinc: the levels they have finished, their stars, and their assessment results.</p></div>
       {kids.length ? kids.map(k => {
         const h = k.home, done = h.levels.filter(l => l.stars > 0).length;
+        const kidLessons = lessonsForGrade(h.grade), kp = lessonProgressOf(k.id), lessonsDone = kidLessons.filter(l => kp.get(l.id)?.passed_at).length;
         const finished = h.assignments.filter(a => a.score !== null), todo = h.assignments.filter(a => a.score === null);
         const avg = finished.length ? finished.reduce((t, a) => t + a.score! / a.max_score!, 0) / finished.length * 100 : null;
         const recent = h.levels.filter(l => l.stars > 0).slice(-5).reverse();
@@ -28,6 +30,7 @@ export default async function ParentHome() {
             <div className="stats">
               <div className="stat"><span className="label">Levels done</span><span className="value">{done} / {h.levels.length}</span></div>
               <div className="stat"><span className="label">Stars</span><span className="value">★ {h.totalStars}</span></div>
+              {kidLessons.length > 0 && <div className="stat"><span className="label">Python lessons</span><span className="value">{lessonsDone} / {kidLessons.length}</span></div>}
               <div className="stat"><span className="label">Assessments</span><span className="value">{finished.length} done</span><span className="hint">{todo.length ? `${todo.length} still to do` : 'nothing pending'}</span></div>
             </div>
             <div><span className="small">Game progress for their class</span><Bar value={h.levels.length ? done / h.levels.length * 100 : 0} /></div>

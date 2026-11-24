@@ -4,7 +4,8 @@ import Shell from '@/components/Shell';
 import ActionForm from '@/components/ActionForm';
 import { Bar, Empty, ScoreBadge, Stat, pct, when } from '@/components/ui';
 import { requireRole } from '@/lib/auth';
-import { assignmentsOfSection, canManageSection, canSeeSection, getSection, schoolCodes, studentsOfSection } from '@/lib/data';
+import { assignmentsOfSection, canManageSection, canSeeSection, getSection, lessonsDoneInSection, schoolCodes, studentsOfSection } from '@/lib/data';
+import { lessonsForGrade } from '@/data/lessons';
 import { ASSESSMENTS } from '@/data/assessments';
 import { addStudentsAction, assignAction, removeStudentAction, resetStudentAction, unassignAction } from '@/app/teacher/actions';
 import { ROLE_HOME } from '@/lib/types';
@@ -16,6 +17,8 @@ export default async function ClassPage({ params }: { params: Promise<{ id: stri
   if (!canSeeSection(user, section)) redirect(ROLE_HOME[user.role]);
   const manage = canManageSection(user, section);
   const students = studentsOfSection(section.id);
+  const lessonTotal = lessonsForGrade(section.grade).length;
+  const lessonsDone = lessonsDoneInSection(section.id, section.grade);
   const assignments = assignmentsOfSection(section.id);
   const assigned = new Set(assignments.map(a => a.assessment_id));
   const available = ASSESSMENTS.filter(a => a.grade <= section.grade && !assigned.has(a.id)).sort((a, b) => b.grade - a.grade);
@@ -46,9 +49,10 @@ export default async function ClassPage({ params }: { params: Promise<{ id: stri
           <div className="card-head"><h2>Students</h2><span className="small muted">Levels count towards Class {section.grade}{section.grade > 4 ? ' (practising on the Class 3–4 levels for now)' : ''}</span></div>
           {students.length ? (
             <div className="table-wrap"><table className="data">
-              <thead><tr><th>Name</th><th>Username</th><th>Game levels</th><th className="num">Stars</th><th className="num">Avg. score</th><th>Last sign-in</th></tr></thead>
+              <thead><tr><th>Name</th><th>Username</th>{lessonTotal > 0 && <th>Python lessons</th>}<th>Game levels</th><th className="num">Stars</th><th className="num">Avg. score</th><th>Last sign-in</th></tr></thead>
               <tbody>{students.map(s => (
                 <tr key={s.id}><td><b>{s.name}</b></td><td className="mono small">{s.username}</td>
+                  {lessonTotal > 0 && <td style={{ minWidth: 140 }}><Bar amber value={(lessonsDone.get(s.id) ?? 0) / lessonTotal * 100} label="lessons done" /><span className="small muted">{lessonsDone.get(s.id) ?? 0} of {lessonTotal}</span></td>}
                   <td style={{ minWidth: 150 }}><Bar value={s.levelsDone / s.levelsTotal * 100} label={`${s.levelsDone} of ${s.levelsTotal} levels`} /><span className="small muted">{s.levelsDone} of {s.levelsTotal}</span></td>
                   <td className="num">{s.stars}</td><td className="num"><ScoreBadge value={s.avgScore} /></td><td className="small">{when(s.last_login_at)}</td></tr>
               ))}</tbody>

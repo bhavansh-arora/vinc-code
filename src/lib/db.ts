@@ -96,6 +96,15 @@ CREATE TABLE IF NOT EXISTS contact_messages (
   email_error TEXT,
   handled_at TEXT
 );
+CREATE TABLE IF NOT EXISTS lesson_progress (
+  student_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  lesson_id TEXT NOT NULL,
+  code TEXT,
+  passed_at TEXT,
+  runs INTEGER NOT NULL DEFAULT 0,
+  updated_at TEXT NOT NULL,
+  PRIMARY KEY (student_id, lesson_id)
+);
 CREATE INDEX IF NOT EXISTS idx_users_school ON users(school_id);
 CREATE INDEX IF NOT EXISTS idx_users_section ON users(section_id);
 CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id);

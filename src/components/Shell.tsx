@@ -5,10 +5,10 @@ import { logoutAction } from '@/app/login/actions';
 import { ROLE_HOME, ROLE_LABEL, type User } from '@/lib/types';
 
 const NAV: Record<User['role'], { href: string; label: string }[]> = {
-  admin: [{ href: '/admin', label: 'Overview' }, { href: '/admin/messages', label: 'Messages' }, { href: '/assessments', label: 'Assessment bank' }],
-  school: [{ href: '/school', label: 'Overview' }, { href: '/assessments', label: 'Assessment bank' }],
-  teacher: [{ href: '/teacher', label: 'My classes' }, { href: '/assessments', label: 'Assessment bank' }],
-  student: [{ href: '/student', label: 'My dashboard' }, { href: '/game', label: 'Play' }],
+  admin: [{ href: '/admin', label: 'Overview' }, { href: '/admin/messages', label: 'Messages' }, { href: '/lessons', label: 'Lessons' }, { href: '/assessments', label: 'Assessment bank' }],
+  school: [{ href: '/school', label: 'Overview' }, { href: '/lessons', label: 'Lessons' }, { href: '/assessments', label: 'Assessment bank' }],
+  teacher: [{ href: '/teacher', label: 'My classes' }, { href: '/lessons', label: 'Lessons' }, { href: '/assessments', label: 'Assessment bank' }],
+  student: [{ href: '/student', label: 'My dashboard' }, { href: '/student/lessons', label: 'Lessons' }, { href: '/game', label: 'Play' }],
   parent: [{ href: '/parent', label: 'My children' }]
 };
 

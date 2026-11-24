@@ -85,6 +85,25 @@ Classes 3 and 4 include board questions ("Where does Vinc stop?"). Run `npm run 
 to prove those answers by running the code on the board, and to check answer positions are spread out.
 Answers are graded on the server and never sent to the browser before a student submits.
 
+## Python lessons (Classes 5 to 8)
+
+`src/data/lessons.ts` holds **48 lessons, 12 per class**, each with an explanation, an example, a task,
+starter code, hints, a model solution and an automatic check. Students write real Python, run in the
+browser by Pyodide (`public/lessons/worker.js`, loaded from cdn.jsdelivr.net), so the server needs no Python.
+
+| Class | Topic | Highlights |
+|---|---|---|
+| 5 | if / else | Vinc's sensors (`blocked()`, `at_spark()`, `tile()`); one program must solve several boards; wall-follower mazes |
+| 6 | Variables | print, maths, `input()`, `while` countdowns, Vinc's step counter, metro fares |
+| 7 | Functions | `def`, parameters, `return`, Vinc moves like `stair()` and `walk(n)`, scope |
+| 8 | Lists, events, AI | lists, dictionaries, a keyboard-driven Vinc, nearest-neighbour classifier, accuracy, bad data, GreenBin sorter |
+
+Every class has Glitch debug lessons and a boss lesson. `public/lessons/harness.py` runs and checks the code
+(boards, expected output, hidden tests, required structures, and a guard that stops endless loops). The
+same file is used by `npm run check:lessons` (needs `python3`), which proves every model solution passes and
+every starter does not. Students see their own class and earlier ones; teachers see progress per student and
+can preview every lesson with its model solution at `/lessons`.
+
 ## The game
 
 `game/vinc-game.html` is the stand-alone prototype. `scripts/build-game.mjs` turns it into

@@ -10,7 +10,8 @@
     "seed": "node --conditions=react-server --import tsx scripts/seed.mts",
     "check:content": "node --conditions=react-server --import tsx scripts/check-content.mts",
     "typecheck": "tsc --noEmit",
-    "predev": "node scripts/build-game.mjs"
+    "predev": "node scripts/build-game.mjs",
+    "check:lessons": "node --conditions=react-server --import tsx scripts/check-lessons.mts"
   },
   "engines": {
     "node": ">=22.13"
