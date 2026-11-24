@@ -98,19 +98,18 @@ scripts/                      seed, content checks, game build
 
 ## Deploying
 
-The app keeps its data in one SQLite file (`DATABASE_PATH`, default `./data/vinc.db`), so it needs a
-server with a persistent disk: a small VPS, Railway or Render with a volume, for example. It will
-**not** work on serverless hosting such as Vercel without moving to a hosted database
-(PostgreSQL); all database code lives in `src/lib/db.ts` and `src/lib/data.ts` to make that move easy.
+Production runs in Docker behind Caddy. Step-by-step instructions for code.vinc-lab.com are in
+**[deploy/DEPLOY.md](deploy/DEPLOY.md)**. In short:
 
 ```bash
-cp .env.example .env              # set DATABASE_PATH and ADMIN_PASSWORD
-npm ci && npm run build
-npm run seed -- --admin-only      # first VINC admin only, no demo data
-npm start
+echo "ADMIN_PASSWORD=$(openssl rand -base64 24)" > .env   # first admin, created on first start
+docker compose up -d --build                             # app on 127.0.0.1:3100
+# Caddyfile:  code.vinc-lab.com { reverse_proxy 127.0.0.1:3100 }
 ```
 
-Back up the database file daily (`sqlite3 vinc.db ".backup backup.db"`), and serve the site over HTTPS.
+The data lives in one SQLite file in the `vinc-data` Docker volume, so the app needs a server with a
+persistent disk. It will not work on serverless hosting such as Vercel without moving to PostgreSQL
+first. All database code lives in `src/lib/db.ts` and `src/lib/data.ts` to make that move easier.
 
 ## Not built yet
 

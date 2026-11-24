@@ -2,6 +2,7 @@ import 'server-only';
 import type { DatabaseSync as DB } from 'node:sqlite';
 import fs from 'node:fs';
 import path from 'node:path';
+import { hashPassword } from './passwords';
 
 // node:sqlite is built into Node 22.13+. Loading it through getBuiltinModule keeps the bundler away from it.
 const { DatabaseSync } = process.getBuiltinModule('node:sqlite') as typeof import('node:sqlite');
@@ -92,7 +93,19 @@ function open(): DB {
   fs.mkdirSync(path.dirname(file), { recursive: true });
   const db = new DatabaseSync(file);
   db.exec(SCHEMA);
+  bootstrapAdmin(db);
   return db;
+}
+
+/** On a fresh server, create the first VINC admin from ADMIN_USERNAME / ADMIN_PASSWORD. Does nothing once an admin exists. */
+function bootstrapAdmin(db: DB) {
+  const password = process.env.ADMIN_PASSWORD;
+  if (!password || db.prepare(`SELECT 1 FROM users WHERE role = 'admin' LIMIT 1`).get()) return;
+  if (password.length < 12) { console.warn('ADMIN_PASSWORD must be at least 12 characters. No admin was created.'); return; }
+  const username = process.env.ADMIN_USERNAME || 'admin';
+  db.prepare(`INSERT INTO users (role, name, username, password_hash, created_at) VALUES ('admin', 'VINC Admin', ?, ?, ?)`)
+    .run(username, hashPassword(password), new Date().toISOString());
+  console.log(`Created the first VINC admin "${username}". You can now remove ADMIN_PASSWORD from the .env file.`);
 }
 
 const g = globalThis as unknown as { __vincDb?: DB };

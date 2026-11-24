@@ -1,0 +1,26 @@
+# VINC Code on the VPS. See deploy/DEPLOY.md.
+services:
+  vinc-code:
+    build: .
+    image: vinc-code:latest
+    container_name: vinc-code
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_PATH: /app/data/vinc.db
+    volumes:
+      - vinc-data:/app/data
+    # Option A: Caddy runs directly on the VPS. Only the VPS itself can reach this port.
+    ports:
+      - "127.0.0.1:3100:3000"
+    # Option B: Caddy runs in Docker. Delete the two "ports" lines above and uncomment these two,
+    # plus the "networks" block at the bottom. Use the name of Caddy's network.
+    # networks:
+    #   - caddy
+
+volumes:
+  vinc-data:
+
+# networks:
+#   caddy:
+#     external: true
