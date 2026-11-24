@@ -104,13 +104,30 @@ certificate for `code.vinc-lab.com` automatically on the first visit.
 
 ## 7. Daily backups
 
-The database lives in the Docker volume `vinc-code_vinc-data`. Add a daily backup to the host's crontab (`crontab -e`):
+The database lives in the Docker volume `vinc-code_vinc-data`. Create a backup script:
 
-```cron
-15 2 * * * docker exec vinc-code node -e "new (require('node:sqlite').DatabaseSync)('/app/data/vinc.db').exec(\"VACUUM INTO '/app/data/backup.db'\")" && docker cp vinc-code:/app/data/backup.db /opt/vinc-backups/vinc-$(date +\%F).db && find /opt/vinc-backups -name 'vinc-*.db' -mtime +30 -delete
+```bash
+mkdir -p /opt/vinc-backups && cat > /opt/vinc-backups/backup.sh <<'SCRIPT'
+#!/bin/sh
+# Daily VINC Code database backup. Keeps 30 days.
+set -e
+docker exec vinc-code rm -f /app/data/backup.db
+docker exec vinc-code node -e "new (require('node:sqlite').DatabaseSync)('/app/data/vinc.db').exec(\"VACUUM INTO '/app/data/backup.db'\")"
+docker cp vinc-code:/app/data/backup.db "/opt/vinc-backups/vinc-$(date +%F).db"
+docker exec vinc-code rm -f /app/data/backup.db
+find /opt/vinc-backups -name 'vinc-*.db' -mtime +30 -delete
+SCRIPT
+chmod 700 /opt/vinc-backups/backup.sh
 ```
 
-Create the folder first with `sudo mkdir -p /opt/vinc-backups && sudo chown "$USER" /opt/vinc-backups`.
+Test it once, then schedule it for 02:15 every night (this adds the line to root's crontab for you):
+
+```bash
+/opt/vinc-backups/backup.sh && ls -l /opt/vinc-backups
+(crontab -l 2>/dev/null | grep -v vinc-backups/backup.sh; echo '15 2 * * * /opt/vinc-backups/backup.sh >> /opt/vinc-backups/backup.log 2>&1') | crontab -
+```
+
+`VACUUM INTO` will not overwrite an existing file, which is why the script removes `backup.db` before and after.
 Copy backups off the server too, for example to cloud storage.
 
 ## Updating
