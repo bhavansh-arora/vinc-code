@@ -395,7 +395,7 @@ html { scroll-behavior: smooth; }
 .au-back { width: 36px; height: 36px; display: grid; place-items: center; border: 1.5px solid var(--line); background: var(--paper); border-radius: 10px; cursor: pointer; }
 .au-chip { display: inline-flex; gap: 6px; align-items: center; padding: 4px 12px; border-radius: 999px; font-weight: 600; font-size: .85rem; color: #FFF7EA; }
 .au-chip .au-ic { color: #FFF7EA; width: 15px; height: 15px; }
-.au-row2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+.au-row2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; align-items: start; }
 .au-picks { border: 0; padding: 0; margin: 0; }
 .au-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
 .au-pick { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--paper); cursor: pointer; font-size: .9rem; }
@@ -451,3 +451,17 @@ html { scroll-behavior: smooth; }
 .code-box code, .family-code { font-family: var(--mono); font-size: 1.5rem; font-weight: 500; letter-spacing: .08em; color: var(--ink); }
 .family-code { padding: 8px 16px; border: 2px dashed var(--amber); border-radius: 12px; background: var(--paper); }
 .au-signed { display: flex; gap: 8px; align-items: center; margin: 8px 8px 0; padding: 10px 12px; border-radius: 12px; background: var(--paper-2); font-size: .88rem; color: var(--ink-2); }
+
+/* Contact page */
+.ct { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 40px; align-items: start; padding: 32px max(16px, env(safe-area-inset-right, 0px)) 72px max(16px, env(safe-area-inset-left, 0px)); }
+.ct-info { display: grid; gap: 16px; padding-top: 16px; }
+.ct-info h1 { font-size: clamp(2rem, 4vw, 3rem); line-height: 1.1; }
+.ct-list { margin: 0; padding-left: 1.1em; display: grid; gap: 10px; color: var(--ink-2); }
+.ct-vinc { width: 150px; height: auto; }
+.ct-card { max-width: none; padding: 20px 8px 24px; }
+.au-textarea { width: 100%; min-height: 140px; resize: vertical; border: 1.5px solid var(--line); border-radius: 12px; background: var(--paper); padding: 11px 12px; color: var(--ink); font: inherit; }
+.au-textarea:focus { outline: none; border-color: var(--amber); box-shadow: 0 0 0 3px color-mix(in srgb, var(--amber) 25%, transparent); }
+.au-field.bad .au-textarea { border-color: var(--bad); }
+.au-chips .au-pick input[type="radio"] { accent-color: var(--amber); }
+.au-done h2 { font-size: 1.5rem; }
+@media (max-width: 900px) { .ct { grid-template-columns: minmax(0, 1fr); } .ct-vinc { display: none; } }

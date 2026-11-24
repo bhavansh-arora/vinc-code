@@ -54,3 +54,11 @@ export async function issueSchoolIdAction(_p: ActionState, form: FormData): Prom
   revalidatePath('/admin');
   return { ok: `School ID ${code} is ready. Send it to the school${note ? ` (${note})` : ''}. They register at /signup?role=school&id=${code}` };
 }
+
+export async function markHandledAction(_p: ActionState, form: FormData): Promise<ActionState> {
+  await requireRole('admin');
+  const id = intParam(form.get('id'));
+  if (!q.run('UPDATE contact_messages SET handled_at = ? WHERE id = ? AND handled_at IS NULL', now(), id).changes) return { error: 'Message not found.' };
+  revalidatePath('/admin/messages');
+  return { ok: 'Marked as handled.' };
+}

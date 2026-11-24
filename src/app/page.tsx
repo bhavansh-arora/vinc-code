@@ -45,6 +45,7 @@ export default async function Home() {
           <a href="#how">How it works</a>
           <a href="#classes">Classes 3–8</a>
           <a href="#schools">For schools</a>
+          <Link href="/contact">Contact</Link>
         </nav>
         <Link className="btn quiet" href="/login">Log in</Link>
         <Link className="btn primary" href="/signup">Create account</Link>
@@ -155,7 +156,7 @@ export default async function Home() {
                 <h2>Bring VINC Code to your school.</h2>
                 <p>VINC Lab sets up your school, teachers and classes, and runs hands-on robotics sessions with the real Vinc.</p>
                 <div className="lp-cta">
-                  <a className="btn primary lp-big" href="https://vinc-lab.com" target="_blank" rel="noopener">Contact VINC Lab</a>
+                  <Link className="btn primary lp-big" href="/contact?topic=school">Contact VINC Lab</Link>
                   <Link className="btn lp-big lp-light" href="/signup?role=school">Have a School ID? Register</Link>
                 </div>
               </div>
@@ -166,7 +167,7 @@ export default async function Home() {
 
       <footer className="lp-footer">
         <span>© VINC DEEPTECH PVT. LTD. · VINC Lab, Bengaluru</span>
-        <a href="https://vinc-lab.com" target="_blank" rel="noopener">vinc-lab.com</a>
+        <span><Link href="/contact">Contact us</Link> · <a href="https://vinc-lab.com" target="_blank" rel="noopener">vinc-lab.com</a></span>
       </footer>
     </div>
   );

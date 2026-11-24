@@ -130,6 +130,20 @@ Test it once, then schedule it for 02:15 every night (this adds the line to root
 `VACUUM INTO` will not overwrite an existing file, which is why the script removes `backup.db` before and after.
 Copy backups off the server too, for example to cloud storage.
 
+## 8. Email for the contact form
+
+Messages from `/contact` are always saved (Admin → Messages). To also email them to the inbox,
+add the mailbox settings to `/opt/vinc-code/.env`. This asks for the password without showing it
+or saving it in the shell history:
+
+```bash
+cd /opt/vinc-code && read -rsp "Mailbox password: " P && echo && printf 'SMTP_HOST=send.one.com\nSMTP_PORT=465\nSMTP_USER=info@vinc-lab.com\nSMTP_PASS=%s\nMAIL_FROM="VINC Code <info@vinc-lab.com>"\nCONTACT_TO=info@vinc-lab.com\n' "$P" >> .env && unset P && chmod 600 .env && docker compose up -d
+```
+
+Check that the VPS can reach the mail server: `nc -zv send.one.com 465` should say "succeeded".
+Then send a test message from https://code.vinc-lab.com/contact. Admin → Messages shows
+"email sent" or the exact error.
+
 ## Updating
 
 Take a backup first, then pull and rebuild:

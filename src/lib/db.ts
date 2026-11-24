@@ -83,6 +83,19 @@ CREATE TABLE IF NOT EXISTS attempts (
   submitted_at TEXT NOT NULL,
   UNIQUE (assignment_id, student_id)
 );
+CREATE TABLE IF NOT EXISTS contact_messages (
+  id INTEGER PRIMARY KEY,
+  topic TEXT NOT NULL,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  phone TEXT,
+  school TEXT,
+  message TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  email_status TEXT NOT NULL DEFAULT 'pending',
+  email_error TEXT,
+  handled_at TEXT
+);
 CREATE INDEX IF NOT EXISTS idx_users_school ON users(school_id);
 CREATE INDEX IF NOT EXISTS idx_users_section ON users(section_id);
 CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id);

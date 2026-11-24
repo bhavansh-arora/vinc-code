@@ -384,7 +384,6 @@ footer { padding-block: 28px 40px; border-top: 1px solid var(--line); font-famil
               <g id="pupils"><circle cx="90" cy="93" r="5" class="f-screen"/><circle cx="130" cy="93" r="5" class="f-screen"/><circle cx="92" cy="90" r="1.6" class="f-eye"/><circle cx="132" cy="90" r="1.6" class="f-eye"/></g>
             </g>
             <path d="M98 110 Q110 119 122 110" class="s-eye" fill="none" stroke-width="4" stroke-linecap="round"/>
-            <rect x="140" y="47" width="30" height="10" rx="2" transform="rotate(22 155 52)" class="f-paper2 s-ink" stroke-width="1.5" opacity=".95"/>
             <g class="hat hat-cap"><path d="M58 52 Q110 0 162 52 Z" class="f-rust s-ink" stroke-width="4"/><path d="M150 45 Q184 42 198 54 L152 56 Z" class="f-rust s-ink" stroke-width="4" stroke-linejoin="round"/><circle cx="110" cy="27" r="5" class="f-ink"/></g>
             <g class="hat hat-phones"><path d="M34 96 Q30 22 110 22 Q190 22 186 96" fill="none" class="s-ink" stroke-width="9" stroke-linecap="round"/><rect x="22" y="74" width="24" height="40" rx="10" class="f-plum s-ink" stroke-width="4"/><rect x="174" y="74" width="24" height="40" rx="10" class="f-plum s-ink" stroke-width="4"/></g>
             <g class="hat hat-grad"><rect x="78" y="34" width="64" height="18" rx="4" class="f-ink"/><path d="M40 34 L110 10 L180 34 L110 56 Z" class="f-ink"/><path d="M110 33 L168 40 L168 66" fill="none" class="s-gold" stroke-width="3"/><circle cx="168" cy="68" r="5" class="f-gold"/></g>
@@ -665,7 +664,6 @@ footer { padding-block: 28px 40px; border-top: 1px solid var(--line); font-famil
     });
     var mouth = mesh(new T.TorusGeometry(.12, .024, 10, 28, PI), M.eye, false); mouth.rotation.z = PI; mouth.position.set(0, .38, .485); head.add(mouth);
     [[-1, M.rust], [1, M.plum]].forEach(function (a) { var e = mesh(new T.CylinderGeometry(.1, .1, .12, 20), a[1]); e.rotation.z = PI / 2; e.position.set(a[0] * .74, .55, 0); head.add(e); });
-    var tape = mesh(new T.BoxGeometry(.32, .09, .02), M.tape, false); tape.position.set(.4, .86, .47); tape.rotation.z = -.45; head.add(tape);
     var ant = new T.Group(); ant.position.y = 1.03; head.add(ant);
     var stalk = mesh(new T.CylinderGeometry(.03, .03, .3, 10), M.ink); stalk.position.y = .15; ant.add(stalk);
     var bulb = mesh(new T.SphereGeometry(.11, 24, 16), M.bulb); bulb.position.y = .36; ant.add(bulb);

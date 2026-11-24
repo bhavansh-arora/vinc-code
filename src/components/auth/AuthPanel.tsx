@@ -106,7 +106,7 @@ function ForgotDialog({ onClose }: { onClose: () => void }) {
         <ul className="au-list">
           <li><Icon name="star" /><span><b>Students:</b> ask your teacher. They can make you a new password straight away.</span></li>
           <li><Icon name="book" /><span><b>Teachers:</b> ask your school coordinator.</span></li>
-          <li><Icon name="school" /><span><b>School coordinators and parents:</b> write to VINC Lab.</span></li>
+          <li><Icon name="school" /><span><b>School coordinators and parents:</b> <a href="/contact?topic=account">write to VINC Lab</a>.</span></li>
         </ul>
         <p className="au-small">Adults get a temporary password and choose a new one after logging in.</p>
         <div className="au-modal-actions"><button type="button" className="btn primary" onClick={onClose}>Got it</button></div>
@@ -192,7 +192,7 @@ function SignupForm({ role, schoolIdParam, onBack, onDone }: { role: Role; schoo
       <div className="au-head"><h1>{title}</h1><p>{sub}</p></div>
 
       {role === 'school' && <>
-        <Field id="schoolId" label="School ID" icon="id" error={err('schoolId') || (look.error && code.length === 9 ? look.error : undefined)} hint={look.data ? <span className="au-good"><Icon name="check" /> School ID accepted{look.data.note ? ` (${look.data.note})` : ''}</span> : 'VINC Lab gives each school its own School ID. No ID yet? Contact VINC Lab.'}>
+        <Field id="schoolId" label="School ID" icon="id" error={err('schoolId') || (look.error && code.length === 9 ? look.error : undefined)} hint={look.data ? <span className="au-good"><Icon name="check" /> School ID accepted{look.data.note ? ` (${look.data.note})` : ''}</span> : <>VINC Lab gives each school its own School ID. No ID yet? <a href="/contact?topic=school">Ask for one</a>.</>}>
           <input id="schoolId" name="schoolId" required placeholder="e.g. VL-7KQ2X9" value={code} onChange={e => setCode(upper(e.target.value, 9))} autoComplete="off" spellCheck={false} />
         </Field>
         <Field id="schoolName" label="School name" icon="school" error={err('schoolName')}><input id="schoolName" name="schoolName" required maxLength={60} placeholder="e.g. Sunflower Public School" /></Field>

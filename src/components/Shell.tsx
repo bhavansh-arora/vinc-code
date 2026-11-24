@@ -5,7 +5,7 @@ import { logoutAction } from '@/app/login/actions';
 import { ROLE_HOME, ROLE_LABEL, type User } from '@/lib/types';
 
 const NAV: Record<User['role'], { href: string; label: string }[]> = {
-  admin: [{ href: '/admin', label: 'Overview' }, { href: '/assessments', label: 'Assessment bank' }],
+  admin: [{ href: '/admin', label: 'Overview' }, { href: '/admin/messages', label: 'Messages' }, { href: '/assessments', label: 'Assessment bank' }],
   school: [{ href: '/school', label: 'Overview' }, { href: '/assessments', label: 'Assessment bank' }],
   teacher: [{ href: '/teacher', label: 'My classes' }, { href: '/assessments', label: 'Assessment bank' }],
   student: [{ href: '/student', label: 'My dashboard' }, { href: '/game', label: 'Play' }],

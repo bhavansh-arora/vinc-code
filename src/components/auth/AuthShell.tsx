@@ -28,7 +28,7 @@ export default function AuthShell({ tab, role, schoolId, signedIn }: { tab: 'log
       </section>
       <main className="au-main">
         <AuthPanel initialTab={tab} initialRole={role} schoolId={schoolId} signedIn={signedIn} />
-        <p className="au-foot"><Link href="/">← Back to VINC Code</Link><span>Need help? Contact <a href="https://vinc-lab.com" target="_blank" rel="noopener">VINC Lab</a></span></p>
+        <p className="au-foot"><Link href="/">← Back to VINC Code</Link><span>Need help? <Link href="/contact">Contact VINC Lab</Link></span></p>
       </main>
     </div>
   );
