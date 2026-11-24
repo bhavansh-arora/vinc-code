@@ -1,6 +1,7 @@
 import 'server-only';
 import { q, now } from './db';
 import { hashPassword } from './passwords';
+import { familyCode, joinCode } from './codes';
 import type { Role } from './types';
 
 export interface Cred { name: string; username: string; password: string }
@@ -33,9 +34,26 @@ export function usernameFor(schoolCode: string, fullName: string, fallback = 'st
 
 export function createUser(u: { role: Role; name: string; username: string; password: string; schoolId?: number | null; sectionId?: number | null; mustChange?: boolean }): number {
   return q.run(
-    `INSERT INTO users (role, name, username, password_hash, school_id, section_id, must_change_password, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    u.role, u.name, u.username, hashPassword(u.password), u.schoolId ?? null, u.sectionId ?? null, u.mustChange ? 1 : 0, now()
+    `INSERT INTO users (role, name, username, password_hash, school_id, section_id, must_change_password, family_code, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    u.role, u.name, u.username, hashPassword(u.password), u.schoolId ?? null, u.sectionId ?? null, u.mustChange ? 1 : 0,
+    u.role === 'student' ? uniqueFamilyCode() : null, now()
   ).id;
+}
+
+/** Every student has a family code that parents use to link to them. */
+export function uniqueFamilyCode(): string {
+  let c = familyCode();
+  while (q.get('SELECT 1 FROM users WHERE family_code = ?', c)) c = familyCode();
+  return c;
+}
+
+/** New student and teacher joining codes for a school, e.g. DPS-7KQ2. */
+export function newJoinCodes(schoolCode: string): { student: string; teacher: string } {
+  const make = () => { let c = joinCode(schoolCode); while (q.get('SELECT 1 FROM schools WHERE student_code = ? OR teacher_code = ?', c, c)) c = joinCode(schoolCode); return c; };
+  const student = make();
+  let teacher = make();
+  while (teacher === student) teacher = make();
+  return { student, teacher };
 }
 
 export function setPassword(userId: number, password: string, mustChange: boolean) {

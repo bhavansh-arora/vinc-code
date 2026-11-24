@@ -3,7 +3,7 @@ import { revalidatePath } from 'next/cache';
 import { requireRole } from '@/lib/auth';
 import { q, now, tx } from '@/lib/db';
 import { tempPassword } from '@/lib/passwords';
-import { cleanName, createUser, intParam, setPassword, uniqueUsername, type ActionState } from '@/lib/accounts';
+import { cleanName, createUser, intParam, newJoinCodes, setPassword, uniqueUsername, type ActionState } from '@/lib/accounts';
 
 export async function createSchoolAction(_p: ActionState, form: FormData): Promise<ActionState> {
   await requireRole('admin');
@@ -17,7 +17,8 @@ export async function createSchoolAction(_p: ActionState, form: FormData): Promi
   if (q.get(`SELECT 1 FROM schools WHERE code = ?`, code)) return { error: `The code ${code} is already used by another school.` };
   const username = uniqueUsername(`${code.toLowerCase()}-admin`), password = tempPassword();
   tx(() => {
-    const id = q.run(`INSERT INTO schools (name, code, city, created_at) VALUES (?, ?, ?, ?)`, name, code, city, now()).id;
+    const jc = newJoinCodes(code);
+    const id = q.run(`INSERT INTO schools (name, code, city, student_code, teacher_code, created_at) VALUES (?, ?, ?, ?, ?, ?)`, name, code, city, jc.student, jc.teacher, now()).id;
     createUser({ role: 'school', name: adminName, username, password, schoolId: id, mustChange: true });
   });
   revalidatePath('/admin', 'layout');
@@ -41,4 +42,15 @@ export async function toggleSchoolAction(_p: ActionState, form: FormData): Promi
   if (s.active) q.run(`DELETE FROM sessions WHERE user_id IN (SELECT id FROM users WHERE school_id = ?)`, s.id);
   revalidatePath('/admin', 'layout');
   return { ok: s.active ? `${s.name} is switched off. Its users cannot sign in.` : `${s.name} is switched on again.` };
+}
+
+export async function issueSchoolIdAction(_p: ActionState, form: FormData): Promise<ActionState> {
+  const admin = await requireRole('admin');
+  const note = cleanName(String(form.get('note') ?? '')).slice(0, 60) || null;
+  const { schoolId } = await import('@/lib/codes');
+  let code = schoolId();
+  while (q.get('SELECT 1 FROM school_invites WHERE code = ?', code)) code = schoolId();
+  q.run('INSERT INTO school_invites (code, note, created_by, created_at) VALUES (?, ?, ?, ?)', code, note, admin.id, now());
+  revalidatePath('/admin');
+  return { ok: `School ID ${code} is ready. Send it to the school${note ? ` (${note})` : ''}. They register at /signup?role=school&id=${code}` };
 }

@@ -3,6 +3,7 @@ import type { DatabaseSync as DB } from 'node:sqlite';
 import fs from 'node:fs';
 import path from 'node:path';
 import { hashPassword } from './passwords';
+import { familyCode, joinCode } from './codes';
 
 // node:sqlite is built into Node 22.13+. Loading it through getBuiltinModule keeps the bundler away from it.
 const { DatabaseSync } = process.getBuiltinModule('node:sqlite') as typeof import('node:sqlite');
@@ -94,8 +95,83 @@ function open(): DB {
   fs.mkdirSync(path.dirname(file), { recursive: true });
   const db = new DatabaseSync(file);
   db.exec(SCHEMA);
+  migrate(db);
   bootstrapAdmin(db);
   return db;
+}
+
+/**
+ * Version 2: self sign-up. Adds the parent role, contact details, family codes for students,
+ * joining codes for schools, parent-child links and School IDs issued by VINC.
+ * Runs once on every database (new or existing) inside a transaction, keeping all data.
+ */
+function migrate(db: DB) {
+  const version = (db.prepare('PRAGMA user_version').get() as { user_version: number }).user_version;
+  if (version >= 2) return;
+  const cols = (t: string) => (db.prepare(`PRAGMA table_info(${t})`).all() as { name: string }[]).map(c => c.name);
+  db.exec('PRAGMA foreign_keys = OFF');
+  db.exec('BEGIN IMMEDIATE');
+  try {
+    if (!cols('users').includes('family_code')) {
+      db.exec(`CREATE TABLE users_v2 (
+        id INTEGER PRIMARY KEY,
+        role TEXT NOT NULL CHECK (role IN ('admin','school','teacher','student','parent')),
+        name TEXT NOT NULL,
+        username TEXT NOT NULL UNIQUE COLLATE NOCASE,
+        password_hash TEXT NOT NULL,
+        school_id INTEGER REFERENCES schools(id) ON DELETE CASCADE,
+        section_id INTEGER REFERENCES sections(id) ON DELETE SET NULL,
+        must_change_password INTEGER NOT NULL DEFAULT 0,
+        active INTEGER NOT NULL DEFAULT 1,
+        created_at TEXT NOT NULL,
+        last_login_at TEXT,
+        email TEXT,
+        phone TEXT,
+        relation TEXT,
+        family_code TEXT
+      )`);
+      db.exec(`INSERT INTO users_v2 (id, role, name, username, password_hash, school_id, section_id, must_change_password, active, created_at, last_login_at)
+               SELECT id, role, name, username, password_hash, school_id, section_id, must_change_password, active, created_at, last_login_at FROM users`);
+      db.exec('DROP TABLE users');
+      db.exec('ALTER TABLE users_v2 RENAME TO users');
+      db.exec('CREATE INDEX IF NOT EXISTS idx_users_school ON users(school_id)');
+      db.exec('CREATE INDEX IF NOT EXISTS idx_users_section ON users(section_id)');
+    }
+    for (const c of ['board', 'student_code', 'teacher_code']) if (!cols('schools').includes(c)) db.exec(`ALTER TABLE schools ADD COLUMN ${c} TEXT`);
+    db.exec(`CREATE TABLE IF NOT EXISTS parent_links (
+      parent_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      student_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      created_at TEXT NOT NULL,
+      PRIMARY KEY (parent_id, student_id)
+    )`);
+    db.exec(`CREATE TABLE IF NOT EXISTS school_invites (
+      code TEXT PRIMARY KEY,
+      note TEXT,
+      created_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+      created_at TEXT NOT NULL,
+      school_id INTEGER REFERENCES schools(id) ON DELETE SET NULL,
+      used_at TEXT
+    )`);
+    db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_users_family ON users(family_code)');
+    db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_schools_scode ON schools(student_code)');
+    db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_schools_tcode ON schools(teacher_code)');
+    db.exec('CREATE INDEX IF NOT EXISTS idx_links_student ON parent_links(student_id)');
+    for (const sc of db.prepare('SELECT id, code FROM schools WHERE student_code IS NULL OR teacher_code IS NULL').all() as { id: number; code: string }[]) {
+      db.prepare('UPDATE schools SET student_code = ?, teacher_code = ? WHERE id = ?').run(joinCode(sc.code), joinCode(sc.code), sc.id);
+    }
+    for (const st of db.prepare(`SELECT id FROM users WHERE role = 'student' AND family_code IS NULL`).all() as { id: number }[]) {
+      db.prepare('UPDATE users SET family_code = ? WHERE id = ?').run(familyCode(), st.id);
+    }
+    const broken = db.prepare('PRAGMA foreign_key_check').all();
+    if (broken.length) throw new Error('Migration found broken references: ' + JSON.stringify(broken.slice(0, 3)));
+    db.exec('PRAGMA user_version = 2');
+    db.exec('COMMIT');
+  } catch (e) {
+    db.exec('ROLLBACK');
+    throw e;
+  } finally {
+    db.exec('PRAGMA foreign_keys = ON');
+  }
 }
 
 /** On a fresh server, create the first VINC admin from ADMIN_USERNAME / ADMIN_PASSWORD. Does nothing once an admin exists. */

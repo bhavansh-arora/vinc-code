@@ -4,7 +4,7 @@ import Shell from '@/components/Shell';
 import ActionForm from '@/components/ActionForm';
 import { Bar, Empty, ScoreBadge, Stat, pct, when } from '@/components/ui';
 import { requireRole } from '@/lib/auth';
-import { assignmentsOfSection, canManageSection, canSeeSection, getSection, studentsOfSection } from '@/lib/data';
+import { assignmentsOfSection, canManageSection, canSeeSection, getSection, schoolCodes, studentsOfSection } from '@/lib/data';
 import { ASSESSMENTS } from '@/data/assessments';
 import { addStudentsAction, assignAction, removeStudentAction, resetStudentAction, unassignAction } from '@/app/teacher/actions';
 import { ROLE_HOME } from '@/lib/types';
@@ -37,6 +37,10 @@ export default async function ClassPage({ params }: { params: Promise<{ id: stri
           <Stat label="Assessments" value={assignments.length} hint="assigned to this section" />
           <Stat label="Average score" value={pct(section.avg_score)} />
         </div>
+
+        {manage && schoolCodes(section.school_id)?.student_code && (
+          <div className="alert info">Students can also join this class themselves: they choose <b>Student</b> at <b>/signup</b>, type the school&apos;s joining code <code className="mono"><b>{schoolCodes(section.school_id)!.student_code}</b></code> and pick <b>Class {section.grade} · {section.name}</b>.</div>
+        )}
 
         <section className="card">
           <div className="card-head"><h2>Students</h2><span className="small muted">Levels count towards Class {section.grade}{section.grade > 4 ? ' (practising on the Class 3–4 levels for now)' : ''}</span></div>

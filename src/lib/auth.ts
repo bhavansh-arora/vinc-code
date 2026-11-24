@@ -31,7 +31,7 @@ export type LoginResult = { ok: true; user: User } | { ok: false; error: string 
 
 export async function signIn(usernameRaw: string, password: string): Promise<LoginResult> {
   const username = usernameRaw.trim();
-  if (!username || !password) return { ok: false, error: 'Enter your username and password.' };
+  if (!username || !password) return { ok: false, error: 'Enter your User ID and password.' };
   const since = new Date(Date.now() - LOCK_MINUTES * 60_000).toISOString();
   const fails = q.get<{ n: number }>(`SELECT COUNT(*) AS n FROM login_failures WHERE username = ? AND at > ?`, username, since)!.n;
   if (fails >= MAX_FAILURES) return { ok: false, error: `Too many wrong tries. Wait ${LOCK_MINUTES} minutes, or ask your teacher to reset your password.` };
@@ -40,21 +40,26 @@ export async function signIn(usernameRaw: string, password: string): Promise<Log
   const good = row && verifyPassword(password, row.password_hash);
   if (!row || !good) {
     q.run(`INSERT INTO login_failures (username, at) VALUES (?, ?)`, username, now());
-    return { ok: false, error: 'That username or password is not right. Check your login card and try again.' };
+    return { ok: false, error: 'That User ID or password is not right. Check and try again.' };
   }
   if (!row.active || row.school_active === 0) return { ok: false, error: 'This account is switched off. Please contact your school.' };
 
   q.run(`DELETE FROM login_failures WHERE username = ?`, username);
+  await startSession(row.id, row.role);
+  return { ok: true, user: toUser(row) };
+}
+
+/** Sign a user in on this browser (after a password check or a new sign-up). */
+export async function startSession(userId: number, role: Role): Promise<void> {
   const token = randomBytes(32).toString('base64url');
-  const ms = row.role === 'student' ? STUDENT_HOURS * 3600_000 : STAFF_DAYS * 86400_000;
+  const ms = role === 'student' ? STUDENT_HOURS * 3600_000 : STAFF_DAYS * 86400_000;
   const expires = new Date(Date.now() + ms);
-  q.run(`INSERT INTO sessions (token_hash, user_id, expires_at, created_at) VALUES (?, ?, ?, ?)`, sha256(token), row.id, expires.toISOString(), now());
-  q.run(`UPDATE users SET last_login_at = ? WHERE id = ?`, now(), row.id);
+  q.run(`INSERT INTO sessions (token_hash, user_id, expires_at, created_at) VALUES (?, ?, ?, ?)`, sha256(token), userId, expires.toISOString(), now());
+  q.run(`UPDATE users SET last_login_at = ? WHERE id = ?`, now(), userId);
   q.run(`DELETE FROM sessions WHERE expires_at < ?`, now());
   (await cookies()).set(COOKIE, token, {
     httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', path: '/', expires
   });
-  return { ok: true, user: toUser(row) };
 }
 
 export async function signOut(): Promise<void> {

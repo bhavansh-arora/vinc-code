@@ -1,11 +1,11 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import ActionForm from '@/components/ActionForm';
-import { Empty, ScoreBadge, Stat, pct } from '@/components/ui';
+import { Empty, ScoreBadge, Stat, pct, when } from '@/components/ui';
 import { requireRole } from '@/lib/auth';
-import { platformStats, schoolsWithCounts } from '@/lib/data';
+import { platformStats, schoolInvites, schoolsWithCounts } from '@/lib/data';
 import { ASSESSMENTS } from '@/data/assessments';
-import { createSchoolAction } from './actions';
+import { createSchoolAction, issueSchoolIdAction } from './actions';
 
 export const metadata: Metadata = { title: 'Admin' };
 
@@ -13,6 +13,7 @@ export default async function AdminHome() {
   await requireRole('admin');
   const s = platformStats();
   const schools = schoolsWithCounts();
+  const invites = schoolInvites();
   return (
     <div className="stack">
       <div><div className="eyebrow">VINC admin</div><h1>Platform overview</h1></div>
@@ -37,6 +38,21 @@ export default async function AdminHome() {
             ))}</tbody>
           </table></div>
         ) : <Empty>No schools yet. Add the first one below.</Empty>}
+      </section>
+      <section className="card">
+        <div className="card-head"><h2>School IDs for self-registration</h2><span className="small muted">A school registers itself at /signup with its School ID</span></div>
+        {invites.length ? (
+          <div className="table-wrap" style={{ marginBottom: 14 }}><table className="data">
+            <thead><tr><th>School ID</th><th>For</th><th>Issued</th><th>Status</th></tr></thead>
+            <tbody>{invites.map(i => (
+              <tr key={i.code}><td className="mono"><b>{i.code}</b></td><td>{i.note ?? '—'}</td><td className="small">{when(i.created_at)}</td>
+                <td>{i.school_name ? <span className="badge good">used by {i.school_name}</span> : <span className="badge plain">waiting</span>}</td></tr>
+            ))}</tbody>
+          </table></div>
+        ) : <p className="small muted" style={{ marginBottom: 12 }}>No School IDs issued yet.</p>}
+        <ActionForm action={issueSchoolIdAction} submit="Issue a School ID" className="form-grid">
+          <div className="field"><label htmlFor="note">Which school is it for? (optional)</label><input className="input" id="note" name="note" maxLength={60} placeholder="e.g. Sunflower Public School, Hubballi" /></div>
+        </ActionForm>
       </section>
       <section className="card">
         <h2>Add a school</h2>

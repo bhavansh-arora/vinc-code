@@ -51,3 +51,15 @@ export async function setSectionTeacherAction(_p: ActionState, form: FormData): 
   refresh();
   return { ok: `Updated the teacher for ${sec.name}.` };
 }
+
+export async function newCodesAction(_p: ActionState, form: FormData): Promise<ActionState> {
+  const user = await requireRole('school');
+  const kind = String(form.get('kind') ?? '');
+  if (kind !== 'student' && kind !== 'teacher') return { error: 'Choose which code to change.' };
+  const sc = q.get<{ code: string }>('SELECT code FROM schools WHERE id = ?', user.schoolId!)!;
+  const { newJoinCodes } = await import('@/lib/accounts');
+  const fresh = newJoinCodes(sc.code)[kind];
+  q.run(`UPDATE schools SET ${kind === 'student' ? 'student_code' : 'teacher_code'} = ? WHERE id = ?`, fresh, user.schoolId!);
+  refresh();
+  return { ok: `New ${kind} joining code: ${fresh}. The old code no longer works. Accounts already created are not affected.` };
+}

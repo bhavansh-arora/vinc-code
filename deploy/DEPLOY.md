@@ -132,11 +132,17 @@ Copy backups off the server too, for example to cloud storage.
 
 ## Updating
 
+Take a backup first, then pull and rebuild:
+
 ```bash
+/opt/vinc-backups/backup.sh
 cd /opt/vinc-code
 git pull
 docker compose up -d --build
 ```
+
+When an update changes the database structure, the app upgrades the database by itself on its first start,
+inside a transaction, keeping all data.
 
 The database is kept in the volume, so updates never touch student data.
 To roll back: `git checkout <previous-commit> && docker compose up -d --build`.

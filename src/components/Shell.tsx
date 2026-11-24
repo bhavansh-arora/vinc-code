@@ -8,7 +8,8 @@ const NAV: Record<User['role'], { href: string; label: string }[]> = {
   admin: [{ href: '/admin', label: 'Overview' }, { href: '/assessments', label: 'Assessment bank' }],
   school: [{ href: '/school', label: 'Overview' }, { href: '/assessments', label: 'Assessment bank' }],
   teacher: [{ href: '/teacher', label: 'My classes' }, { href: '/assessments', label: 'Assessment bank' }],
-  student: [{ href: '/student', label: 'My dashboard' }, { href: '/game', label: 'Play' }]
+  student: [{ href: '/student', label: 'My dashboard' }, { href: '/game', label: 'Play' }],
+  parent: [{ href: '/parent', label: 'My children' }]
 };
 
 export default function Shell({ user, children }: { user: User; children: React.ReactNode }) {
@@ -21,7 +22,7 @@ export default function Shell({ user, children }: { user: User; children: React.
           <div className="who">
             <span><span className="role">{ROLE_LABEL[user.role]}</span><br />{user.name}</span>
             <Link className="btn small quiet" href="/account">Password</Link>
-            <form action={logoutAction}><button className="btn small">Sign out</button></form>
+            <form action={logoutAction}><button className="btn small">Log out</button></form>
           </div>
         </div>
       </header>

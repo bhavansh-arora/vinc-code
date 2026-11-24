@@ -25,8 +25,29 @@ npm run dev       # http://localhost:3000
 | Student (Class 3) | `dps-aaravk` | `demo1234` | Dashboard, assessments, the game |
 | Student (Class 4) | `dps-reyanshg` | `demo1234` | Has one assessment still to do |
 | Student (Class 6) | `dps-tarak` | `demo1234` | |
+| Parent | `sunita.gupta` | `demo1234` | Reyansh's progress and results |
+
+Demo codes for trying **Create account** at `/signup`: student joining code `DPS-JOIN`,
+teacher joining code `DPS-TCHR`, family code `REYAN4` (Reyansh), School ID `VL-DEMO26`.
 
 `npm run seed -- --reset` deletes the database and creates the demo again.
+
+## Logging in and signing up
+
+`/login` and `/signup` are one page with two tabs, **Log in** and **Create account**.
+People log in with a User ID and password. To sign up, they choose who they are:
+
+| Role | Needs | Gets |
+|---|---|---|
+| Student | The school's **student joining code** (from their teacher), then picks class and section | A **family code** for their parent |
+| Teacher | The school's **teacher joining code** (from the coordinator); can pick sections that have no teacher yet | Their sections on the teacher dashboard |
+| Parent | Their child's **family code** (on the child's dashboard) | A dashboard with each linked child's progress and results |
+| School | A **School ID** issued by VINC (Admin → School IDs) | The school, its coordinator account, and its two joining codes |
+
+Students are never asked for an email address, phone number or date of birth. The User ID is
+suggested from the name and checked live; passwords need 8+ characters and show a strength meter.
+Code lookups and sign-ups are rate-limited per network. School coordinators can replace a leaked
+joining code from their dashboard.
 
 ## Who can do what
 
@@ -41,6 +62,8 @@ npm run dev       # http://localhost:3000
 | Assign assessments, see results, allow a retake | | ✓ | ✓ | |
 | See every school's numbers | ✓ | own school | own sections | own work |
 | Play the game, take assessments | | | | ✓ |
+| Issue School IDs for self-registration | ✓ | | | |
+| See and replace joining codes | | ✓ | | |
 
 Every page and every server action checks the signed-in role **and** ownership (a teacher only
 reaches their own sections, a school admin only their own school).

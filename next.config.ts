@@ -14,7 +14,11 @@ const nextConfig: NextConfig = {
     return [{ source: '/:path*', headers: securityHeaders }];
   },
   async rewrites() {
-    return [{ source: '/game', destination: '/game/index.html' }];
+    return [
+      { source: '/game', destination: '/game/index.html' },
+      // /login and /signup are one page, so switching tabs and signing up never swaps the page out.
+      { source: '/signup', destination: '/login?tab=signup' }
+    ];
   }
 };
 

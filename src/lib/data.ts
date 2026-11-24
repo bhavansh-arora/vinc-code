@@ -166,3 +166,24 @@ export function bankByGrade() {
   for (const a of ASSESSMENTS) (out[a.grade] ||= []).push(a);
   return out;
 }
+
+/* ---------- parent ---------- */
+export function childrenOfParent(parentId: number) {
+  const kids = q.all<{ id: number; name: string; username: string; section_id: number | null; school_id: number | null; school_name: string | null }>(`
+    SELECT u.id, u.name, u.username, u.section_id, u.school_id, s.name AS school_name
+    FROM parent_links l JOIN users u ON u.id = l.student_id LEFT JOIN schools s ON s.id = u.school_id
+    WHERE l.parent_id = ? AND u.active = 1 ORDER BY u.name`, parentId);
+  return kids.map(k => ({
+    ...k,
+    home: studentHome({ id: k.id, role: 'student', name: k.name, username: k.username, schoolId: k.school_id, sectionId: k.section_id, mustChangePassword: false })
+  }));
+}
+
+export function schoolCodes(schoolId: number) {
+  return q.get<{ student_code: string | null; teacher_code: string | null }>('SELECT student_code, teacher_code FROM schools WHERE id = ?', schoolId);
+}
+
+export function schoolInvites() {
+  return q.all<{ code: string; note: string | null; created_at: string; used_at: string | null; school_name: string | null }>(`
+    SELECT i.code, i.note, i.created_at, i.used_at, s.name AS school_name FROM school_invites i LEFT JOIN schools s ON s.id = i.school_id ORDER BY i.created_at DESC LIMIT 50`);
+}

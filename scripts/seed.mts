@@ -38,8 +38,9 @@ const daysAgo = (d: number) => new Date(Date.now() - d * 86400_000).toISOString(
 
 tx(() => {
   createUser({ role: 'admin', name: 'VINC Admin', username: 'admin', password: 'vinc-demo-admin' });
-  const schoolId = q.run(`INSERT INTO schools (name, code, city, created_at) VALUES (?, ?, ?, ?)`, 'Demo Public School', 'DPS', 'Bengaluru', now()).id;
-  q.run(`INSERT INTO schools (name, code, city, created_at) VALUES (?, ?, ?, ?)`, 'Green Valley School', 'GVS', 'Mysuru', now());
+  const schoolId = q.run(`INSERT INTO schools (name, code, city, board, student_code, teacher_code, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)`, 'Demo Public School', 'DPS', 'Bengaluru', 'CBSE', 'DPS-JOIN', 'DPS-TCHR', now()).id;
+  q.run(`INSERT INTO schools (name, code, city, board, student_code, teacher_code, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)`, 'Green Valley School', 'GVS', 'Mysuru', 'State board', 'GVS-JOIN', 'GVS-TCHR', now());
+  q.run(`INSERT INTO school_invites (code, note, created_at) VALUES (?, ?, ?)`, 'VL-DEMO26', 'Demo: any new school', now());
   createUser({ role: 'school', name: 'Anita Rao', username: 'dps-admin', password: DEMO, schoolId });
   createUser({ role: 'school', name: 'Suresh Gowda', username: 'gvs-admin', password: DEMO, schoolId: 2, mustChange: true });
   const meera = createUser({ role: 'teacher', name: 'Meera Iyer', username: 'dps-meerai', password: DEMO, schoolId });
@@ -76,6 +77,12 @@ tx(() => {
       });
     });
   }
+  // A demo parent linked to Reyansh, with an easy family code.
+  const rey = q.get<{ id: number }>(`SELECT id FROM users WHERE username = 'dps-reyanshg'`)!.id;
+  q.run(`UPDATE users SET family_code = 'REYAN4' WHERE id = ?`, rey);
+  const mum = createUser({ role: 'parent', name: 'Sunita Gupta', username: 'sunita.gupta', password: DEMO });
+  q.run(`UPDATE users SET relation = 'Mother', phone = '9800000000' WHERE id = ?`, mum);
+  q.run(`INSERT INTO parent_links (parent_id, student_id, created_at) VALUES (?, ?, ?)`, mum, rey, now());
 });
 
 console.log(`Demo data created in ${dbFile}
@@ -88,5 +95,10 @@ console.log(`Demo data created in ${dbFile}
   Student       dps-aaravk      ${DEMO}   (Class 3, section 3-A)
   Student       dps-reyanshg    ${DEMO}   (Class 4, section 4-A)
   Student       dps-tarak       ${DEMO}   (Class 6, section 6-B)
+  Parent        sunita.gupta    ${DEMO}   (Reyansh's mother)
+
+Sign-up codes for trying /signup:
+  Student joining code   DPS-JOIN     Teacher joining code   DPS-TCHR
+  Family code (Reyansh)  REYAN4       School ID              VL-DEMO26
 
 These are demo passwords. Never use demo data on a live site.`);

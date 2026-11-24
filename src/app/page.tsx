@@ -46,7 +46,8 @@ export default async function Home() {
           <a href="#classes">Classes 3–8</a>
           <a href="#schools">For schools</a>
         </nav>
-        <Link className="btn primary" href="/login">Sign in</Link>
+        <Link className="btn quiet" href="/login">Log in</Link>
+        <Link className="btn primary" href="/signup">Create account</Link>
       </header>
 
       <main>
@@ -61,8 +62,8 @@ export default async function Home() {
               every crash is a bug to catch, and every class finished wins Vinc a new part.
             </p>
             <div className="lp-cta lp-rise" style={{ animationDelay: '240ms' }}>
-              <Link className="btn primary lp-big" href="/login">Sign in to play</Link>
-              <a className="btn lp-big" href="#how">See how it works</a>
+              <Link className="btn primary lp-big" href="/signup">Create an account</Link>
+              <Link className="btn lp-big" href="/login">Log in</Link>
             </div>
             <ul className="lp-facts lp-rise" style={{ animationDelay: '320ms' }}>
               <li><b>{LEVELS.length}</b> playable 3D levels</li>
@@ -155,7 +156,7 @@ export default async function Home() {
                 <p>VINC Lab sets up your school, teachers and classes, and runs hands-on robotics sessions with the real Vinc.</p>
                 <div className="lp-cta">
                   <a className="btn primary lp-big" href="https://vinc-lab.com" target="_blank" rel="noopener">Contact VINC Lab</a>
-                  <Link className="btn lp-big lp-light" href="/login">Already set up? Sign in</Link>
+                  <Link className="btn lp-big lp-light" href="/signup?role=school">Have a School ID? Register</Link>
                 </div>
               </div>
             </div>

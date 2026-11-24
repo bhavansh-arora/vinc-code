@@ -4,12 +4,14 @@ import VincArt from '@/components/VincArt';
 import { Bar, Empty, ScoreBadge, Stars, when } from '@/components/ui';
 import { requireRole } from '@/lib/auth';
 import { studentHome } from '@/lib/data';
+import { q } from '@/lib/db';
 
 export const metadata: Metadata = { title: 'My dashboard' };
 
 export default async function StudentHome() {
   const user = await requireRole('student');
   const h = studentHome(user);
+  const fam = q.get<{ family_code: string | null }>('SELECT family_code FROM users WHERE id = ?', user.id)?.family_code;
   const done = h.levels.filter(l => l.stars > 0).length;
   const todo = h.assignments.filter(a => a.score === null);
   const finished = h.assignments.filter(a => a.score !== null);
@@ -51,6 +53,12 @@ export default async function StudentHome() {
           </div>
         </section>
       </div>
+      {fam && (
+        <section className="card spread">
+          <div><h2>Your family code</h2><p className="small muted">Give this code to your parent. They can sign up as a Parent and follow your progress.</p></div>
+          <code className="family-code">{fam}</code>
+        </section>
+      )}
     </div>
   );
 }

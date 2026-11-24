@@ -3,8 +3,8 @@ import type { Metadata } from 'next';
 import ActionForm from '@/components/ActionForm';
 import { Bar, Empty, ScoreBadge, Stat, pct, when } from '@/components/ui';
 import { requireRole } from '@/lib/auth';
-import { getSchool, gradeSummary, schoolStats, sectionsOfSchool, teachersOfSchool } from '@/lib/data';
-import { createSectionAction, createTeacherAction, resetTeacherAction, setSectionTeacherAction } from './actions';
+import { getSchool, gradeSummary, schoolCodes, schoolStats, sectionsOfSchool, teachersOfSchool } from '@/lib/data';
+import { createSectionAction, createTeacherAction, newCodesAction, resetTeacherAction, setSectionTeacherAction } from './actions';
 
 export const metadata: Metadata = { title: 'School' };
 
@@ -12,6 +12,7 @@ export default async function SchoolHome({ searchParams }: { searchParams: Promi
   const user = await requireRole('school');
   const { pw } = await searchParams;
   const school = getSchool(user.schoolId!)!;
+  const codes = schoolCodes(school.id);
   const st = schoolStats(school.id), grades = gradeSummary(school.id), sections = sectionsOfSchool(school.id), teachers = teachersOfSchool(school.id);
   return (
     <div className="stack">
@@ -20,6 +21,15 @@ export default async function SchoolHome({ searchParams }: { searchParams: Promi
       <div className="stats">
         <Stat label="Teachers" value={st.teachers} /><Stat label="Sections" value={st.sections} /><Stat label="Students" value={st.students} /><Stat label="Average score" value={pct(st.avgScore)} hint="all assessments" />
       </div>
+      <section className="card">
+        <div className="card-head"><h2>Joining codes</h2><span className="small muted">People sign up themselves at <b>/signup</b> with these codes</span></div>
+        <div className="grid-2">
+          <div className="code-box"><span className="label">For teachers</span><code>{codes?.teacher_code ?? '—'}</code><span className="small muted">Share with your teachers only. They choose their sections when they sign up.</span>
+            <ActionForm action={newCodesAction} submit="Make a new teacher code" className="row" buttonClass="btn small quiet"><input type="hidden" name="kind" value="teacher" /></ActionForm></div>
+          <div className="code-box"><span className="label">For students</span><code>{codes?.student_code ?? '—'}</code><span className="small muted">Teachers give this to their students. Students pick their class and section.</span>
+            <ActionForm action={newCodesAction} submit="Make a new student code" className="row" buttonClass="btn small quiet"><input type="hidden" name="kind" value="student" /></ActionForm></div>
+        </div>
+      </section>
       <section className="card">
         <div className="card-head"><h2>How each class is doing</h2></div>
         {grades.length ? <div className="table-wrap"><table className="data">
