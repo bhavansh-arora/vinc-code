@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
 import VincArt from '@/components/VincArt';
-import HeroVinc from '@/components/landing/HeroVinc';
+import HeroVinc3D from '@/components/landing/HeroVinc3D';
 import SpeechCycle from '@/components/landing/SpeechCycle';
 import CodeDemo from '@/components/landing/CodeDemo';
 import Reveal from '@/components/landing/Reveal';
@@ -72,7 +72,7 @@ export default async function Home() {
           </div>
           <div className="lp-hero-art">
             <div className="lp-stage" aria-hidden="true"><span className="lp-ring r1" /><span className="lp-ring r2" /><span className="lp-orbit"><i>✦</i></span></div>
-            <HeroVinc />
+            <HeroVinc3D />
             <SpeechCycle />
             <span className="lp-chip c1">step()</span>
             <span className="lp-chip c2">repeat 3:</span>

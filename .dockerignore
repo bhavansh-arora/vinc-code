@@ -7,4 +7,5 @@ data/*.db-*
 .env.*
 !.env.example
 public/game/index.html
+public/vinc3d.js
 *.tsbuildinfo

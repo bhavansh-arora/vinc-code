@@ -9,6 +9,13 @@ import path from 'node:path';
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 let src = fs.readFileSync(path.join(root, 'game/vinc-game.html'), 'utf8');
 
+// The 3D engine (window.V3D) is also published on its own, so the landing page can show the 3D Vinc.
+const engineStart = src.indexOf('/* ---------- Vinc 3D engine');
+const engineEnd = src.indexOf('</script>', engineStart);
+if (engineStart < 0 || engineEnd < 0) throw new Error('build-game: could not find the 3D engine');
+fs.mkdirSync(path.join(root, 'public'), { recursive: true });
+fs.writeFileSync(path.join(root, 'public/vinc3d.js'), src.slice(engineStart, engineEnd));
+
 function replaceOnce(from, to) {
   const i = src.indexOf(from);
   if (i < 0 || src.indexOf(from, i + 1) >= 0) throw new Error('build-game: expected exactly one match for: ' + from.slice(0, 70));

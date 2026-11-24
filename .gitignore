@@ -13,3 +13,4 @@ npm-debug.log*
 public/game/index.html
 # Server-specific Docker settings (e.g. joining Caddy's network). See deploy/DEPLOY.md.
 docker-compose.override.yml
+public/vinc3d.js

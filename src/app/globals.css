@@ -310,3 +310,10 @@ html { scroll-behavior: smooth; }
   .lp *, .lp *::before, .lp *::after { animation: none !important; transition: none !important; }
   .lp-float { display: none; }
 }
+/* 3D Vinc on the landing page (falls back to the 2D drawing) */
+.lp-vinc-btn { position: relative; z-index: 1; display: grid; place-items: center; width: min(92%, 440px); background: none; border: 0; padding: 0; cursor: pointer; border-radius: 24px; }
+.lp-vinc-btn .lp-vinc { width: min(80%, 330px); }
+.lp-vinc3d { display: none; width: 100%; height: auto; aspect-ratio: 1 / 1.05; }
+.lp-vinc-btn.is3d .lp-vinc3d { display: block; }
+.lp-vinc-btn.is3d .lp-vinc { display: none; }
+.lp-tap { position: absolute; bottom: 2%; left: 50%; transform: translateX(-50%); font-family: var(--mono); font-size: .74rem; color: var(--muted); }
