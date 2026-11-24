@@ -32,6 +32,27 @@ teacher joining code `DPS-TCHR`, family code `REYAN4` (Reyansh), School ID `VL-D
 
 `npm run seed -- --reset` deletes the database and creates the demo again.
 
+## Play: the game (`/play`)
+
+Anyone can play from the landing page's **Start playing** button, with no login. Guests' stars are kept in their browser;
+when a student logs in, those levels are re-checked and saved to their account. Students' progress saves to the account
+(the server re-runs every program, so wins and stars cannot be faked) and shows on the teacher's class page.
+
+| Track | Who | Chapters | How you code |
+|---|---|---|---|
+| **Junior** | Classes 3–4 | First Steps · Big Plans · Loop Hill · Jumping River (24 levels: the Class 3–4 block lessons) | Drag or tap **picture-only blocks** into a row of slots, press the big ▶ |
+| **Adventure** | Classes 5–8 | Spark Island · Loop Lagoon · Sensor Jungle · Function Factory (32 levels, `src/data/adventure.ts`) | Type **VincScript**: `step(3)`, `turn_left()`, `for`, `while`, `if/elif/else`, `def` (`src/lib/vincscript.ts`) |
+
+- A world map with chapter medallions (each with its crew tutor), progress, stars and locks: finish a chapter to open the next.
+- Each level opens with a tutor card that is **read aloud** (the browser's speech; 🗣 switches it off), has sound effects (🔊),
+  hints, a pointing-hand tutorial on the very first level, a **ruler** in Adventure (tap a square to count the squares),
+  friendly error messages ("Did you mean step?") and a 3-star win screen. Fewer blocks or lines earn more stars.
+- Every level is a themed 3D world (meadow, orchard, hills, river, beach, lagoon, jungle, factory) built by the game engine.
+- Teachers and school admins can open any level, and a 👁 button loads the answer.
+- Class 3–4 students' **Lessons** link now opens the Junior game; Classes 5–8 keep their Python lessons and also get Adventure.
+
+`npm run check:lessons` proves every Junior and Adventure model answer wins with 3 stars and every starter fails.
+
 ## Logging in and signing up
 
 `/login` and `/signup` are one page with two tabs, **Log in** and **Create account**.

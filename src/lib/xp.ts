@@ -1,5 +1,6 @@
 /** Lesson XP and ranks. XP comes from the lesson type plus 5 per star (best stars per lesson). */
-import { LESSONS, lessonXp } from '@/data/lessons';
+import { LESSONS, lessonXp, type LessonType } from '@/data/lessons';
+import { ADVENTURE } from '@/data/adventure';
 
 export const RANKS = [
   { xp: 0, name: 'Spark Rookie', icon: '✦' },
@@ -18,7 +19,10 @@ export function rankOf(xp: number) {
   return { ...cur, level: i + 1, next, progress: next ? (xp - cur.xp) / (next.xp - cur.xp) : 1 };
 }
 
-const TYPE = new Map(LESSONS.map(l => [l.id, l.type]));
+const TYPE = new Map<string, LessonType>([
+  ...LESSONS.map(l => [l.id, l.type] as [string, LessonType]),
+  ...ADVENTURE.map(l => [l.id, l.boss ? 'Boss' : l.debug ? 'Catch Glitch' : 'Puzzle'] as [string, LessonType])
+]);
 /** Total XP from a student's best stars, keyed by lesson id. */
 export function totalXp(stars: Iterable<[string, number]>) {
   let xp = 0;

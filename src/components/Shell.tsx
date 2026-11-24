@@ -8,7 +8,7 @@ const NAV: Record<User['role'], { href: string; label: string }[]> = {
   admin: [{ href: '/admin', label: 'Overview' }, { href: '/admin/messages', label: 'Messages' }, { href: '/lessons', label: 'Lessons' }, { href: '/assessments', label: 'Assessment bank' }],
   school: [{ href: '/school', label: 'Overview' }, { href: '/lessons', label: 'Lessons' }, { href: '/assessments', label: 'Assessment bank' }],
   teacher: [{ href: '/teacher', label: 'My classes' }, { href: '/lessons', label: 'Lessons' }, { href: '/assessments', label: 'Assessment bank' }],
-  student: [{ href: '/student', label: 'My dashboard' }, { href: '/student/lessons', label: 'Lessons' }, { href: '/game', label: 'Play' }],
+  student: [{ href: '/student', label: 'My dashboard' }, { href: '/play', label: 'Play' }, { href: '/student/lessons', label: 'Lessons' }, { href: '/game', label: 'Workshop' }],
   parent: [{ href: '/parent', label: 'My children' }]
 };
 

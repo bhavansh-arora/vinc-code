@@ -7,7 +7,8 @@ const DR = [-1, 0, 1, 0], DC = [0, 1, 0, -1];
 const TILES: Record<string, string> = { r: 'red', g: 'green', b: 'blue' };
 type Pos = { r: number; c: number; d: number };
 type Engine = {
-  build(P: { rows: number; cols: number; crates: Record<string, boolean>; sparks: string[]; tiles: Record<string, string> }): void;
+  build(P: { rows: number; cols: number; crates: Record<string, boolean>; sparks: string[]; tiles: Record<string, string>; theme?: string }): void;
+  pick?(x: number, y: number): { r: number; c: number } | null; mark?(keys: string[]): void; onTile?: ((t: { r: number; c: number } | null) => void) | null;
   place(p: Pos, ms: number, jump?: boolean): void; reset(): void; collect(k: string): void;
   bump(p: Pos, nr: number, nc: number, off: boolean): void; win(): void; dispose?(): void;
 };
@@ -56,7 +57,11 @@ function Board2D({ map, trace, frame }: { map: string[]; trace: TraceStep[]; fra
  * Vinc's board in 3D (the same Three.js engine as the game). `frame` is how far through `trace` the animation is;
  * -1 shows the start. Moving `frame` forward animates each step; `won` plays the victory dance at the end.
  */
-export default function Board3D({ map, trace, frame, won, stepMs }: { map: string[]; trace: TraceStep[]; frame: number; won: boolean; stepMs: number }) {
+export default function Board3D({ map, trace, frame, won, stepMs, theme, onTile, marks, className, hint = true, onReady }: {
+  map: string[]; trace: TraceStep[]; frame: number; won: boolean; stepMs: number;
+  /** A themed world around the board (the /play game). */
+  theme?: string; onTile?: (t: { r: number; c: number } | null) => void; marks?: string[]; className?: string; hint?: boolean; onReady?: (is3d: boolean) => void;
+}) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const eng = useRef<Engine | null>(null);
   const shown = useRef(-1);
@@ -67,8 +72,8 @@ export default function Board3D({ map, trace, frame, won, stepMs }: { map: strin
     load(THREE_SRC).then(() => load('/vinc3d.js')).then(() => {
       const v = (window as unknown as { V3D?: V3D }).V3D;
       if (cancelled || !v?.ok || !canvas.current) return;
-      try { eng.current = v.initBoard(canvas.current); setReady(true); } catch { /* keep 2D */ }
-    }).catch(() => { /* keep 2D */ });
+      try { eng.current = v.initBoard(canvas.current); setReady(true); onReady?.(true); } catch { onReady?.(false); }
+    }).catch(() => { onReady?.(false); });
     return () => { cancelled = true; eng.current?.dispose?.(); eng.current = null; };
   }, []);
 
@@ -80,9 +85,12 @@ export default function Board3D({ map, trace, frame, won, stepMs }: { map: strin
       const k = r + ',' + c;
       if (ch === '#') crates[k] = true; else if (ch === '*') sparks.push(k); else if (TILES[ch]) tiles[k] = TILES[ch];
     }));
-    B.build({ rows: map.length, cols: map[0].length, crates, sparks, tiles });
+    B.build({ rows: map.length, cols: map[0].length, crates, sparks, tiles, theme });
     B.reset(); B.place(startOf(map), 0); shown.current = -1;
-  }, [ready, map]);
+  }, [ready, map, theme]);
+
+  useEffect(() => { const B = eng.current; if (ready && B) B.onTile = onTile ?? null; }, [ready, onTile]);
+  useEffect(() => { const B = eng.current; if (ready && B?.mark) B.mark(marks ?? []); }, [ready, marks, map]);
 
   // Play the trace up to `frame`.
   useEffect(() => {
@@ -105,10 +113,10 @@ export default function Board3D({ map, trace, frame, won, stepMs }: { map: strin
   }, [ready, frame, trace, map, won, stepMs]);
 
   return (
-    <div className={'b3d' + (ready ? ' is3d' : '')}>
+    <div className={'b3d' + (ready ? ' is3d' : '') + (className ? ' ' + className : '')}>
       <canvas ref={canvas} className="b3d-canvas" aria-label="3D board. Drag sideways to turn it." />
       {!ready && <Board2D map={map} trace={trace} frame={frame} />}
-      {ready && <span className="b3d-hint">drag to turn · double-click to reset</span>}
+      {ready && hint && <span className="b3d-hint">drag to turn · double-click to reset</span>}
     </div>
   );
 }

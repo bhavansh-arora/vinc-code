@@ -12,7 +12,8 @@ import { BLOCK_LESSONS } from './blockLessons';
 import { countBlocks, parseBlocks, type BlockName, type BlocksCheck } from '@/lib/blocks';
 import type { CharId } from '@/lib/crew';
 
-export type LessonType = 'Learn' | 'Puzzle' | 'Catch Glitch' | 'Challenge' | 'Boss';
+import { lessonXp, TYPE_XP, type LessonType } from '@/lib/playcore';
+export { lessonXp, TYPE_XP, type LessonType };
 export interface Require { uses?: string[]; calls?: string[]; defines?: string[]; maxLines?: number }
 export type Check =
   | { kind: 'vinc'; maps: string[][]; require?: Require; expectOutputs?: string[]; events?: string[] | string[][] }
@@ -561,9 +562,7 @@ export const LESSON_GRADES = [3, 4, 5, 6, 7, 8];
 export const isBlockLesson = (l: Pick<Lesson, 'check'>) => l.check.kind === 'blocks';
 /** Block lessons: the model solution's block count, which earns 3 stars. */
 export const parOf = (l: Lesson) => (l.check.kind === 'blocks' ? countBlocks(parseBlocks(l.solution)) : 0);
-/** XP for a lesson type; stars add a bonus. */
-export const TYPE_XP: Record<LessonType, number> = { Learn: 10, Puzzle: 15, 'Catch Glitch': 20, Challenge: 25, Boss: 40 };
-export const lessonXp = (type: LessonType, stars: number) => (stars > 0 ? TYPE_XP[type] + 5 * stars : 0);
+
 export const lessonById = (id: string) => LESSONS.find(l => l.id === id);
 export const lessonsForGrade = (g: number) => LESSONS.filter(l => l.grade === g);
 export const LESSON_IDS = new Set(LESSONS.map(l => l.id));

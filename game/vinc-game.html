@@ -808,7 +808,8 @@ footer { padding-block: 28px 40px; border-top: 1px solid var(--line); font-famil
   }
   V.initBoard = function (canvas) {
     var v = makeView(canvas, 36), key = lights(v.scene, 5);
-    var world = new T.Group(), tilesG = new T.Group(), propsG = new T.Group(), fxG = new T.Group(); v.scene.add(world); world.add(tilesG, propsG, fxG);
+    var world = new T.Group(), tilesG = new T.Group(), propsG = new T.Group(), fxG = new T.Group(), sceneG = new T.Group(); v.scene.add(world); world.add(sceneG, tilesG, propsG, fxG);
+    var tileMesh = {}, marked = [], downX = 0, downY = 0;
     var FY = .05, SC = .43, YAW = [PI, PI / 2, 0, -PI / 2];
     var tileA = std({ roughness: .75 }), tileB = std({ roughness: .75 }), baseM = plastic({ color: L('#6B4A33'), clearcoat: .2 });
     var crateM = std({ map: crateTex(), roughness: .78 });
@@ -844,10 +845,12 @@ footer { padding-block: 28px 40px; border-top: 1px solid var(--line); font-famil
       try { v.renderer.dispose(); v.renderer.forceContextLoss(); } catch (e) {}
     };
     B.build = function (P) {
-      rows = P.rows; cols = P.cols; clear(tilesG); clear(propsG); sparks = {}; refresh();
+      rows = P.rows; cols = P.cols; clear(tilesG); clear(propsG); clear(sceneG); sparks = {}; tileMesh = {}; marked = []; refresh();
+      if (P.theme) scenery(P.theme);
       var base = mesh(new T.BoxGeometry(cols + .45, .4, rows + .45), baseM); base.position.y = -.25; tilesG.add(base);
       for (var r = 0; r < rows; r++) for (var c = 0; c < cols; c++) {
         var k = r + ',' + c, tm = P.tiles && P.tiles[k] ? tileM(P.tiles[k]) : (r + c) % 2 ? tileB : tileA, tile = mesh(tileGeo, tm, false); tile.position.set(wx(c), 0, wz(r)); tilesG.add(tile);
+        tile.userData = { r: r, c: c, m: tm }; tileMesh[k] = tile;
         if (P.crates[k]) { var cr = mesh(crateGeo, crateM); cr.position.set(wx(c), FY + .38, wz(r)); cr.rotation.y = ((r * 7 + c * 3) % 5 - 2) * .04; propsG.add(cr); }
         if (P.sparks.indexOf(k) >= 0) {
           var sg = new T.Group(), star = mesh(sGeo, sparkM), glow = new T.Sprite(glowM);
@@ -856,8 +859,60 @@ footer { padding-block: 28px 40px; border-top: 1px solid var(--line); font-famil
         }
       }
       var n = Math.max(rows, cols), sc = key.shadow.camera; sc.left = sc.bottom = -(n / 2 + 1.5); sc.right = sc.top = n / 2 + 1.5; sc.updateProjectionMatrix();
-      v.dist = n * 1.45 + 2.6;
+      v.dist = n * 1.45 + (P.theme ? 3.4 : 2.6);
     };
+    /* ----- themed world around the board ----- */
+    var THEMES = {
+      meadow: { ground: '#7DBB4E', props: 'tree', leaf: '#4E9A3A', extra: 'flower' },
+      orchard: { ground: '#86B957', props: 'tree', leaf: '#3F8A3A', fruit: '#E8762C', extra: 'flower' },
+      hills: { ground: '#6FAF55', props: 'pine', leaf: '#2F7A4A', extra: 'rock' },
+      river: { ground: '#78B04D', props: 'tree', leaf: '#4E9A3A', water: '#4FA9D8', extra: 'rock' },
+      beach: { ground: '#EBD3A0', props: 'palm', leaf: '#3E9B4F', water: '#45B3CF', extra: 'shell' },
+      lagoon: { ground: '#E3CF9C', props: 'palm', leaf: '#2F8C55', water: '#2FA3B8', extra: 'rock' },
+      jungle: { ground: '#3F7D3A', props: 'tree', leaf: '#2E6B2C', fruit: '#E8B030', extra: 'fern' },
+      factory: { ground: '#6B6F7A', props: 'pipe', leaf: '#8C3557', extra: 'crate' }
+    };
+    function rnd(i) { var x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); }
+    function scenery(name) {
+      var th = THEMES[name] || THEMES.meadow, n = Math.max(rows, cols), R = n / 2 + 4.2;
+      var g = mesh(new T.CylinderGeometry(R, R + .3, .3, 48), std({ color: L(th.ground), roughness: .95 }), false); g.position.y = -.6; sceneG.add(g);
+      if (th.water) { var w = mesh(new T.CylinderGeometry(R + 2.6, R + 2.6, .1, 48), std({ color: L(th.water), roughness: .25, metalness: .1, transparent: true, opacity: .9 }), false); w.position.y = -.72; sceneG.add(w); }
+      var leafM = std({ color: L(th.leaf), roughness: .8 }), trunkM = std({ color: L('#7A5232'), roughness: .9 }), fruitM = th.fruit ? std({ color: L(th.fruit), emissive: L(th.fruit), emissiveIntensity: .15 }) : null;
+      var greyM = std({ color: L('#8B8F99'), roughness: .5, metalness: .4 }), accentM = std({ color: L(th.leaf), roughness: .4, metalness: .3 });
+      var count = 16 + n * 2;
+      for (var i = 0; i < count; i++) {
+        var a = i / count * PI * 2 + rnd(i) * .3, rr = n / 2 + 1.3 + rnd(i + 50) * (R - n / 2 - 1.8), x = Math.cos(a) * rr, z = Math.sin(a) * rr, s = .7 + rnd(i + 90) * .6;
+        var o = new T.Group(); o.position.set(x, -.45, z); o.rotation.y = rnd(i + 7) * PI * 2; o.scale.setScalar(s);
+        var kind = i % 3 === 2 ? th.extra : th.props;
+        if (kind === 'tree') { var t1 = mesh(new T.CylinderGeometry(.07, .1, .6, 8), trunkM); t1.position.y = .3; var t2 = mesh(new T.IcosahedronGeometry(.42, 1), leafM); t2.position.y = .85; o.add(t1, t2);
+          if (fruitM) for (var f = 0; f < 4; f++) { var fr = mesh(new T.SphereGeometry(.06, 8, 6), fruitM); fr.position.set(Math.cos(f * 1.7) * .36, .8 + (f % 2) * .18, Math.sin(f * 1.7) * .36); o.add(fr); } }
+        else if (kind === 'pine') { var p1 = mesh(new T.CylinderGeometry(.06, .08, .4, 8), trunkM); p1.position.y = .2; o.add(p1); for (var q = 0; q < 3; q++) { var cn = mesh(new T.ConeGeometry(.42 - q * .1, .5, 10), leafM); cn.position.y = .55 + q * .28; o.add(cn); } }
+        else if (kind === 'palm') { var tr = mesh(new T.CylinderGeometry(.05, .09, 1.1, 8), trunkM); tr.position.y = .55; tr.rotation.z = .15; o.add(tr); for (var l = 0; l < 5; l++) { var lf = mesh(new T.ConeGeometry(.12, .7, 4), leafM); lf.position.set(Math.cos(l * 1.26) * .28 + .08, 1.1, Math.sin(l * 1.26) * .28); lf.rotation.set(Math.sin(l * 1.26) * 1.2, 0, -Math.cos(l * 1.26) * 1.2); o.add(lf); } }
+        else if (kind === 'pipe') { var pp = mesh(new T.CylinderGeometry(.14, .14, .9 + rnd(i) * .8, 14), greyM); pp.position.y = .5; var cap = mesh(new T.TorusGeometry(.16, .05, 8, 16), accentM); cap.rotation.x = PI / 2; cap.position.y = 1 + rnd(i) * .4; o.add(pp, cap); }
+        else if (kind === 'rock') { var rk = mesh(new T.DodecahedronGeometry(.25, 0), greyM); rk.position.y = .12; rk.scale.set(1.2, .7, 1); o.add(rk); }
+        else if (kind === 'flower') { for (var fl = 0; fl < 3; fl++) { var st = mesh(new T.CylinderGeometry(.015, .015, .3, 5), leafM); st.position.set(fl * .12 - .12, .15, rnd(i + fl) * .2); var bl = mesh(new T.SphereGeometry(.07, 8, 6), std({ color: L(['#E8762C', '#E0A0C8', '#F7D774'][fl]) })); bl.position.set(fl * .12 - .12, .32, rnd(i + fl) * .2); o.add(st, bl); } }
+        else if (kind === 'shell') { var sh = mesh(new T.ConeGeometry(.12, .2, 8), std({ color: L('#F2B8A8') })); sh.position.y = .1; sh.rotation.z = PI / 2; o.add(sh); }
+        else if (kind === 'fern') { for (var fe = 0; fe < 4; fe++) { var fn = mesh(new T.ConeGeometry(.08, .5, 4), leafM); fn.position.set(0, .2, 0); fn.rotation.set(Math.cos(fe * 1.57) * .8, 0, Math.sin(fe * 1.57) * .8); o.add(fn); } }
+        else if (kind === 'crate') { var cb = mesh(new T.BoxGeometry(.45, .45, .45), crateM); cb.position.y = .22; o.add(cb); }
+        sceneG.add(o);
+      }
+    }
+    /* ----- tapping a square, and highlighting squares (the ruler) ----- */
+    var ray = new T.Raycaster(), ndc = new T.Vector2(), markM = std({ color: L('#F7D774'), emissive: L('#F0B44C'), emissiveIntensity: .55, roughness: .5 });
+    B.pick = function (clientX, clientY) {
+      var rc = canvas.getBoundingClientRect(); ndc.set((clientX - rc.left) / rc.width * 2 - 1, -((clientY - rc.top) / rc.height) * 2 + 1);
+      ray.setFromCamera(ndc, v.camera);
+      var hits = ray.intersectObjects(tilesG.children, false);
+      for (var i = 0; i < hits.length; i++) if (hits[i].object.userData && hits[i].object.userData.m) return { r: hits[i].object.userData.r, c: hits[i].object.userData.c };
+      return null;
+    };
+    B.mark = function (keys) {
+      marked.forEach(function (k) { var t = tileMesh[k]; if (t) t.material = t.userData.m; });
+      marked = (keys || []).filter(function (k) { return tileMesh[k]; });
+      marked.forEach(function (k) { tileMesh[k].material = markM; });
+    };
+    canvas.addEventListener('pointerdown', function (e) { downX = e.clientX; downY = e.clientY; });
+    canvas.addEventListener('pointerup', function (e) { if (B.onTile && Math.hypot(e.clientX - downX, e.clientY - downY) < 6) B.onTile(B.pick(e.clientX, e.clientY)); });
     B.place = function (pos, dur, jump) {
       var ty = YAW[pos.d], d = ((ty - cur.yaw) % (2 * PI) + 3 * PI) % (2 * PI) - PI;
       var to = { x: wx(pos.c), z: wz(pos.r), yaw: cur.yaw + d };
@@ -937,7 +992,7 @@ footer { padding-block: 28px 40px; border-top: 1px solid var(--line); font-famil
         q.m.scale.setScalar(Math.max(.001, Math.min(1, q.life / q.max * 2.5)));
       }
       yawOff += (yawAim - yawOff) * Math.min(1, dt * 6);
-      var el = .8, R = v.dist || 9, yaw = yawOff;
+      var el = .8, R = (v.dist || 9) * Math.max(1, 1.25 / (v.camera.aspect || 1)), yaw = yawOff;
       v.camera.position.set(Math.sin(yaw) * R * Math.cos(el), R * Math.sin(el), Math.cos(yaw) * R * Math.cos(el));
       var sk = (t - shakeT) / .3;
       if (sk >= 0 && sk < 1 && !reduce) { v.camera.position.x += (Math.random() - .5) * .12 * (1 - sk); v.camera.position.y += (Math.random() - .5) * .08 * (1 - sk); }

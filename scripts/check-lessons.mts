@@ -41,6 +41,28 @@ for (const l of blocks) {
 }
 console.log(`${blocks.length} block lessons checked`);
 
+// The Adventure game (typed VincScript) and the /play chapters.
+const { ADVENTURE } = await import('../src/data/adventure');
+const { checkScript, countLines } = await import('../src/lib/vincscript');
+const { CHAPTERS, playLevel } = await import('../src/data/play');
+for (const l of ADVENTURE) {
+  if (ids.has(l.id)) fail(l.id, 'duplicate id'); ids.add(l.id);
+  if (!crewIds.has(l.tutor)) fail(l.id, 'unknown tutor ' + l.tutor);
+  for (const m of l.check.maps) {
+    if (new Set(m.map(r => r.length)).size !== 1) fail(l.id, 'a board has rows of different lengths');
+    if (m.join('').replace(/[^\^>v<]/g, '').length !== 1) fail(l.id, 'a board needs exactly one Vinc');
+  }
+  const s = checkScript(l.check, l.solution);
+  if (!s.passed) fail(l.id, 'model solution fails: ' + (s.missing.join(' ') || s.error));
+  else if (s.blocks > countLines(l.solution)) fail(l.id, 'model solution is over par');
+  if (checkScript(l.check, l.starter).passed) fail(l.id, 'starter already passes');
+}
+for (const c of CHAPTERS) {
+  if (c.levels.length < 6) fail(c.key, 'chapter has fewer than 6 levels');
+  for (const id of c.levels) if (!playLevel(id)) fail(c.key, 'unknown level ' + id);
+}
+console.log(`${ADVENTURE.length} adventure levels and ${CHAPTERS.length} chapters checked`);
+
 const py = LESSONS.filter(l => l.check.kind !== 'blocks');
 const file = path.join(os.tmpdir(), 'vinc-lessons.json');
 fs.writeFileSync(file, JSON.stringify(py));

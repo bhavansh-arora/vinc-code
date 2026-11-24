@@ -202,3 +202,11 @@ export function lessonsDoneInSection(sectionId: number, grade: number): Map<numb
     WHERE u.section_id = ? AND p.passed_at IS NOT NULL AND p.lesson_id LIKE ? GROUP BY p.student_id`, sectionId, `${grade}-L%`);
   return new Map(rows.map(r => [r.student_id, r.n]));
 }
+
+/** Adventure game levels passed per student in a section. */
+export function adventureDoneInSection(sectionId: number): Map<number, number> {
+  const rows = q.all<{ student_id: number; n: number }>(`
+    SELECT p.student_id, COUNT(*) AS n FROM lesson_progress p JOIN users u ON u.id = p.student_id
+    WHERE u.section_id = ? AND p.passed_at IS NOT NULL AND p.lesson_id LIKE 'adv-%' GROUP BY p.student_id`, sectionId);
+  return new Map(rows.map(r => [r.student_id, r.n]));
+}

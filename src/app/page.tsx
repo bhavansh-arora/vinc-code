@@ -66,7 +66,7 @@ export default async function Home() {
           <Link href="/contact">Contact</Link>
         </nav>
         <Link className="btn quiet" href="/login">Log in</Link>
-        <Link className="btn primary" href="/signup">Create account</Link>
+        <Link className="btn primary" href="/play">▶ Play now</Link>
       </header>
 
       <main>
@@ -81,9 +81,10 @@ export default async function Home() {
               every crash is a bug to catch, and every class finished wins Vinc a new part.
             </p>
             <div className="lp-cta lp-rise" style={{ animationDelay: '240ms' }}>
-              <Link className="btn primary lp-big" href="/signup">Create an account</Link>
-              <Link className="btn lp-big" href="/login">Log in</Link>
+              <Link className="btn primary lp-big lp-play" href="/play">▶ Start playing</Link>
+              <Link className="btn lp-big" href="/signup">Create an account</Link>
             </div>
+            <p className="lp-free lp-rise" style={{ animationDelay: '280ms' }}>Free to play, no login needed. Log in to save stars to your account.</p>
             <ul className="lp-facts lp-rise" style={{ animationDelay: '320ms' }}>
               <li><b>{LEVELS.length}</b> playable 3D levels</li>
               <li><b>{ASSESSMENTS.length}</b> assessments, <b>{questions}</b> questions</li>

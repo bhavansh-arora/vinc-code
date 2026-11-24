@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import LessonList from '@/components/lessons/LessonList';
 import CrewArt from '@/components/CrewArt';
 import { Bar } from '@/components/ui';
@@ -13,10 +15,11 @@ export const metadata: Metadata = { title: 'Lessons' };
 export default async function StudentLessons() {
   const user = await requireRole('student');
   const grade = (user.sectionId ? getSection(user.sectionId)?.grade : undefined) ?? 3;
+  if (grade <= 4) redirect('/play?track=junior');
   const prog = lessonProgressOf(user.id);
   const stars = new Map([...prog.values()].filter(p => p.passed_at).map(p => [p.lesson_id, p.stars] as [string, number]));
   const xp = totalXp(stars), rank = rankOf(xp);
-  const grades = LESSON_GRADES.filter(g => g <= grade).sort((a, b) => b - a);
+  const grades = LESSON_GRADES.filter(g => g >= 5 && g <= grade).sort((a, b) => b - a);
   const crew = crewFor(grade);
   return (
     <div className="stack">
@@ -33,6 +36,11 @@ export default async function StudentLessons() {
         <div className="ls-crew" aria-label="Your crew">
           {crew.map((c, i) => <div key={c.id} className="ls-crew-m" style={{ animationDelay: i * 90 + 'ms' }}><CrewArt id={c.id} label={c.name} /><span>{c.name}</span></div>)}
         </div>
+      </section>
+      <section className="card play-callout">
+        <div><div className="eyebrow">New · Adventure game</div><h2>Guide Vinc across four worlds with code</h2>
+          <p className="muted small">32 levels with loops, sensors and functions. Your stars there count towards your XP too.</p></div>
+        <Link className="btn primary" href="/play?track=adventure">▶ Play Adventure</Link>
       </section>
       {grades.map(g => <LessonList key={g} grade={g} lessons={lessonsForGrade(g)} stars={stars} hrefFor={id => `/student/lessons/${id}`} />)}
     </div>

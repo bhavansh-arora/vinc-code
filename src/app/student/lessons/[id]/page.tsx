@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import LessonPlayer from '@/components/lessons/LessonPlayer';
 import { requireRole } from '@/lib/auth';
 import { getSection, lessonProgressOf } from '@/lib/data';
@@ -10,6 +10,7 @@ export default async function StudentLesson({ params }: { params: Promise<{ id: 
   const lesson = lessonById((await params).id);
   const grade = (user.sectionId ? getSection(user.sectionId)?.grade : undefined) ?? 3;
   if (!lesson || lesson.grade > grade) notFound();
+  if (lesson.check.kind === 'blocks') redirect(`/play/${lesson.id}`);
   const prog = lessonProgressOf(user.id), p = prog.get(lesson.id);
   const xp = totalXp([...prog.values()].map(r => [r.lesson_id, r.stars] as [string, number]));
   const nx = LESSONS.find(l => l.grade === lesson.grade && l.n === lesson.n + 1);

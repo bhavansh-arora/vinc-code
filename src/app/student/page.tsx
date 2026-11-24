@@ -8,6 +8,7 @@ import { lessonsForGrade } from '@/data/lessons';
 import CrewArt from '@/components/CrewArt';
 import { crewFor } from '@/lib/crew';
 import { rankOf, totalXp } from '@/lib/xp';
+import { ADVENTURE } from '@/data/adventure';
 import { q } from '@/lib/db';
 
 export const metadata: Metadata = { title: 'My dashboard' };
@@ -26,6 +27,8 @@ export default async function StudentHome() {
   const nextLesson = myLessons.find(l => !lp.get(l.id)?.passed_at);
   const xp = totalXp([...lp.values()].map(r => [r.lesson_id, r.stars] as [string, number])), rank = rankOf(xp);
   const lessonStars = myLessons.reduce((t, l) => t + (lp.get(l.id)?.stars ?? 0), 0);
+  const junior = h.grade <= 4, lessonHref = (id: string) => (junior ? `/play/${id}` : `/student/lessons/${id}`);
+  const advDone = ADVENTURE.filter(l => lp.get(l.id)?.passed_at).length, nextAdv = ADVENTURE.find(l => !lp.get(l.id)?.passed_at);
   return (
     <div className="stack">
       <section className="card" style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) auto', gap: 20, alignItems: 'center' }}>
@@ -33,22 +36,29 @@ export default async function StudentHome() {
           <div className="eyebrow">Class {h.grade}{h.section ? ` · Section ${h.section.name}` : ''}</div>
           <h1>Hi {user.name.split(' ')[0]}! Ready to code?</h1>
           <p className="muted">{next ? <>Your next level is <b>{next.id}: {next.name}</b>.</> : 'You finished every level for your class. Amazing!'} {todo.length ? `You have ${todo.length} assessment${todo.length === 1 ? '' : 's'} to do.` : ''}</p>
-          <div className="row">{myLessons.length > 0 && nextLesson && <Link className="btn primary" href={`/student/lessons/${nextLesson.id}`}>▶ Lesson {nextLesson.n}: {nextLesson.title}</Link>}<a className={myLessons.length && nextLesson ? 'btn' : 'btn primary'} href="/game">Play with Vinc</a>{todo[0] && <Link className="btn" href={`/student/assessments/${todo[0].id}`}>Start assessment</Link>}</div>
+          <div className="row">{myLessons.length > 0 && nextLesson && <Link className="btn primary" href={lessonHref(nextLesson.id)}>▶ {junior ? 'Play' : 'Lesson'} {nextLesson.n}: {nextLesson.title}</Link>}<Link className={myLessons.length && nextLesson ? 'btn' : 'btn primary'} href="/play">{junior ? 'World map' : 'Play Adventure'}</Link>{todo[0] && <Link className="btn" href={`/student/assessments/${todo[0].id}`}>Start assessment</Link>}</div>
         </div>
         <VincArt className="student-vinc" label="Vinc waving" />
       </section>
       {myLessons.length > 0 && (
         <section className="card stack" style={{ gap: 14 }}>
           <div className="spread">
-            <div><div className="eyebrow">{h.grade <= 4 ? 'Block lessons' : 'Python lessons'} · Class {h.grade}</div><h2>{lessonsDone} of {myLessons.length} lessons done</h2>
+            <div><div className="eyebrow">{junior ? 'Junior game' : 'Python lessons'} · Class {h.grade}</div><h2>{lessonsDone} of {myLessons.length} lessons done</h2>
               <p className="small muted">{nextLesson ? `Next up: Lesson ${nextLesson.n}, ${nextLesson.title}.` : 'You finished every lesson for your class. Amazing!'}</p></div>
-            <div style={{ minWidth: 220, display: 'grid', gap: 8 }}><Bar value={lessonsDone / myLessons.length * 100} /><Link className="btn small" href="/student/lessons">See all lessons</Link></div>
+            <div style={{ minWidth: 220, display: 'grid', gap: 8 }}><Bar value={lessonsDone / myLessons.length * 100} /><Link className="btn small" href={junior ? '/play?track=junior' : '/student/lessons'}>{junior ? 'Open the world map' : 'See all lessons'}</Link></div>
           </div>
           <div className="xp-strip">
             <div className="xp-rank"><span className="xp-icon" aria-hidden="true">{rank.icon}</span><div><b>{rank.name}</b><span className="small muted">Level {rank.level} · {xp} XP · ★ {lessonStars} lesson stars</span></div></div>
             <div className="xp-next"><Bar value={rank.progress * 100} /><span className="small muted">{rank.next ? `${rank.next.xp - xp} XP to ${rank.next.name}` : 'Top rank!'}</span></div>
             <div className="crew-row" aria-label="Your crew">{crewFor(h.grade).map(c => <CrewArt key={c.id} id={c.id} className="crew-chip" label={c.name} />)}</div>
           </div>
+        </section>
+      )}
+      {!junior && (
+        <section className="card play-callout">
+          <div><div className="eyebrow">Adventure game</div><h2>{advDone} of {ADVENTURE.length} Adventure levels done</h2>
+            <p className="small muted">{nextAdv ? `Next up: ${nextAdv.title}.` : 'You finished the whole Adventure. Legend!'}</p></div>
+          <div style={{ minWidth: 220, display: 'grid', gap: 8 }}><Bar value={advDone / ADVENTURE.length * 100} /><Link className="btn small primary" href={nextAdv ? `/play/${nextAdv.id}` : '/play?track=adventure'}>▶ Play Adventure</Link></div>
         </section>
       )}
       <div className="grid-2">
